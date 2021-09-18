@@ -1,4 +1,4 @@
-# comp345-warzone
+# risk-game
 On Windows:
 Video for path variables:
 https://www.youtube.com/watch?v=VtEstN5gOts
