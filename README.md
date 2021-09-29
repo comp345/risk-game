@@ -20,3 +20,6 @@ to use cmake, in terminal go to the "build" directory of the project then execut
 then
     make                                            --> Actually compiles the code
 
+(path example to switch compiler for macOS)
+usr/local/bin/gcc-<version>
+*it's also possible to configure the compiler in vscode
