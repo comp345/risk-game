@@ -5,7 +5,6 @@
 
 using namespace std;
 
-
 void testOrdersLink()
 {
     cout << "Successfully linked orders.cpp and orders.hpp to main\n";
@@ -43,18 +42,19 @@ void testOrdersDriver()
     // testing the operator=
     o2 = o1;
     cout << "\nTesting the assignment operator:\n";
-    cout << "Assigning o1 to o2 => " << "o1: " << o1 << ", o2: " << o2;
-    
+    cout << "Assigning o1 to o2 => "
+         << "o1: " << o1 << ", o2: " << o2;
+
     cout << "\nCheck if assignment created a deep copy (not a shallow copy):\n";
     o1.setDetails("New details");
-    cout << "o1: " << o1 << ", o2" << o2 ;
+    cout << "o1: " << o1 << ", o2" << o2;
     cout << "\n";
 
     // create OrderList
     OrderList myFirstOrderList;
 
     // testing adding orders (in alphabetical order) to end of list
-    cout << "============================================" 
+    cout << "============================================"
          << "\nAdding each type of Order in the OrderList: \n";
 
     myFirstOrderList.add(advance1);
@@ -71,7 +71,7 @@ void testOrdersDriver()
     // myFirstOrderList.add(advance1);
 
     // move orders
-    cout << "============================================" 
+    cout << "============================================"
          << "\nTesting moving an order in the list: \n";
     try
     {
@@ -88,8 +88,33 @@ void testOrdersDriver()
     // check invalid moves (OutOfBound)
 
     // remove order by position (starting at position 0)
-    cout << "============================================" 
+    cout << "============================================"
          << "\nTesting removing an order from the list: \n";
     myFirstOrderList.remove(4);
     myFirstOrderList.printList();
+
+    // Testing the operator << for OrderList
+    cout << "============================================";
+    cout << "\nTesting the operator << of OrderList:\n";
+    cout << myFirstOrderList
+         << "\n";
+
+
+    // Testing OrderList::getList
+    cout << "============================================";
+    vector<Order> copyList = myFirstOrderList.getList();
+    cout << "\n...Created a copy of the content of myFirstOrderList.";
+    copyList.push_back(Order("New order to copyList."));
+    cout << "...Check if the copyList is a shallow copy of myFirstOrderList's list.\n"
+         << "...Yes if Order {\"New order to copyList \"} is added.\n";
+    myFirstOrderList.printList();
+
+    // output the copyList content
+    cout << "... Outputting content of copyList to compare: \n";
+    vector<Order>::iterator begin = copyList.begin();
+    vector<Order>::iterator end = copyList.end();
+    for (vector<Order>::iterator it = begin; it != end; ++it)
+        // cout << *it;
+        cout << " " << it->getCommand();
+    cout << "\n";
 }
