@@ -7,46 +7,65 @@ using namespace std;
 
 
 // Implementation of Orders
-Order::Order() : name("")
+Order::Order() : command(""), details("")
 {
 }
-Order::Order(string orderName) : name(orderName)
+Order::Order(string ordercommand) : command(ordercommand), details("no details")
 {
+}
+Order& Order::operator= (const Order &o)
+{
+    // self-assignment guard
+    if (this == &o)
+        return *this;
+    // copy every private data members (to do)
+    command = o.command;
+
+    return *this;
+}
+ostream& operator<<(ostream &out, const Order &o)
+{
+    string command = o.command;
+    string details = o.details;
+    // insert every data field (to do)
+    out << "{ ostream object: Command type(" << command << "), Details(" << details << ")}";
+
+    return out;
 }
 Deploy::Deploy() : Order("Deploy type")
 {
 }
-Deploy::Deploy(string orderName) : Order(orderName)
+Deploy::Deploy(string ordercommand) : Order(ordercommand)
 {
 }
 Advance::Advance() : Order("Advance type")
 {
 }
-Advance::Advance(string orderName) : Order(orderName)
+Advance::Advance(string ordercommand) : Order(ordercommand)
 {
 }
 Bomb::Bomb() : Order("Bomb type")
 {
 }
-Bomb::Bomb(string orderName) : Order(orderName)
+Bomb::Bomb(string ordercommand) : Order(ordercommand)
 {
 }
 Blockade::Blockade() : Order("Blockade type")
 {
 }
-Blockade::Blockade(string orderName) : Order(orderName)
+Blockade::Blockade(string ordercommand) : Order(ordercommand)
 {
 }
 AirLift::AirLift() : Order("Airlift type")
 {
 }
-AirLift::AirLift(string orderName) : Order(orderName)
+AirLift::AirLift(string ordercommand) : Order(ordercommand)
 {
 }
 Negotiate::Negotiate() : Order("Negotiate type")
 {
 }
-Negotiate::Negotiate(string orderName) : Order(orderName)
+Negotiate::Negotiate(string ordercommand) : Order(ordercommand)
 {
 }
 
@@ -55,34 +74,35 @@ OrderList::OrderList()
 {
     list = new vector<Order>;
 }
+
 void OrderList::add(Order o)
 {
     list->push_back(o);
 }
+
 void OrderList::remove(int i)
 {
     list->erase(list->begin() + i);
 }
+
 void OrderList::move(int initPosition, int newPosition)
 {
     // validate positions (OutOfBound or if init == new)
     if (initPosition < 0 || initPosition > list->size() - 1 || newPosition < 0 || newPosition > list->size() - 1 || initPosition == newPosition)
         throw std::out_of_range("Exception from OrderList::move. Invalid position(s).\n");
-
-    // get iterator/node containing the target order
-    Order o = *(list->begin() + initPosition);
-    // erase from the initposition
-    list->erase(list->begin() + initPosition);
-    // insert it back at newposition
-    list->insert(list->begin() + newPosition, o);
+    
+    Order o = *(list->begin() + initPosition); // get iterator/node containing the target order
+    list->erase(list->begin() + initPosition); // erase from the initposition
+    list->insert(list->begin() + newPosition, o); // insert it back at newposition
 }
+
 void OrderList::printList()
 {
     cout << "Printing an order list!";
     for (vector<Order>::iterator it = list->begin(); it != list->end(); ++it)
     {
         cout << " "
-             << (it)->getName();
+             << (it)->getCommand();
     }
     cout << "\n";
 }
