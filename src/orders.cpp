@@ -20,6 +20,7 @@ Order& Order::operator= (const Order &o)
         return *this;
     // copy every private data members (to do)
     command = o.command;
+    details = o.details;
 
     return *this;
 }
@@ -75,6 +76,39 @@ OrderList::OrderList()
     list = new vector<Order>;
 }
 
+vector<Order> OrderList::getList() 
+{ 
+        vector<Order> list2 = *list;
+        return list2; 
+}
+
+void OrderList::setList(vector<Order> &olist)
+{
+    vector<Order> newList = olist; // copy the original list into new object
+    list = &newList;
+}
+
+OrderList& OrderList::operator=(const OrderList& o) 
+{
+    if (this == &o)
+        return *this;
+    this->list = o.list;
+    return *this;
+}
+
+ostream& operator<<(ostream& out, const OrderList& ol) 
+{
+    vector<Order> copyList = *(ol.list); // note: cannot use ol.getList() -> non-const functions cannot be called by a const object/reference
+    out << "OrderList: {";
+    for (vector<Order>::iterator it = copyList.begin(); it != copyList.end(); ++it)
+    {
+        out << " "
+             << (it)->getCommand();
+    }
+    out << "}";
+    return out;
+}
+
 void OrderList::add(Order o)
 {
     list->push_back(o);
@@ -103,6 +137,7 @@ void OrderList::printList()
     {
         cout << " "
              << (it)->getCommand();
+             // << *it;
     }
     cout << "\n";
 }

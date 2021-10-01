@@ -18,7 +18,7 @@ public:
     // Copy constructor (to-do)
     // Order(Order &o);
     Order &operator=(const Order &o);
-    friend std::ostream &operator<<(std::ostream &out, const Order &o);
+    friend std::ostream &operator <<(std::ostream &out, const Order &o);
     std::string getCommand() { return command; }
     void setCommand(std::string ordercommand) { command = ordercommand; }
     std::string getDetails() { return details; }
@@ -36,7 +36,7 @@ public:
     // Copy constructor to-do
     // Deploy(Deploy &d);
     void operator=(Deploy &d);
-    // friend ostream& operator<< (std::ostream& out, const Deploy &d);
+    // friend ostream& operator << (std::ostream& out, const Deploy &d);
 };
 
 class Advance : public Order
@@ -47,7 +47,7 @@ public:
     // Copy constructor to-do
     // Advance(Advance &a);
     void operator=(Order &o);
-    // friend ostream& operator<< (std::ostream& out, const Order &o);
+    // friend ostream& operator << (std::ostream& out, const Order &o);
 };
 
 class Bomb : public Order
@@ -88,6 +88,8 @@ class OrderList
 public:
     OrderList();
     // Copy constructor to-do
+    OrderList& operator=(const OrderList& o);
+    friend std::ostream& operator <<(std::ostream& out, const OrderList& ol);
     // adds an order at the end of the orderlist
     void add(Order o);
     // remove an order by its position (positions start at 0).
@@ -97,9 +99,15 @@ public:
     // prints every order's command on the console.
     void printList();
 
+    // returns a deep copy of the list (tested)
+    std::vector<Order> getList();
+    // to be tested
+    void setList(std::vector<Order> &list);
+
 private:
     std::vector<Order> *list;
 };
 
 // Test function (to delete)
 void testOrdersDriver();
+
