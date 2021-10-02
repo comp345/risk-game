@@ -18,14 +18,14 @@ public:
     // Copy constructor (to-do)
     // Order(Order &o);
     Order &operator=(const Order &o);
-    friend std::ostream &operator <<(std::ostream &out, const Order &o);
+    friend std::ostream &operator<<(std::ostream &out, const Order &o);
     std::string getCommand() { return command; }
     void setCommand(std::string ordercommand) { command = ordercommand; }
     std::string getDetails() { return details; }
     void setDetails(std::string orderDetails) { details = orderDetails; }
     // To implement
-    //virtual bool validate();
-    //virtual bool execute();
+    bool validate();
+    bool execute();
 };
 
 class Deploy : public Order
@@ -37,6 +37,8 @@ public:
     // Deploy(Deploy &d);
     void operator=(Deploy &d);
     // friend ostream& operator << (std::ostream& out, const Deploy &d);
+    bool validate ();
+    bool execute ();
 };
 
 class Advance : public Order
@@ -48,6 +50,8 @@ public:
     // Advance(Advance &a);
     void operator=(Order &o);
     // friend ostream& operator << (std::ostream& out, const Order &o);
+    bool validate ();
+    bool execute ();
 };
 
 class Bomb : public Order
@@ -55,6 +59,8 @@ class Bomb : public Order
 public:
     Bomb();
     Bomb(std::string command);
+    bool validate ();
+    bool execute ();
 };
 
 class Blockade : public Order
@@ -64,6 +70,8 @@ public:
     Blockade(std::string command);
     // Copy constructor to-do
     // Blockade(Blockade &b);
+    bool validate ();
+    bool execute ();
 };
 class AirLift : public Order
 {
@@ -72,6 +80,8 @@ public:
     AirLift(std::string command);
     // Copy constructor to-do
     //AirLift(AirLift &a);
+    bool validate ();
+    bool execute ();
 };
 
 class Negotiate : public Order
@@ -81,6 +91,8 @@ public:
     Negotiate(std::string command);
     // Copy constructor to-do
     // Negotiate(Negotiate &n);
+    bool validate ();
+    bool execute ();
 };
 
 class OrderList
@@ -88,8 +100,8 @@ class OrderList
 public:
     OrderList();
     // Copy constructor to-do
-    OrderList& operator=(const OrderList& o);
-    friend std::ostream& operator <<(std::ostream& out, const OrderList& ol);
+    OrderList &operator=(const OrderList &o);
+    friend std::ostream &operator<<(std::ostream &out, const OrderList &ol);
     // adds an order at the end of the orderlist
     void add(Order o);
     // remove an order by its position (positions start at 0).
@@ -110,4 +122,3 @@ private:
 
 // Test function (to delete)
 void testOrdersDriver();
-

@@ -33,41 +33,119 @@ ostream& operator<<(ostream &out, const Order &o)
 
     return out;
 }
+bool Order::validate ()
+{
+    return true;
+}
+bool Order::execute ()
+{
+    return true;
+}
+
 Deploy::Deploy() : Order("Deploy type")
 {
 }
 Deploy::Deploy(string ordercommand) : Order(ordercommand)
 {
 }
+// Fake validate and execute methods to implement later
+bool Deploy::validate() 
+{
+    cout << "Validate Deploy order.";
+    return true;
+}
+bool Deploy::execute() 
+{
+    cout << "Execute Deploy order.";
+    return true;
+}
+
 Advance::Advance() : Order("Advance type")
 {
 }
 Advance::Advance(string ordercommand) : Order(ordercommand)
 {
 }
+// Fake validate and execute methods to implement later
+bool Advance::validate() 
+{
+    cout << "Validate Advance order.";
+    return true;
+}
+bool Advance::execute() 
+{
+    cout << "Execute Advance order.";
+    return true;
+}
+
 Bomb::Bomb() : Order("Bomb type")
 {
 }
 Bomb::Bomb(string ordercommand) : Order(ordercommand)
 {
 }
+// Fake validate and execute methods to implement later
+bool Bomb::validate() 
+{
+    cout << "Validate Bomb order.";
+    return true;
+}
+bool Bomb::execute() 
+{
+    cout << "Execute Bomb order.";
+    return true;
+}
+
 Blockade::Blockade() : Order("Blockade type")
 {
 }
 Blockade::Blockade(string ordercommand) : Order(ordercommand)
 {
 }
+// Fake validate and execute methods to implement later
+bool Blockade::validate() 
+{
+    cout << "Validate Blockade order.";
+    return true;
+}
+bool Blockade::execute() 
+{
+    cout << "Execute Blockade order.";
+    return true;
+}
+
 AirLift::AirLift() : Order("Airlift type")
 {
 }
 AirLift::AirLift(string ordercommand) : Order(ordercommand)
 {
 }
+bool AirLift::validate() 
+{
+    cout << "Validate AirLift order.";
+    return true;
+}
+bool AirLift::execute() 
+{
+    cout << "Execute AirLift order.";
+    return true;
+}
+
 Negotiate::Negotiate() : Order("Negotiate type")
 {
 }
 Negotiate::Negotiate(string ordercommand) : Order(ordercommand)
 {
+}
+bool Negotiate::validate() 
+{
+    cout << "Validate Negotiate order.";
+    return true;
+}
+bool Negotiate::execute() 
+{
+    cout << "Execute Negotiate order.";
+    return true;
 }
 
 // Implementation of OrderList
