@@ -1,2 +1,4 @@
 # Build files
 !/build/**/.gitkeep
+.vscode
+/src/main.dSYM
