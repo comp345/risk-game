@@ -27,7 +27,7 @@ How to Run the project:
 
 
 to use cmake, in terminal go to the "build" directory of the project then execute:
-    export CXX=/path/to/your/gccCompiler            --> Changes default compiler to GCC
+    export CXX=/opt/homebrew/bin/g++-11            --> Changes default compiler to GCC
     cmake ..                                        --> Builds the assembly
 then
     make                                            --> Actually compiles the code
