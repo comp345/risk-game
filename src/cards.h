@@ -5,23 +5,26 @@ class Player;
 class Deck;
 
 using namespace std;
-// correct copy constructor, assignment operator, and stream insertion operator
+
 class Card
 {
 public:
     enum class Effect {bomb, reinforcement, blockade, airlift, diplomacy};
 
+    //Constructors
     Card(Effect m_effect);
+    Card(const Card& other);
     ~Card();
 
     // Methods
     void play(Player& player, Deck& deck);
-    
+    Effect* getEffect();
+
     // Operator functions
     friend std::ostream& operator<<(std::ostream& lhs, Card* c);
     friend std::ostream& operator<<(std::ostream& lhs, Effect* e);
+    Card& operator=(const Card& rhs);
 
-    Effect* getEffect();
 private:
     Effect* m_effect;
 
@@ -36,7 +39,9 @@ private:
     std::vector<Card*> m_cards;
 
 public:
+    //Constructors
     Deck(int size);
+    Deck(const Deck& other);
     ~Deck();
 
     // Functions
@@ -46,6 +51,10 @@ public:
     void draw(Player& player);
     void returnCard(Card* card);
 
+    // Operator functions
+    friend std::ostream& operator<<(std::ostream& lhs, Deck& d);
+    Deck& operator=(const Deck& rhs);
+
 };
 
 
@@ -54,12 +63,19 @@ class Hand
 private:
     std::vector<Card*> m_cards;
 public:
+    //Constructors
     Hand(/* args */);
+    Hand(const Hand& other);
     ~Hand();
 
+    // Functions
     void drawCard(Card* card);
     void showCards(Player player);
     Card* useLast();
+
+    // Operator functions
+    friend std::ostream& operator<<(std::ostream& lhs, Deck& d);
+    Deck& operator=(const Deck& rhs);
 };
 
 

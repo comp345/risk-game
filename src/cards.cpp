@@ -12,6 +12,11 @@ Card::Card(Effect value)
     m_effect = new Effect(value);
 }
 
+Card::Card(const Card& other)
+{
+    m_effect = other.m_effect;
+}
+
 Card::~Card()
 {
     delete m_effect;
@@ -24,7 +29,10 @@ void Card::play(Player& player, Deck& deck)
     cout << "\n" << m_effect << " was played by " << player.getName() << "\n";
 }
 
-
+Card::Effect* Card::getEffect()
+{
+    return m_effect;
+}
 
 std::ostream& operator<<(std::ostream& lhs, Card::Effect* e) 
 {
@@ -53,10 +61,18 @@ std::ostream& operator<<(std::ostream& lhs, Card* card)
     return lhs << card->m_effect;
 }
 
-Card::Effect* Card::getEffect()
+Card& Card::operator=(const Card& rhs)
 {
-    return m_effect;
+    if(this == &rhs)
+        return *this;
+    
+    m_effect = rhs.m_effect;
+
+    return *this;
 }
+
+
+
 
 
 // **************** //
@@ -80,6 +96,10 @@ void Deck::initialize(int size)
     {
         initialize(size);
     }   
+}
+
+Deck::Deck(const Deck& other){
+    m_cards = other.m_cards;
 }
 
 Deck::~Deck()
@@ -141,6 +161,26 @@ void Deck::returnCard(Card* card)
     m_cards.insert(m_cards.begin(), card);
 }
 
+std::ostream& operator<<(std::ostream& lhs, Deck& deck) 
+{
+    int count = 1;
+    cout << "\nThe deck currently contains:\n";
+    for(Card* i: deck.m_cards)
+    {
+        std::cout << count++ << ": " << i << "\n";
+    }
+    return lhs;
+}
+
+Deck& Deck::operator=(const Deck& rhs)
+{
+    if(this == &rhs)
+        return *this;
+    
+    m_cards = rhs.m_cards;
+    return *this;
+}
+
 
 
 
@@ -151,6 +191,11 @@ void Deck::returnCard(Card* card)
 // **************** //
 Hand::Hand(/* args */)
 {
+}
+
+Hand::Hand(const Hand& other)
+{
+    m_cards = other.m_cards;
 }
 
 Hand::~Hand()
@@ -164,10 +209,7 @@ void Hand::drawCard(Card* card)
 void Hand::showCards(Player player)
 {
     cout << "\nPlayer: " << player.getName() << " currently has the following cards\n";
-    for(Card* i: m_cards)
-    {
-        std::cout << i << " card\n";
-    }
+    cout << this;
 
 }
 Card* Hand::useLast()
@@ -176,6 +218,28 @@ Card* Hand::useLast()
     m_cards.pop_back();
     return toUse;
 }
+
+std::ostream& operator<<(std::ostream& lhs, Hand& Hand) 
+{
+    cout << "\nPlayer: " << player.getName() << " currently has the following cards\n";
+    for(Card* i: m_cards)
+    {
+        std::cout << i << " card\n";
+    }
+    return lhs;
+}
+
+Hand& Hand::operator=(const Hand& rhs)
+{
+    if(this == &rhs)
+        return *this;
+    
+    m_cards = rhs.m_cards;
+    return *this;
+}
+
+
+
 
 
 

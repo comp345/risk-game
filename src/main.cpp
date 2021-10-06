@@ -17,7 +17,7 @@ int main(int args, char * argv[]) {
     p1.getHand()->showCards(p1);
 
     // Show that the cards have been removed from the deck
-    deck.showDeck();
+    cout << deck;
 
     // Use the last card in the players hand
     p1.getHand()->useLast()->play(p1, deck);
@@ -29,13 +29,13 @@ int main(int args, char * argv[]) {
     p1.getHand()->showCards(p1);
 
     // Show that the deck has the card that was played
-    deck.showDeck();
+    cout << deck;
 
     // Removing the last two cards.
     p1.getHand()->useLast()->play(p1, deck);
     p1.getHand()->useLast()->play(p1, deck);
     p1.showOrders();
-    deck.showDeck();
+    cout << deck;
 
     int i;
     cin >> i;
