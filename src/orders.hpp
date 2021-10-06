@@ -2,6 +2,8 @@
 #include <string>
 #include <iostream>
 
+// Destructors to implement!!
+
 void testOrdersLink();
 
 class Order
@@ -17,6 +19,7 @@ public:
     Order(std::string command);
     // Copy constructor (to-do)
     // Order(const Order &o);
+    
     
     Order &operator=(const Order &o);
     friend std::ostream &operator<<(std::ostream &out, const Order &o);
@@ -109,10 +112,11 @@ public:
     friend std::ostream &operator<<(std::ostream &out, const OrderList &ol);
     friend std::istream &operator>>(std::istream &in, OrderList& ol);
 
-    // adds an order at the end of the orderlist
-    void add(Order o);
+    // adds an order ptr at the end of the orderlist
+    void add(Order *o);
     
-    // remove an order by its position (positions start at 0).
+    // remove an order ptr by its position (positions start at 0).
+    // return the order ptr (?)
     void remove(int i);
     
     // move order from init to new position. Throws out_of_range exception.
@@ -122,13 +126,13 @@ public:
     void printList();
 
     // returns a deep copy of the list (tested)
-    std::vector<Order> getList();
+    std::vector<Order*> getList();
     
     // to be tested
-    void setList(std::vector<Order> &list);
+    void setList(std::vector<Order*> list);
 
 private:
-    std::vector<Order> *list;
+    std::vector<Order*> list;
 };
 
 // Test function (to delete)

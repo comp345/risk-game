@@ -16,38 +16,39 @@ void testOrdersDriver()
     // Test stream insertion operator on Order object and all its subtypes
     cout << "Testing the stream insertion operators for each Order type/subtype: \n";
 
-    Order o1 = Order("First order");
-    cout << o1 << "\n";
+    Order *o1 = new Order("First order");
+    cout << *o1 << "\n";
 
-    Order o2 = Order("Second order");
+    Order *o2 = new Order("Second order");
 
-    Deploy deploy1 = Deploy();
-    cout << deploy1 << "\n";
+    Deploy *deploy1 = new Deploy();
+    cout << *deploy1 << "\n";
 
-    Advance advance1 = Advance();
-    cout << advance1 << "\n";
+    Advance *advance1 = new Advance();
+    cout << *advance1 << "\n";
 
-    Bomb bomb1 = Bomb();
-    cout << bomb1 << "\n";
+    Bomb *bomb1 = new Bomb();
+    cout << *bomb1 << "\n";
 
-    Blockade blockade1 = Blockade();
-    cout << blockade1 << "\n";
+    Blockade *blockade1 = new Blockade();
+    cout << *blockade1 << "\n";
 
-    AirLift airlift1 = AirLift();
-    cout << airlift1 << "\n";
+    AirLift *airlift1 = new AirLift();
+    cout << *airlift1 << "\n";
 
-    Negotiate negotiate1 = Negotiate();
-    cout << negotiate1 << "\n";
+    Negotiate *negotiate1 = new Negotiate();
+    cout << *negotiate1 << "\n";
 
     // testing the operator=
+    // ! REDO: ??
     o2 = o1;
     cout << "\nTesting the assignment operator:\n";
     cout << "Assigning o1 to o2 => "
-         << "o1: " << o1 << ", o2: " << o2;
+         << "o1: " << *o1 << ", o2: " << *o2;
 
     cout << "\nCheck if assignment created a deep copy (not a shallow copy):\n";
-    o1.setDetails("New details");
-    cout << "o1: " << o1 << ", o2" << o2;
+    o1->setDetails("New details");
+    cout << "o1: " << *o1 << ", o2" << *o2;
     cout << "\n";
 
     // create OrderList
@@ -102,20 +103,21 @@ void testOrdersDriver()
 
     // Testing OrderList::getList
     cout << "============================================";
-    vector<Order> copyList = myFirstOrderList.getList();
+    vector<Order*> copyList = myFirstOrderList.getList();
     cout << "\n...Created a copy of the content of myFirstOrderList.";
-    copyList.push_back(Order("New order to copyList."));
+    copyList.push_back(new Order("New order to copyList."));
     cout << "...Check if the copyList is a shallow copy of myFirstOrderList's list.\n"
          << "...Yes if Order {\"New order to copyList \"} is added.\n";
     myFirstOrderList.printList();
 
     // output the copyList content
     cout << "... Outputting content of copyList to compare: \n";
-    vector<Order>::iterator begin = copyList.begin();
-    vector<Order>::iterator end = copyList.end();
-    for (vector<Order>::iterator it = begin; it != end; ++it)
-        // cout << *it;
-        cout << " " << it->getCommand();
+    vector<Order*>::iterator begin = copyList.begin();
+    vector<Order*>::iterator end = copyList.end();
+    Order tempOrder;
+    for (vector<Order*>::iterator it = begin; it != end; ++it)
+        tempOrder = **it;
+        cout << " " << tempOrder.getCommand();
     cout << "\n";
 
 

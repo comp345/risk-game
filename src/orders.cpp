@@ -184,19 +184,23 @@ bool Negotiate::execute()
 // Implementation of OrderList
 OrderList::OrderList()
 {
-    list = new vector<Order>;
+    list = vector<Order*>();
 }
 
-vector<Order> OrderList::getList() 
+vector<Order*> OrderList::getList() 
 { 
-        vector<Order> list2 = *list;
-        return list2; 
+    // 
+        return list;
 }
 
-void OrderList::setList(vector<Order> &olist)
+// ??? Copy the olist's Order ptrs 
+// Rewrite this: loop over the Order ptrs of olist, 
+// Dynamically allocated newList (vector of Order ptrs) and 
+// deep copy 
+void OrderList::setList(vector<Order*> olist)
 {
-    vector<Order> newList = olist; // copy the original list into new object
-    list = &newList;
+    // vector<Order*> newList = olist; // copy the original list into new object
+    // list = &newList;
 }
 
 OrderList& OrderList::operator=(const OrderList& o) 
@@ -209,45 +213,47 @@ OrderList& OrderList::operator=(const OrderList& o)
 
 ostream& operator<<(ostream& out, const OrderList& ol) 
 {
-    vector<Order> copyList = *(ol.list); // note: cannot use ol.getList() -> non-const functions cannot be called by a const object/reference
+    vector<Order*> copyList = ol.list; // note: cannot use ol.getList() -> non-const functions cannot be called by a const object/reference
     out << "OrderList: {";
-    for (vector<Order>::iterator it = copyList.begin(); it != copyList.end(); ++it)
+    for (vector<Order*>::iterator it = copyList.begin(); it != copyList.end(); ++it)
     {
+        Order o = **it;
         out << " "
-             << (it)->getCommand();
+             << o.getCommand();
     }
     out << "}";
     return out;
 }
 
-void OrderList::add(Order o)
+void OrderList::add(Order *o)
 {
-    list->push_back(o);
+    list.push_back(o);
 }
 
 void OrderList::remove(int i)
 {
-    list->erase(list->begin() + i);
+    list.erase(list.begin() + i);
 }
 
 void OrderList::move(int initPosition, int newPosition)
 {
     // validate positions (OutOfBound or if init == new)
-    if (initPosition < 0 || initPosition > list->size() - 1 || newPosition < 0 || newPosition > list->size() - 1 || initPosition == newPosition)
+    if (initPosition < 0 || initPosition > list.size() - 1 || newPosition < 0 || newPosition > list.size() - 1 || initPosition == newPosition)
         throw std::out_of_range("Exception from OrderList::move. Invalid position(s).\n");
     
-    Order o = *(list->begin() + initPosition); // get iterator/node containing the target order
-    list->erase(list->begin() + initPosition); // erase from the initposition
-    list->insert(list->begin() + newPosition, o); // insert it back at newposition
+    Order *o = *(list.begin() + initPosition); // get iterator/node (iterator is a ptr?) containing the target order ptr
+    list.erase(list.begin() + initPosition); // erase from the initposition
+    list.insert(list.begin() + newPosition, o); // insert it back at newposition
 }
 
 void OrderList::printList()
 {
     cout << "Printing an order list!";
-    for (vector<Order>::iterator it = list->begin(); it != list->end(); ++it)
+    for (vector<Order*>::iterator it = list.begin(); it != list.end(); ++it)
     {
+        Order eachOrder = **it;
         cout << " "
-             << (it)->getCommand();
+             << eachOrder.getCommand(); 
              // << *it;
     }
     cout << "\n";
