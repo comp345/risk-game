@@ -16,13 +16,17 @@ public:
     Order();
     Order(std::string command);
     // Copy constructor (to-do)
-    // Order(Order &o);
+    // Order(const Order &o);
+    
     Order &operator=(const Order &o);
     friend std::ostream &operator<<(std::ostream &out, const Order &o);
-    std::string getCommand() { return command; }
-    void setCommand(std::string ordercommand) { command = ordercommand; }
-    std::string getDetails() { return details; }
-    void setDetails(std::string orderDetails) { details = orderDetails; }
+    friend std::istream &operator>>(std::istream &in, Order& o);
+
+    std::string getCommand();
+    void setCommand(std::string ordercommand);
+    std::string getDetails();
+    void setDetails(std::string orderDetails);
+    
     // To implement
     bool validate();
     bool execute();
@@ -34,9 +38,7 @@ public:
     Deploy();
     Deploy(std::string command);
     // Copy constructor to-do
-    // Deploy(Deploy &d);
-    void operator=(Deploy &d);
-    // friend ostream& operator << (std::ostream& out, const Deploy &d);
+    // Deploy(const Deploy &d);
     bool validate ();
     bool execute ();
 };
@@ -47,9 +49,7 @@ public:
     Advance();
     Advance(std::string command);
     // Copy constructor to-do
-    // Advance(Advance &a);
-    void operator=(Order &o);
-    // friend ostream& operator << (std::ostream& out, const Order &o);
+    // Advance(const Advance &a);
     bool validate ();
     bool execute ();
 };
@@ -59,6 +59,8 @@ class Bomb : public Order
 public:
     Bomb();
     Bomb(std::string command);
+    // Copu constructor to-do
+    // Bomb(const Bomb &b);
     bool validate ();
     bool execute ();
 };
@@ -79,7 +81,7 @@ public:
     AirLift();
     AirLift(std::string command);
     // Copy constructor to-do
-    //AirLift(AirLift &a);
+    // AirLift(AirLift &a);
     bool validate ();
     bool execute ();
 };
@@ -100,19 +102,28 @@ class OrderList
 public:
     OrderList();
     // Copy constructor to-do
+    // OrderList(const OrderList& ol);
+
     OrderList &operator=(const OrderList &o);
+
     friend std::ostream &operator<<(std::ostream &out, const OrderList &ol);
+    friend std::istream &operator>>(std::istream &in, OrderList& ol);
+
     // adds an order at the end of the orderlist
     void add(Order o);
+    
     // remove an order by its position (positions start at 0).
     void remove(int i);
+    
     // move order from init to new position. Throws out_of_range exception.
     void move(int initPosition, int newPosition);
+    
     // prints every order's command on the console.
     void printList();
 
     // returns a deep copy of the list (tested)
     std::vector<Order> getList();
+    
     // to be tested
     void setList(std::vector<Order> &list);
 

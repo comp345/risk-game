@@ -117,4 +117,31 @@ void testOrdersDriver()
         // cout << *it;
         cout << " " << it->getCommand();
     cout << "\n";
+
+
+    // Testing the istream operator on Order class
+    cout << "\n============================================\n"
+     << "User-create a new Order.\n";
+    Order order2; 
+    cin >> order2;
+    cout << "This is the new Order:";
+    cout << order2;
+    cout << "Command: " << order2.getCommand() 
+    << " Details: " << order2.getDetails() << "\n";
+
+    cout << "\nUser-create a Deploy order\n";
+    Deploy deploy2;
+    cin >> deploy2;
+    cout << "This is the new Deploy:";
+    cout << deploy2;
+    cout << "Command: " << deploy2.getCommand() 
+    << " Details: " << deploy2.getDetails() << "\n";
+
+    cout << "\nUser-create a Negotiate order\n";
+    Negotiate negotiate2;
+    cin >> negotiate2;
+    cout << "This is the new Negotiate:";
+    cout << negotiate2;
+    cout << "Command: " << negotiate2.getCommand() 
+    << " Details: " << negotiate2.getDetails() << "\n";
 }

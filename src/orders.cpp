@@ -33,6 +33,39 @@ ostream& operator<<(ostream &out, const Order &o)
 
     return out;
 }
+istream &operator>>(istream &in, Order& o)
+{
+    // Make user enter every data member of the Order
+    cout << "Enter the command type for this new Order.\n"
+    
+    << "Command type:\n";
+    in >> o.command;
+    cout << "Details: \n";
+    in >> o.details; // Delete this data member
+    
+    // ... Add future data member
+        // in >> o.player
+        // in >> o.territory
+
+    return in;
+
+}
+string Order::getCommand()
+{
+    return command;
+}
+void Order::setCommand(std::string ordercommand)
+{
+    command = ordercommand;
+}
+std::string Order::getDetails() 
+{ 
+    return details; 
+}
+void Order::setDetails(std::string orderDetails) 
+{ 
+    details = orderDetails; 
+}
 bool Order::validate ()
 {
     return true;
