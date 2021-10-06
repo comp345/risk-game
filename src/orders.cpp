@@ -11,7 +11,13 @@ Order::Order() : command(""), details("")
 {
 }
 Order::Order(string ordercommand) : command(ordercommand), details("no details")
+{ 
+
+}
+Order::Order(const Order& o)
 {
+    command = o.command;
+    details = o.details;
 }
 Order& Order::operator= (const Order &o)
 {
@@ -81,6 +87,12 @@ Deploy::Deploy() : Order("Deploy type")
 Deploy::Deploy(string ordercommand) : Order(ordercommand)
 {
 }
+Deploy::Deploy(const Deploy &d)
+{ 
+    Deploy cpyDeploy = d;
+    setCommand(cpyDeploy.getCommand());
+    setDetails(cpyDeploy.getDetails());
+}
 // Fake validate and execute methods to implement later
 bool Deploy::validate() 
 {
@@ -98,6 +110,12 @@ Advance::Advance() : Order("Advance type")
 }
 Advance::Advance(string ordercommand) : Order(ordercommand)
 {
+}
+Advance::Advance(const Advance &a)
+{ 
+    Advance cpyAdvance = a;
+    setCommand(cpyAdvance.getCommand());
+    setDetails(cpyAdvance.getDetails());
 }
 // Fake validate and execute methods to implement later
 bool Advance::validate() 
@@ -117,6 +135,12 @@ Bomb::Bomb() : Order("Bomb type")
 Bomb::Bomb(string ordercommand) : Order(ordercommand)
 {
 }
+Bomb::Bomb(const Bomb &b)
+{
+    Bomb cpyBomb = b;
+    setCommand(cpyBomb.getCommand());
+    setDetails(cpyBomb.getDetails());
+}
 // Fake validate and execute methods to implement later
 bool Bomb::validate() 
 {
@@ -134,6 +158,12 @@ Blockade::Blockade() : Order("Blockade type")
 }
 Blockade::Blockade(string ordercommand) : Order(ordercommand)
 {
+}
+Blockade::Blockade(const Blockade &b)
+{
+    Blockade cpyBlockade = b;
+    setCommand(cpyBlockade.getCommand());
+    setDetails(cpyBlockade.getDetails());
 }
 // Fake validate and execute methods to implement later
 bool Blockade::validate() 
@@ -153,6 +183,12 @@ AirLift::AirLift() : Order("Airlift type")
 AirLift::AirLift(string ordercommand) : Order(ordercommand)
 {
 }
+AirLift::AirLift(const AirLift &a)
+{
+    AirLift cpyAirLift = a;
+    setCommand(cpyAirLift.getCommand());
+    setDetails(cpyAirLift.getDetails());
+}
 bool AirLift::validate() 
 {
     cout << "Validate AirLift order.";
@@ -169,6 +205,12 @@ Negotiate::Negotiate() : Order("Negotiate type")
 }
 Negotiate::Negotiate(string ordercommand) : Order(ordercommand)
 {
+}
+Negotiate::Negotiate(const Negotiate &n)
+{
+    Negotiate cpyNegotiate = n;
+    setCommand(cpyNegotiate.getCommand());
+    setDetails(cpyNegotiate.getDetails());
 }
 bool Negotiate::validate() 
 {
@@ -187,10 +229,26 @@ OrderList::OrderList()
     list = vector<Order*>();
 }
 
-vector<Order*> OrderList::getList() 
+// returns a vector object that contains pointers to Orders
+// These orders are deep copy of this.OrderList::list
+// !! Review implementation
+vector<Order*> * OrderList ::getList() 
 { 
-    // 
-        return list;
+    // call a vector's =assignment operator -> does not work: vector<Order*> copyList = list;
+    vector<Order*> * copyList = new vector<Order*>;
+
+    // Try loop over pointers' orders
+    for (int i = 0; i < list.size(); i++) 
+    {
+        // Need the copy constructor of Order and its subclasses
+        Order *ptrOrder = *(list.begin() + i);
+        Order *o = new Order(*ptrOrder);
+        copyList->push_back(o);
+        cout << **(copyList->begin() + i); // print newly added OrderPtr's object
+    }
+    
+    
+    return copyList;
 }
 
 // ??? Copy the olist's Order ptrs 

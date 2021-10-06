@@ -18,8 +18,7 @@ public:
     Order();
     Order(std::string command);
     // Copy constructor (to-do)
-    // Order(const Order &o);
-    
+    Order(const Order &o);
     
     Order &operator=(const Order &o);
     friend std::ostream &operator<<(std::ostream &out, const Order &o);
@@ -41,7 +40,8 @@ public:
     Deploy();
     Deploy(std::string command);
     // Copy constructor to-do
-    // Deploy(const Deploy &d);
+    Deploy(const Deploy &d);
+
     bool validate ();
     bool execute ();
 };
@@ -52,7 +52,8 @@ public:
     Advance();
     Advance(std::string command);
     // Copy constructor to-do
-    // Advance(const Advance &a);
+    Advance(const Advance &a);
+
     bool validate ();
     bool execute ();
 };
@@ -63,7 +64,8 @@ public:
     Bomb();
     Bomb(std::string command);
     // Copu constructor to-do
-    // Bomb(const Bomb &b);
+    Bomb(const Bomb &b);
+
     bool validate ();
     bool execute ();
 };
@@ -74,7 +76,8 @@ public:
     Blockade();
     Blockade(std::string command);
     // Copy constructor to-do
-    // Blockade(Blockade &b);
+    Blockade(const Blockade &b);
+
     bool validate ();
     bool execute ();
 };
@@ -84,7 +87,8 @@ public:
     AirLift();
     AirLift(std::string command);
     // Copy constructor to-do
-    // AirLift(AirLift &a);
+    AirLift(const AirLift &a);
+
     bool validate ();
     bool execute ();
 };
@@ -95,7 +99,8 @@ public:
     Negotiate();
     Negotiate(std::string command);
     // Copy constructor to-do
-    // Negotiate(Negotiate &n);
+    Negotiate(const Negotiate &n);
+
     bool validate ();
     bool execute ();
 };
@@ -126,7 +131,7 @@ public:
     void printList();
 
     // returns a deep copy of the list (tested)
-    std::vector<Order*> getList();
+    std::vector<Order*> * getList();
     
     // to be tested
     void setList(std::vector<Order*> list);

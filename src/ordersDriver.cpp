@@ -40,8 +40,8 @@ void testOrdersDriver()
     cout << *negotiate1 << "\n";
 
     // testing the operator=
-    // ! REDO: ??
-    o2 = o1;
+    // ! REDO: ?? --> THIS CREATES A SHALLOW COPY, REDO!
+    *o2 = *o1;
     cout << "\nTesting the assignment operator:\n";
     cout << "Assigning o1 to o2 => "
          << "o1: " << *o1 << ", o2: " << *o2;
@@ -70,6 +70,7 @@ void testOrdersDriver()
     // check if we should add orders by pointer/ or directly ...
     // add duplicate
     // myFirstOrderList.add(advance1);
+
 
     // move orders
     cout << "============================================"
@@ -101,49 +102,68 @@ void testOrdersDriver()
          << "\n";
 
 
-    // Testing OrderList::getList
+    // ! Testing OrderList::getList --> does not work with vector<Order*>!
     cout << "============================================";
-    vector<Order*> copyList = myFirstOrderList.getList();
+    vector<Order*> * copyList = myFirstOrderList.getList();
+     cout << "\n" << copyList->size();
+
     cout << "\n...Created a copy of the content of myFirstOrderList.";
-    copyList.push_back(new Order("New order to copyList."));
+    copyList->push_back(new Order("New order to copyList."));
+
     cout << "...Check if the copyList is a shallow copy of myFirstOrderList's list.\n"
          << "...Yes if Order {\"New order to copyList \"} is added.\n";
     myFirstOrderList.printList();
 
     // output the copyList content
     cout << "... Outputting content of copyList to compare: \n";
-    vector<Order*>::iterator begin = copyList.begin();
-    vector<Order*>::iterator end = copyList.end();
-    Order tempOrder;
+    vector<Order*>::iterator begin = copyList->begin();
+    vector<Order*>::iterator end = copyList->end();
+
     for (vector<Order*>::iterator it = begin; it != end; ++it)
-        tempOrder = **it;
-        cout << " " << tempOrder.getCommand();
+        cout << " " <<(**it).getCommand();
     cout << "\n";
 
 
     // Testing the istream operator on Order class
     cout << "\n============================================\n"
      << "User-create a new Order.\n";
-    Order order2; 
-    cin >> order2;
-    cout << "This is the new Order:";
-    cout << order2;
-    cout << "Command: " << order2.getCommand() 
-    << " Details: " << order2.getDetails() << "\n";
+//     Order order2; 
+//     cin >> order2;
+//     cout << "This is the new Order:";
+//     cout << order2;
+//     cout << "Command: " << order2.getCommand() 
+//     << " Details: " << order2.getDetails() << "\n";
 
-    cout << "\nUser-create a Deploy order\n";
-    Deploy deploy2;
-    cin >> deploy2;
-    cout << "This is the new Deploy:";
-    cout << deploy2;
-    cout << "Command: " << deploy2.getCommand() 
-    << " Details: " << deploy2.getDetails() << "\n";
+//     cout << "\nUser-create a Deploy order\n";
+//     Deploy deploy2;
+//     cin >> deploy2;
+//     cout << "This is the new Deploy:";
+//     cout << deploy2;
+//     cout << "Command: " << deploy2.getCommand() 
+//     << " Details: " << deploy2.getDetails() << "\n";
 
-    cout << "\nUser-create a Negotiate order\n";
-    Negotiate negotiate2;
-    cin >> negotiate2;
-    cout << "This is the new Negotiate:";
-    cout << negotiate2;
-    cout << "Command: " << negotiate2.getCommand() 
-    << " Details: " << negotiate2.getDetails() << "\n";
+//     cout << "\nUser-create a Negotiate order\n";
+//     Negotiate negotiate2;
+//     cin >> negotiate2;
+//     cout << "This is the new Negotiate:";
+//     cout << negotiate2;
+//     cout << "Command: " << negotiate2.getCommand() 
+//     << " Details: " << negotiate2.getDetails() << "\n";
+
+
+
+    // Test destructors/delete on o1, o2, and the subclasses of Order
+    cout << "\n============================================\n";
+    cout << "Testing destructor/delete";
+    // Call destructor on o1 and o2!!
+    delete o1;
+    delete o2;
+    delete deploy1; 
+    delete advance1; 
+    delete airlift1;
+    delete blockade1;
+    delete bomb1;
+    delete negotiate1;
+
+    cout << myFirstOrderList;
 }
