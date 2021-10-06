@@ -21,6 +21,7 @@ void Card::play(Player& player, Deck& deck)
 {
     player.add_to_orders(static_cast<int>(*m_effect));
     deck.returnCard(this);
+    cout << "\n" << m_effect << " was played by " << player.getName() << "\n";
 }
 
 
@@ -137,7 +138,7 @@ void Deck::draw(Player& player)
 
 void Deck::returnCard(Card* card)
 {
-    m_cards.push_back(card);
+    m_cards.insert(m_cards.begin(), card);
 }
 
 
