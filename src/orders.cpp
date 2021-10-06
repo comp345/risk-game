@@ -244,7 +244,7 @@ vector<Order*> * OrderList ::getList()
         Order *ptrOrder = *(list.begin() + i);
         Order *o = new Order(*ptrOrder);
         copyList->push_back(o);
-        cout << **(copyList->begin() + i); // print newly added OrderPtr's object
+        // cout << **(copyList->begin() + i); // Debug: print newly added OrderPtr's object
     }
     
     

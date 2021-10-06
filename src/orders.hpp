@@ -2,7 +2,11 @@
 #include <string>
 #include <iostream>
 
-// Destructors to implement!!
+// To implement for each Order class/subclass: 
+// - Player ptr
+// - Territory ptr
+// - Armies number data member (Deploy, Advance) ?
+// 
 
 void testOrdersLink();
 
