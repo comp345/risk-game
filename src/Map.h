@@ -1,4 +1,8 @@
 #pragma once
+#ifndef MAP_H
+#define MAP_H
+#define MAX_SIZE 255
+
 #include <vector>
 #include <string>
 
@@ -43,28 +47,22 @@ class Map{
     public:
         Map();
         ~Map();
-
+        std::vector<Territory*> neightborsList[MAX_SIZE];
         std::vector<Territory*> territoryNodeList;
         std::vector<Continent*> continentList;
         std::vector<Territory*> continentNeightborsList;
-
+        Territory* createTerritoryNode();
         int addEdge(Territory* u, Territory* v);//to create edges between territory nodes
-        
         int createContinent(std::string cName, int numOfCountries);
         int addToContinent(int index, Territory* u);
-        int getContinentIndexByName(std::string name);
-        
-        int DFS(Territory* currentNode, std::vector<Territory*>* _nodeVec); //to traverse through the territory nodes
-        bool isIn(Territory* currentNode, std::vector<Territory*>* nodeVec); //for checking if territory 
-        
-        Territory* createTerritoryNode();
-        std::vector<Territory*> getTerritories();
+        int DFS(Territory* currentTNode, std::vector<Territory*>* tNodeVec); //to traverse through the territory nodes
+        bool isIn(Territory* currentTNode, std::vector<Territory*>* tNodeVec); //for checking if territory 
         int territorySizeCheck();
-        int subgraphCheck(int continentIndex, std::vector<Territory*>* vec);
-        
+        int subgraphCheck(int continentIdx, std::vector<Territory*>* graphVec);
         int validate();
         int duplicateCheck();
-
+        std::vector<Territory*> getTerritories();
     private:
     int counter;
 };
+#endif
