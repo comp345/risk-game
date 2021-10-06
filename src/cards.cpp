@@ -38,7 +38,7 @@ std::ostream& operator<<(std::ostream& lhs, Card::Effect* e)
 {
     switch (*e)
     {
-    case Card::Effect::bomb:
+    case Card::Effect::BOMB:
         return lhs << "Bomb";
         break;
     case Card::Effect::reinforcement:
@@ -202,6 +202,11 @@ Hand::~Hand()
 {
     m_cards.clear();
 }
+std::vector<Card*> Hand::getCards()
+{
+    return m_cards;
+}
+
 void Hand::drawCard(Card* card)
 {
     m_cards.push_back(card);
@@ -219,10 +224,10 @@ Card* Hand::useLast()
     return toUse;
 }
 
-std::ostream& operator<<(std::ostream& lhs, Hand& Hand) 
+std::ostream& operator<<(std::ostream& lhs, Hand& hand) 
 {
-    cout << "\nPlayer: " << player.getName() << " currently has the following cards\n";
-    for(Card* i: m_cards)
+    // cout << "\nPlayer: " << player.getName() << " currently has the following cards\n";
+    for(Card* i: hand.getCards())
     {
         std::cout << i << " card\n";
     }

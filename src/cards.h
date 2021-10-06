@@ -9,7 +9,7 @@ using namespace std;
 class Card
 {
 public:
-    enum class Effect {bomb, reinforcement, blockade, airlift, diplomacy};
+    enum class Effect {BOMB, reinforcement, blockade, airlift, diplomacy};
 
     //Constructors
     Card(Effect m_effect);
@@ -27,6 +27,12 @@ public:
 
 private:
     Effect* m_effect;
+
+};
+
+class Bomb: public Card
+{
+    public:
 
 };
 
@@ -68,6 +74,8 @@ public:
     Hand(const Hand& other);
     ~Hand();
 
+    std::vector<Card*> getCards();
+
     // Functions
     void drawCard(Card* card);
     void showCards(Player player);
@@ -75,7 +83,7 @@ public:
 
     // Operator functions
     friend std::ostream& operator<<(std::ostream& lhs, Deck& d);
-    Deck& operator=(const Deck& rhs);
+    Hand& operator=(const Hand& rhs);
 };
 
 
