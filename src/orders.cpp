@@ -277,8 +277,7 @@ OrderList::OrderList()
 // !! Warning, the copy constructor currently FAILS
 OrderList::OrderList(const OrderList &ol)
 {
-    OrderList cpyList = ol;
-    list = cpyList.getList();
+    list = ol.list;
 }
 // returns a deep copy of OrderList's list (vector of pointers to deep copies of Orders)
 vector<Order *> OrderList ::getList()

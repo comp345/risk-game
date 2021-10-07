@@ -140,15 +140,15 @@ void testOrdersDriver()
      cout << "... Printing First OrderList: " << myFirstOrderList << "\n";
 
      // (CURRENTLY FAILING) Testing the OrderList copy constructor
-     // cout << "============================================\n";
-     // cout << "Testing OrderList copy constructor\n";
-     // OrderList myThirdOrderList = OrderList(myFirstOrderList);
-     // cout << "First OrderList: " << myFirstOrderList << "\n";
-     // cout << "Third OrderList: " << myThirdOrderList << "\n";
-     // cout << "Updating the Third OrderList (adding new order)\n";
-     // myThirdOrderList.add(new Order("Test Third Orderlist", "none"));
-     // cout << "First OrderList: " << myFirstOrderList << "\n";
-     // cout << "Third OrderList: " << myThirdOrderList << "\n";
+     cout << "============================================\n";
+     cout << "Testing OrderList copy constructor\n";
+     OrderList myThirdOrderList = OrderList(myFirstOrderList);
+     cout << "First OrderList: " << myFirstOrderList << "\n";
+     cout << "Third OrderList: " << myThirdOrderList << "\n";
+     cout << "Updating the Third OrderList (adding new order)\n";
+     myThirdOrderList.add(new Order("Test Third Orderlist", "none"));
+     cout << "First OrderList: " << myFirstOrderList << "\n";
+     cout << "Third OrderList: " << myThirdOrderList << "\n";
 
      // Testing validate() and execute()
      cout << "\n============================================\n"
