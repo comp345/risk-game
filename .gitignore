@@ -1,2 +1,11 @@
 # Build files
-!/build/**/.gitkeep
+!/build/**/.gitkeep!/build/**/.gitkeep
+.vscode
+/src/main.dSYM
+CMake*/**/**
+cmake*
+CPack**/**
+Dart*
+Ctest**/**
+Makefile
+build/**/**.**
