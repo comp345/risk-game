@@ -104,11 +104,11 @@ void testOrdersDriver()
 
     // ! Testing OrderList::getList --> does not work with vector<Order*>!
     cout << "============================================";
-    vector<Order*> * copyList = myFirstOrderList.getList();
-     cout << "\n" << copyList->size();
+    vector<Order*>  copyList = myFirstOrderList.getList();
+     cout << "\n" << copyList.size();
 
     cout << "\n...Created a copy of the content of myFirstOrderList.";
-    copyList->push_back(new Order("New order to copyList."));
+    copyList.push_back(new Order("New order to copyList."));
 
     cout << "...Check if the copyList is a shallow copy of myFirstOrderList's list.\n"
          << "...Yes if Order {\"New order to copyList \"} is added.\n";
@@ -116,8 +116,8 @@ void testOrdersDriver()
 
     // output the copyList content
     cout << "... Outputting content of copyList to compare: \n";
-    vector<Order*>::iterator begin = copyList->begin();
-    vector<Order*>::iterator end = copyList->end();
+    vector<Order*>::iterator begin = copyList.begin();
+    vector<Order*>::iterator end = copyList.end();
 
     for (vector<Order*>::iterator it = begin; it != end; ++it)
         cout << " " <<(**it).getCommand();
@@ -155,15 +155,5 @@ void testOrdersDriver()
     // Test destructors/delete on o1, o2, and the subclasses of Order
     cout << "\n============================================\n";
     cout << "Testing destructor/delete";
-    // Call destructor on o1 and o2!!
-    delete o1;
-    delete o2;
-    delete deploy1; 
-    delete advance1; 
-    delete airlift1;
-    delete blockade1;
-    delete bomb1;
-    delete negotiate1;
-
-    cout << myFirstOrderList;
+    
 }
