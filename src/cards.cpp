@@ -41,16 +41,16 @@ std::ostream& operator<<(std::ostream& lhs, Card::Effect* e)
     case Card::Effect::BOMB:
         return lhs << "Bomb";
         break;
-    case Card::Effect::reinforcement:
+    case Card::Effect::REINFORCEMENT:
         return lhs << "reinforcement";
         break;
-    case Card::Effect::blockade:
+    case Card::Effect::BLOCKADE:
         return lhs << "blockade";
         break;
-    case Card::Effect::airlift:
+    case Card::Effect::AIRLIFT:
         return lhs << "airlift";
         break;
-    case Card::Effect::diplomacy:
+    case Card::Effect::DIPLOMACY:
         return lhs << "diplomacy";
         break;
     }
@@ -226,7 +226,6 @@ Card* Hand::useLast()
 
 std::ostream& operator<<(std::ostream& lhs, Hand& hand) 
 {
-    // cout << "\nPlayer: " << player.getName() << " currently has the following cards\n";
     for(Card* i: hand.getCards())
     {
         std::cout << i << " card\n";

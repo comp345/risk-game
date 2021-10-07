@@ -1,0 +1,12 @@
+[
+{
+  "directory": "C:/Users/figue/Desktop/School/This semester/Comp 345/risk-game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe   -g -o CMakeFiles\\HelloWorld.dir\\src\\cards.cpp.obj -c \"C:\\Users\\figue\\Desktop\\School\\This semester\\Comp 345\\risk-game\\src\\cards.cpp\"",
+  "file": "C:/Users/figue/Desktop/School/This semester/Comp 345/risk-game/src/cards.cpp"
+},
+{
+  "directory": "C:/Users/figue/Desktop/School/This semester/Comp 345/risk-game/build",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe   -g -o CMakeFiles\\HelloWorld.dir\\src\\main.cpp.obj -c \"C:\\Users\\figue\\Desktop\\School\\This semester\\Comp 345\\risk-game\\src\\main.cpp\"",
+  "file": "C:/Users/figue/Desktop/School/This semester/Comp 345/risk-game/src/main.cpp"
+}
+]

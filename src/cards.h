@@ -9,7 +9,7 @@ using namespace std;
 class Card
 {
 public:
-    enum class Effect {BOMB, reinforcement, blockade, airlift, diplomacy};
+    enum class Effect {BOMB, REINFORCEMENT, BLOCKADE, AIRLIFT, DIPLOMACY};
 
     //Constructors
     Card(Effect m_effect);
@@ -29,14 +29,6 @@ private:
     Effect* m_effect;
 
 };
-
-class Bomb: public Card
-{
-    public:
-
-};
-
-
 
 
 class Deck

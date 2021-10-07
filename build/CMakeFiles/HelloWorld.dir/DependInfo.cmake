@@ -8,8 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/Users/alexanderfigueiras/Google Drive/Other computers/Desktop/This semester/Comp 345/risk-game/src/cards.cpp" "CMakeFiles/HelloWorld.dir/src/cards.cpp.o" "gcc" "CMakeFiles/HelloWorld.dir/src/cards.cpp.o.d"
-  "/Users/alexanderfigueiras/Google Drive/Other computers/Desktop/This semester/Comp 345/risk-game/src/main.cpp" "CMakeFiles/HelloWorld.dir/src/main.cpp.o" "gcc" "CMakeFiles/HelloWorld.dir/src/main.cpp.o.d"
+  "C:/Users/figue/Desktop/School/This semester/Comp 345/risk-game/src/cards.cpp" "CMakeFiles/HelloWorld.dir/src/cards.cpp.obj" "gcc" "CMakeFiles/HelloWorld.dir/src/cards.cpp.obj.d"
+  "C:/Users/figue/Desktop/School/This semester/Comp 345/risk-game/src/main.cpp" "CMakeFiles/HelloWorld.dir/src/main.cpp.obj" "gcc" "CMakeFiles/HelloWorld.dir/src/main.cpp.obj.d"
   )
 
 # Targets to which this target links.
