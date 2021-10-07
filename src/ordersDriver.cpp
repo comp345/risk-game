@@ -40,7 +40,6 @@ void testOrdersDriver()
      cout << *negotiate1 << "\n";
 
      // testing the operator=
-     // ! REDO: ?? --> THIS CREATES A SHALLOW COPY, REDO!
      *o2 = *o1;
      cout << "\nTesting the assignment operator:\n";
      cout << "Assigning o1 to o2 => "
@@ -101,7 +100,7 @@ void testOrdersDriver()
      cout << myFirstOrderList
           << "\n";
 
-     // ! Testing OrderList::getList --> does not work with vector<Order*>!
+     // Testing OrderList::getList
      cout << "============================================";
      vector<Order *> copyList = myFirstOrderList.getList();
 
@@ -120,7 +119,36 @@ void testOrdersDriver()
      for (vector<Order *>::iterator it = begin; it != end; ++it)
           cout << " " << (**it).getCommand();
      cout << "\n";
-     
+
+     // Testing OrderList::setList
+     cout << "======================================\n";
+     cout << "Testing OrderList::setList. This method copies the Vector<Order*> copyList passed as argument to setList.\n";
+     OrderList UpdatedFirstList;
+     UpdatedFirstList.setList(copyList);
+     cout << "UpdateFirstList: " << UpdatedFirstList << "\n";
+
+     // Testing assignment operator= from OrderList by creating a duplicate OrderList
+     cout << "============================================\n";
+     cout << "Testing assignment operator= from OrderList by creating a duplicate OrderList\n";
+     OrderList mySecondOrderList;
+     mySecondOrderList = myFirstOrderList;
+     cout << "First OrderList: " << myFirstOrderList << "\n";
+     cout << "Second OrderList: " << mySecondOrderList << "\n";
+     cout << "...Adding Order ptr to Second OrderList to verify that it is a deep copy\n";
+     mySecondOrderList.add(new Order("Test Second OrderList", "none"));
+     cout << "... Printing Second OrderList: " << mySecondOrderList << "\n";
+     cout << "... Printing First OrderList: " << myFirstOrderList << "\n";
+
+     // (CURRENTLY FAILING) Testing the OrderList copy constructor
+     // cout << "============================================\n";
+     // cout << "Testing OrderList copy constructor\n";
+     // OrderList myThirdOrderList = OrderList(myFirstOrderList);
+     // cout << "First OrderList: " << myFirstOrderList << "\n";
+     // cout << "Third OrderList: " << myThirdOrderList << "\n";
+     // cout << "Updating the Third OrderList (adding new order)\n";
+     // myThirdOrderList.add(new Order("Test Third Orderlist", "none"));
+     // cout << "First OrderList: " << myFirstOrderList << "\n";
+     // cout << "Third OrderList: " << myThirdOrderList << "\n";
 
      // Testing validate() and execute()
      cout << "\n============================================\n"

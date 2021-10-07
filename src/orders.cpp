@@ -273,11 +273,14 @@ OrderList::OrderList()
 {
     list = vector<Order *>();
 }
-// Copy constructor of OrderList...
-
-// returns a vector object that contains pointers to Orders
-// These orders are deep copy of this.OrderList::list
-// !! Review implementation
+// Copy constructor of OrderList
+// !! Warning, the copy constructor currently FAILS
+OrderList::OrderList(const OrderList &ol)
+{
+    OrderList cpyList = ol;
+    list = cpyList.getList();
+}
+// returns a deep copy of OrderList's list (vector of pointers to deep copies of Orders)
 vector<Order *> OrderList ::getList()
 {
     // call a vector's =assignment operator -> does not work: vector<Order*> copyList = list;
@@ -296,17 +299,12 @@ vector<Order *> OrderList ::getList()
     return copyList;
 }
 
-// ??? Copy the olist's Order ptrs
-// Rewrite this: loop over the Order ptrs of olist,
-// Dynamically allocated newList (vector of Order ptrs) and
-// deep copy
 void OrderList::setList(vector<Order *> olist)
 {
-    // vector<Order*> newList = olist; // copy the original list into new object
-    // list = &newList;
+    list = olist;
 }
 
-OrderList &OrderList::operator=(const OrderList &o)
+OrderList& OrderList::operator=(const OrderList &o)
 {
     if (this == &o)
         return *this;

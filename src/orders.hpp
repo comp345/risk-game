@@ -118,6 +118,7 @@ public:
     // Copy constructor to-do
     OrderList(const OrderList& ol);
     // ~OrderList(); // no need to explicitely call destructor
+
     OrderList &operator=(const OrderList &o);
 
     friend std::ostream &operator<<(std::ostream &out, const OrderList &ol);
