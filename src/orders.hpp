@@ -10,20 +10,21 @@
 
 void testOrdersLink();
 
+// The Order class is the base class for Advance, AirLift, Bomb, Blockade, Deploy, Negotiate
 class Order
 {
 private:
-    // command attribute to debug. to delete?
+    // name of the order. Tool to debug. To delete later
     std::string command; // Ex. Deploy, Advance, ...
+
     // standin details string. to delete when Orders are completely implemented
     std::string details; // Ex. Deploy 5 armies to France
 
 public:
     Order();
-    Order(std::string command);
-    // Copy constructor (to-do)
+    Order(std::string command, std::string details);
     Order(const Order &o);
-    ~Order();
+    // ~Order(); // Destructor to implement when ptr data members are added
     
     Order &operator=(const Order &o);
     friend std::ostream &operator<<(std::ostream &out, const Order &o);
@@ -43,7 +44,7 @@ class Deploy : public Order
 {
 public:
     Deploy();
-    Deploy(std::string command);
+    Deploy(std::string details);
     // Copy constructor to-do
     Deploy(const Deploy &d);
 
@@ -55,7 +56,7 @@ class Advance : public Order
 {
 public:
     Advance();
-    Advance(std::string command);
+    Advance(std::string details);
     // Copy constructor to-do
     Advance(const Advance &a);
 
@@ -67,7 +68,7 @@ class Bomb : public Order
 {
 public:
     Bomb();
-    Bomb(std::string command);
+    Bomb(std::string details);
     // Copu constructor to-do
     Bomb(const Bomb &b);
 
@@ -79,7 +80,7 @@ class Blockade : public Order
 {
 public:
     Blockade();
-    Blockade(std::string command);
+    Blockade(std::string details);
     // Copy constructor to-do
     Blockade(const Blockade &b);
 
@@ -90,7 +91,7 @@ class AirLift : public Order
 {
 public:
     AirLift();
-    AirLift(std::string command);
+    AirLift(std::string details);
     // Copy constructor to-do
     AirLift(const AirLift &a);
 
@@ -102,7 +103,7 @@ class Negotiate : public Order
 {
 public:
     Negotiate();
-    Negotiate(std::string command);
+    Negotiate(std::string details);
     // Copy constructor to-do
     Negotiate(const Negotiate &n);
 
@@ -115,8 +116,8 @@ class OrderList
 public:
     OrderList();
     // Copy constructor to-do
-    // OrderList(const OrderList& ol);
-    ~OrderList();
+    OrderList(const OrderList& ol);
+    // ~OrderList(); // no need to explicitely call destructor
     OrderList &operator=(const OrderList &o);
 
     friend std::ostream &operator<<(std::ostream &out, const OrderList &ol);
