@@ -25,7 +25,6 @@ void testOrdersDriver()
      Deploy *deploy1 = new Deploy();
      deploy1->setDetails("deployig details!");
      cout << *deploy1 << typeid(*deploy1).name() << "\n";
-     
 
      Advance *advance1 = new Advance();
      cout << *advance1 << "\n";
@@ -43,17 +42,21 @@ void testOrdersDriver()
      cout << *negotiate1 << "\n";
 
      // testing the operator=
-     // cout << "============================================" ;
-     // cout << "\nTesting the assignment operator:\n";
-     // *o2 = *o1;
-     // cout << "Assigning o1 to o2 => "
-     //      << "o1: " << *o1 << ", o2: " << *o2;
+     cout << "============================================" ;
+     AirLift *a1 = new AirLift("First order");
+     cout << *a1 << "\n";
 
-     // cout << "\nCheck if assignment created a deep copy (not a shallow copy):\n";
-     // o1->setCommand("Update command");
-     // o1->setDetails("Update details");
-     // cout << "o1: " << *o1 << ", o2: " << *o2;
-     // cout << "\n";
+     AirLift *a2 = new AirLift("Second order");
+     cout << "\nTesting the assignment operator (inherited from Order class) with AirLift:\n";
+     *a2 = *a1;
+     cout << "Assigning a1 to a2 => "
+          << "a1: " << *a1 << ", a2: " << *a2;
+
+     cout << "\nCheck if assignment created a deep copy (not a shallow copy):\n";
+     a1->setCommand("Update command");
+     a1->setDetails("Update details");
+     cout << "a1: " << *a1 << ", a2: " << *a2;
+     cout << "\n";
 
      // create OrderList
      OrderList myFirstOrderList;
@@ -153,21 +156,22 @@ void testOrdersDriver()
      myThirdOrderList.add(new Bomb("Test Third Orderlist"));
      cout << "First OrderList: " << myFirstOrderList << "\n";
      cout << "Third OrderList: " << myThirdOrderList << "\n";
-     
+
+     cout << "===============================================\n";
      cout << "\nCheck if the copy constructor preserved the static classes of the objects: \n";
-     cout << myFirstOrderList.getList().at(0)->getCommand() << ":" 
+     cout << myFirstOrderList.getList().at(0)->getCommand() << ":"
           // << typeid(myFirstOrderList.getList().at(0)).name() << ":"
           << myFirstOrderList.getList().at(0)->execute() << "\n";
-     cout << myFirstOrderList.getList().at(1)->getCommand() << ":" 
+     cout << myFirstOrderList.getList().at(1)->getCommand() << ":"
           // << typeid(myFirstOrderList.getList().at(1)).name() << ":"
           << myFirstOrderList.getList().at(1)->execute() << "\n";
      cout << myFirstOrderList.getList().at(2)->getCommand() << ":"
-          // << typeid(myFirstOrderList.getList().at(2)).name() << ":" 
+          // << typeid(myFirstOrderList.getList().at(2)).name() << ":"
           << myFirstOrderList.getList().at(2)->execute() << "\n";
-     cout << myFirstOrderList.getList().at(3)->getCommand() << ":" 
+     cout << myFirstOrderList.getList().at(3)->getCommand() << ":"
           // << typeid(myFirstOrderList.getList().at(3)).name() << ":"
           << myFirstOrderList.getList().at(3)->execute() << "\n";
-     cout << myFirstOrderList.getList().at(4)->getCommand() << ":" 
+     cout << myFirstOrderList.getList().at(4)->getCommand() << ":"
           // << typeid(myFirstOrderList.getList().at(4)).name() << ":"
           << myFirstOrderList.getList().at(4)->execute() << "\n";
 
