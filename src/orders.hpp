@@ -11,6 +11,7 @@
 void testOrdersLink();
 
 // The Order class is the base class for Advance, AirLift, Bomb, Blockade, Deploy, Negotiate
+// !Abstract class so that Order cannot be instantiated, and avoid object slicing when using polymorphism with vector
 class Order
 {
 private:
@@ -36,8 +37,8 @@ public:
     void setDetails(std::string orderDetails);
     
     // To implement
-    bool validate();
-    bool execute();
+    virtual bool validate() = 0;
+    virtual bool execute() = 0;
 };
 
 class Deploy : public Order

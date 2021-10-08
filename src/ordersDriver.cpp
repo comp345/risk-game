@@ -12,17 +12,20 @@ void testOrdersLink()
 
 void testOrdersDriver()
 {
+     cout << "abstract class test\n\n";
      // Testing creation and init of order and their subtypes here
      // Test stream insertion operator on Order object and all its subtypes
      cout << "Testing the stream insertion operators for each Order type/subtype: \n";
 
-     Order *o1 = new Order("First order", "Nothing 1");
-     cout << *o1 << "\n";
+     // Order *o1 = new Order("First order", "Nothing 1");
+     // cout << *o1 << "\n";
 
-     Order *o2 = new Order("Second order", "Nothin 2");
+     // Order *o2 = new Order("Second order", "Nothin 2");
 
      Deploy *deploy1 = new Deploy();
-     cout << *deploy1 << "\n";
+     deploy1->setDetails("deployig details!");
+     cout << *deploy1 << typeid(*deploy1).name() << "\n";
+     
 
      Advance *advance1 = new Advance();
      cout << *advance1 << "\n";
@@ -40,16 +43,17 @@ void testOrdersDriver()
      cout << *negotiate1 << "\n";
 
      // testing the operator=
-     *o2 = *o1;
-     cout << "\nTesting the assignment operator:\n";
-     cout << "Assigning o1 to o2 => "
-          << "o1: " << *o1 << ", o2: " << *o2;
+     // cout << "============================================" ;
+     // cout << "\nTesting the assignment operator:\n";
+     // *o2 = *o1;
+     // cout << "Assigning o1 to o2 => "
+     //      << "o1: " << *o1 << ", o2: " << *o2;
 
-     cout << "\nCheck if assignment created a deep copy (not a shallow copy):\n";
-     o1->setCommand("Update command");
-     o1->setDetails("Update details");
-     cout << "o1: " << *o1 << ", o2: " << *o2;
-     cout << "\n";
+     // cout << "\nCheck if assignment created a deep copy (not a shallow copy):\n";
+     // o1->setCommand("Update command");
+     // o1->setDetails("Update details");
+     // cout << "o1: " << *o1 << ", o2: " << *o2;
+     // cout << "\n";
 
      // create OrderList
      OrderList myFirstOrderList;
@@ -105,7 +109,7 @@ void testOrdersDriver()
      vector<Order *> copyList = myFirstOrderList.getList();
 
      cout << "\n...Created a copy of the content of myFirstOrderList.";
-     copyList.push_back(new Order("New order to copyList.", "no details"));
+     copyList.push_back(new Deploy("new details for copyList"));
 
      cout << "...Check if the copyList is a shallow copy of myFirstOrderList's list.\n"
           << "-> Yes if Order {\"New order to copyList \"} is added ONLY to myFirstOrderList.\n";
@@ -135,7 +139,7 @@ void testOrdersDriver()
      cout << "First OrderList: " << myFirstOrderList << "\n";
      cout << "Second OrderList: " << mySecondOrderList << "\n";
      cout << "...Adding Order ptr to Second OrderList to verify that it is a deep copy\n";
-     mySecondOrderList.add(new Order("Test Second OrderList", "none"));
+     mySecondOrderList.add(new Advance("Test Second OrderList"));
      cout << "... Printing Second OrderList: " << mySecondOrderList << "\n";
      cout << "... Printing First OrderList: " << myFirstOrderList << "\n";
 
@@ -146,9 +150,26 @@ void testOrdersDriver()
      cout << "First OrderList: " << myFirstOrderList << "\n";
      cout << "Third OrderList: " << myThirdOrderList << "\n";
      cout << "Updating the Third OrderList (adding new order)\n";
-     myThirdOrderList.add(new Order("Test Third Orderlist", "none"));
+     myThirdOrderList.add(new Bomb("Test Third Orderlist"));
      cout << "First OrderList: " << myFirstOrderList << "\n";
      cout << "Third OrderList: " << myThirdOrderList << "\n";
+     
+     cout << "\nCheck if the copy constructor preserved the static classes of the objects: \n";
+     cout << myFirstOrderList.getList().at(0)->getCommand() << ":" 
+          // << typeid(myFirstOrderList.getList().at(0)).name() << ":"
+          << myFirstOrderList.getList().at(0)->execute() << "\n";
+     cout << myFirstOrderList.getList().at(1)->getCommand() << ":" 
+          // << typeid(myFirstOrderList.getList().at(1)).name() << ":"
+          << myFirstOrderList.getList().at(1)->execute() << "\n";
+     cout << myFirstOrderList.getList().at(2)->getCommand() << ":"
+          // << typeid(myFirstOrderList.getList().at(2)).name() << ":" 
+          << myFirstOrderList.getList().at(2)->execute() << "\n";
+     cout << myFirstOrderList.getList().at(3)->getCommand() << ":" 
+          // << typeid(myFirstOrderList.getList().at(3)).name() << ":"
+          << myFirstOrderList.getList().at(3)->execute() << "\n";
+     cout << myFirstOrderList.getList().at(4)->getCommand() << ":" 
+          // << typeid(myFirstOrderList.getList().at(4)).name() << ":"
+          << myFirstOrderList.getList().at(4)->execute() << "\n";
 
      // Testing validate() and execute()
      cout << "\n============================================\n"
@@ -159,10 +180,10 @@ void testOrdersDriver()
      // Testing the istream operator on Order class
      cout << "\n============================================\n"
           << "User-create a new Order.\n";
-     Order order2;
-     cin >> order2;
-     cout << "This is the new Order:";
-     cout << order2;
+     // Order order2;
+     // cin >> order2;
+     // cout << "This is the new Order:";
+     // cout << order2;
 
      //     cout << "\nUser-create a Deploy order\n";
      //     Deploy deploy2;
@@ -183,8 +204,8 @@ void testOrdersDriver()
      // Test destructors/delete on o1, o2, and the subclasses of Order
      cout << "\n============================================\n";
      cout << "Testing destructor/delete\n";
-     delete o1;
-     delete o2;
+     // delete o1;
+     // delete o2;
      delete advance1;
      delete airlift1;
      delete deploy1;
