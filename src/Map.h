@@ -99,14 +99,28 @@ private:
 };
 
 class MapLoader {
+private:
+    string mapFileName;
+    vector<string> continentList;
+    vector<Territory *> countryList;
+    vector<vector<Territory *> > bordersList; //Vector of vector of territories to store borders lists
+    vector<int> continentNb; //To store the index of each continent associated to each country
+    vector<int> armiesNb; //To store the nb of armies for each continent
+
 public:
     MapLoader();
 
-    MapLoader(MapLoader &);
+    MapLoader(const MapLoader &other);
 
     MapLoader(string mapFile);
 
-    MapLoader &operator=(MapLoader &h);
+    ~MapLoader();
+
+    // Operator functions
+    friend std::ostream &operator<<(std::ostream &lhs, MapLoader *d);
+
+    MapLoader &operator=(const MapLoader &rhs);
+
 
     virtual bool checkValidity();
 
@@ -114,6 +128,8 @@ public:
     virtual vector<string> readMapFileForContinents(); //reads file & return list of continents
     virtual vector<vector<Territory *> > readMapFileForBorders(); //reads file & return list of borders for each country
     virtual vector<Territory *> readMapFileForCountries(); //reads file & return list of countries
+    virtual Map *combineInfos(); //stores all information into map
+
     vector<string> getContinentList();
 
     vector<Territory *> getCountryList();
@@ -126,19 +142,7 @@ public:
 
     vector<int> getArmiesNb();
 
-    void setMapFileName(vector<int> *armiesNumList);
+    void setMapFileName(string mapFile);
 
     string getMapFileName();
-
-    friend ostream &operator<<(ostream &out, MapLoader &hps);
-
-    virtual Map *combineInfos(); //stores all information into map
-
-private:
-    string mapFileName;
-    vector<string> continentList;
-    vector<Territory *> countryList;
-    vector<vector<Territory *> > bordersList; //Vector of vector of territories to store borders lists
-    vector<int> continentNb; //To store the index of each continent associated to each country
-    vector<int> armiesNb; //To store the nb of armies for each continent
 };

@@ -180,18 +180,6 @@ int Map::subgraphCheck(int continentIdx, std::vector<Territory *> *graphVec) {
     return 0;
 }
 
-////TODO: maybe they're already implemented?
-//void Map::addTerritory(Territory* territory, vector<Territory*> neighborList) {
-//    territories.push_back(territory);
-//    territoryNeighbors[territory->getName()] = neighborList;
-//}
-//
-//void Map::registerWithContinent(string continent, int bonusArmyCount, Territory* territory) {
-//    continents[continent].push_back(territory);
-//    continentArmies[continent] = bonusArmyCount;
-//}
-
-
 //map validation method
 int Map::validate() {
     std::vector<Territory *> visitedTerritory;
@@ -214,6 +202,68 @@ int Map::validate() {
 
 }
 
+// ********************** //
+// Map Loader functions:  //
+// ********************** //
+
+MapLoader::MapLoader(string mapFile) {
+    mapFileName = mapFile;
+}
+
+MapLoader::MapLoader(const MapLoader &other) {
+    mapFileName = other.mapFileName;
+}
+
+MapLoader::~MapLoader() {
+    countryList.clear();
+    bordersList.clear();
+}
+
+std::ostream &operator<<(std::ostream &lhs, MapLoader *mapLoader) {
+    return lhs << mapLoader->mapFileName;
+}
+
+MapLoader &MapLoader::operator=(const MapLoader &rhs) {
+    if (this == &rhs)
+        return *this;
+
+    mapFileName = rhs.mapFileName;
+
+    return *this;
+}
+
+vector<string> MapLoader::getContinentList() {
+    return continentList;
+}
+
+vector<vector<Territory *> > MapLoader::getBordersList() {
+    return bordersList;
+}
+
+vector<Territory *> MapLoader::getCountryList() {
+    return countryList;
+}
+
+vector<int> MapLoader::getArmiesNb() {
+    return armiesNb;
+}
+
+vector<int> MapLoader::getContinentNb() {
+    return continentNb;
+}
+
+string MapLoader::getMapFileName() {
+    return mapFileName;
+}
+
+void MapLoader::setMapFileName(string mapFile) {
+    mapFileName = mapFile;
+}
+
+void MapLoader::setArmiesNb(vector<int> *armiesNumList) {
+    armiesNb = *armiesNumList;
+}
+
 bool MapLoader::checkValidity() {
     cout << "\nChecking validity of map" << mapFileName << "..." << endl;
 
@@ -221,6 +271,11 @@ bool MapLoader::checkValidity() {
     ifstream ifs(mapFileName);
 
     string currentLine;
+
+    if (!ifs.is_open()) {
+        cout << "File not open. Exiting program...\n\n";
+        return false;
+    }
 
     while (getline(ifs, currentLine) && currentLine != "[continents]") {
         //While current line isn't equal to [Continents] skip
@@ -230,7 +285,7 @@ bool MapLoader::checkValidity() {
         ifs.close();
         ifs.clear();
         cout << "Missing [continents] tag. Exiting program...\n\n";
-        exit(0);
+        return false;
     }
 
     while (getline(ifs, currentLine) && currentLine != "[countries]") {
@@ -241,7 +296,7 @@ bool MapLoader::checkValidity() {
         ifs.close();
         ifs.clear();
         cout << "Missing [countries] tag. Exiting program...\n\n";
-        exit(0);
+        return false;
     }
 
     while (getline(ifs, currentLine) && currentLine != "[borders]") {
@@ -252,7 +307,7 @@ bool MapLoader::checkValidity() {
         ifs.close();
         ifs.clear();
         cout << "Missing [borders] tag. Exiting program...\n\n";
-        exit(0);
+        return false;
     }
 
     ifs.close();
@@ -273,10 +328,8 @@ Map *MapLoader::readMapFile() {
 
         //Add continents
         continentList = readMapFileForContinents();
-
         //Add countries
         countryList = readMapFileForCountries();
-
         //Add borders
         bordersList = readMapFileForBorders();
 
@@ -286,8 +339,9 @@ Map *MapLoader::readMapFile() {
             return map;
         }
     } else {
-        //TODO: throw exception?
-        cout << "\nMap file is invalid. Cannot create map." << endl;
+        //TODO: return an empty map or a map we know is correct or just exit the program?
+        cout << "\nMap file is invalid. Returning an empty map." << endl;
+        return map;
     }
 }
 
@@ -296,9 +350,9 @@ Map *MapLoader::combineInfos() {
     int currContinentNb;
 
     for (int i = 0; i < countryList.size(); i++) {
-        map->addTerritory(countryList[i], bordersList[i]);
-        currContinentNb = continentNb[i] - 1;
-        map->registerWithContinent(continentList[currContinentNb], countryList[i]);
+//        map->addTerritory(countryList[i], bordersList[i]);
+//        currContinentNb = continentNb[i] - 1;
+//        map->registerWithContinent(continentList[currContinentNb], countryList[i]);
     }
     cout << "\n";
     cout << "\n";
@@ -312,7 +366,6 @@ vector<string> MapLoader::readMapFileForContinents() {
 
     int armies;
     string territoryName, continentName, color;
-    //vector<string> continentList;
 
     if (inputFileStream.is_open()) {
 
@@ -345,7 +398,8 @@ vector<string> MapLoader::readMapFileForContinents() {
     }
 
     cout << "File is not open " << "\n";
-    exit(0);
+    //TODO: return something else? or just an empty list? or exit?
+    return continentList;
 }
 
 vector<Territory *> MapLoader::readMapFileForCountries() {
@@ -385,11 +439,10 @@ vector<Territory *> MapLoader::readMapFileForCountries() {
     }
 
     cout << "File is not open " << "\n";
-    exit(0);
+    return countryList;
 }
 
-vector<vector<Territory *> >
-MapLoader::readMapFileForBorders() {
+vector<vector<Territory *> > MapLoader::readMapFileForBorders() {
     cout << "\nREGISTERING BORDERS" << endl;
 
     string line;
@@ -441,16 +494,17 @@ MapLoader::readMapFileForBorders() {
     }
 
     cout << "File is not open " << "\n";
-    exit(0);
-}
-
-MapLoader::MapLoader(string mapFile) {
-//    vector<string> continentList;
-//    vector<Territory *> countryList;
-//    vector<vector<Territory *> > bordersList; //Vector of vector of territories to store borders lists
-//    vector<int> continentNb; //To store the index of each continent associated to each country
-//    vector<int> armiesNb; //To store the nb of armies for each continent
-    mapFileName = mapFile;
+    return bordersList;
 }
 
 
+////TODO: maybe they're already implemented?
+//void Map::addTerritory(Territory* territory, vector<Territory*> neighborList) {
+//    territories.push_back(territory);
+//    territoryNeighbors[territory->getName()] = neighborList;
+//}
+//
+//void Map::registerWithContinent(string continent, int bonusArmyCount, Territory* territory) {
+//    continents[continent].push_back(territory);
+//    continentArmies[continent] = bonusArmyCount;
+//}
