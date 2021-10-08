@@ -90,6 +90,10 @@ public:
 
     std::vector<Territory *> getTerritories();
 
+    void registerWithContinent(string continent, int bonusArmyCount, Territory *territory);
+
+    void addTerritory(Territory *territory, vector<Territory *> neighborList);
+
 private:
     int counter;
 };
@@ -100,18 +104,16 @@ public:
 
     MapLoader(MapLoader &);
 
+    MapLoader(string mapFile);
+
     MapLoader &operator=(MapLoader &h);
 
-    virtual bool checkValidity(string _inputFileStream);
+    virtual bool checkValidity();
 
-    virtual Map *readMapFile(string _inputFileStream); //stores all information into map
-    virtual vector<string> readMapFileForContinents(string _inputFileStream,
-                                                    vector<string> _continentList); //reads file & return list of continents
-    virtual vector<vector<Territory *> >
-    readMapFileForBorders(string _inputFileStream, vector<vector<Territory *> > _bordersList,
-                          vector<Territory *> _countryList); //reads file & return list of borders for each country
-    virtual vector<Territory *> readMapFileForCountries(string _inputFileStream,
-                                                        vector<Territory *> _countryList); //reads file & return list of countries
+    virtual Map *readMapFile(); //stores all information into map
+    virtual vector<string> readMapFileForContinents(); //reads file & return list of continents
+    virtual vector<vector<Territory *> > readMapFileForBorders(); //reads file & return list of borders for each country
+    virtual vector<Territory *> readMapFileForCountries(); //reads file & return list of countries
     vector<string> getContinentList();
 
     vector<Territory *> getCountryList();
@@ -120,16 +122,20 @@ public:
 
     vector<int> getContinentNb();
 
-    vector<int> setArmiesNb(vector<int> *armiesNumList);
+    void setArmiesNb(vector<int> *armiesNumList);
 
     vector<int> getArmiesNb();
 
+    void setMapFileName(vector<int> *armiesNumList);
+
+    string getMapFileName();
+
     friend ostream &operator<<(ostream &out, MapLoader &hps);
 
-    virtual Map *combineInfos(vector<string> _continentList, vector<Territory *> _countryList,
-                              vector<vector<Territory *> > _bordersList); //stores all information into map
+    virtual Map *combineInfos(); //stores all information into map
 
 private:
+    string mapFileName;
     vector<string> continentList;
     vector<Territory *> countryList;
     vector<vector<Territory *> > bordersList; //Vector of vector of territories to store borders lists

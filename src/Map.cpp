@@ -34,7 +34,7 @@ Territory::Territory(const Territory &t1) {
 
 Territory::~Territory() {}
 
-Territory& Territory::operator=(const Territory &t) {
+Territory &Territory::operator=(const Territory &t) {
     std::cout << "Assignment operator" << std::endl;
     ID = t.ID;
     numArmies = t.numArmies;
@@ -180,6 +180,18 @@ int Map::subgraphCheck(int continentIdx, std::vector<Territory *> *graphVec) {
     return 0;
 }
 
+////TODO: maybe they're already implemented?
+//void Map::addTerritory(Territory* territory, vector<Territory*> neighborList) {
+//    territories.push_back(territory);
+//    territoryNeighbors[territory->getName()] = neighborList;
+//}
+//
+//void Map::registerWithContinent(string continent, int bonusArmyCount, Territory* territory) {
+//    continents[continent].push_back(territory);
+//    continentArmies[continent] = bonusArmyCount;
+//}
+
+
 //map validation method
 int Map::validate() {
     std::vector<Territory *> visitedTerritory;
@@ -202,11 +214,11 @@ int Map::validate() {
 
 }
 
-bool MapLoader::checkValidity(string _inputFileStream) {
-    cout << "\nChecking validity of map..." << endl;
+bool MapLoader::checkValidity() {
+    cout << "\nChecking validity of map" << mapFileName << "..." << endl;
 
     string line;
-    ifstream ifs(_inputFileStream);
+    ifstream ifs(mapFileName);
 
     string currentLine;
 
@@ -251,57 +263,52 @@ bool MapLoader::checkValidity(string _inputFileStream) {
     return true;
 }
 
-Map *MapLoader::readMapFile(string _inputFileStream) {
+Map *MapLoader::readMapFile() {
     Map *map = new Map();
 
     //Check validity
-    //bool isValid = checkValidity(_inputFileStream);
-    bool isValid = true;
+    bool isValid = checkValidity();
     if (isValid) {
         std::cout << "Map file is valid." << endl;
 
         //Add continents
-        //vector<string> continentList;
-        continentList = readMapFileForContinents(_inputFileStream, continentList);
+        continentList = readMapFileForContinents();
 
-         //Add countries
-         //vector<Territory*> countryList;
-         countryList = readMapFileForCountries(_inputFileStream, countryList);
+        //Add countries
+        countryList = readMapFileForCountries();
 
-         //Add borders
-         //vector<vector<Territory*> > bordersList;
-         bordersList = readMapFileForBorders(_inputFileStream, bordersList, countryList);
+        //Add borders
+        bordersList = readMapFileForBorders();
 
-         //Create the map
-         if (!continentList.empty() && !countryList.empty() && !bordersList.empty() ) {
-         	map = combineInfos(continentList, countryList, bordersList);
-             return map;
-         }
+        //Create the map
+        if (!continentList.empty() && !countryList.empty() && !bordersList.empty()) {
+            map = combineInfos();
+            return map;
+        }
     } else {
         //TODO: throw exception?
         cout << "\nMap file is invalid. Cannot create map." << endl;
     }
 }
 
-Map *MapLoader::combineInfos(vector<string> _continentList, vector<Territory *> _countryList,
-                             vector<vector<Territory *> > _bordersList) {
+Map *MapLoader::combineInfos() {
     Map *map = new Map();
     int currContinentNb;
 
-    for (int i = 0; i < _countryList.size(); i++) {
-        // map->addTerritory(_countryList[i], _bordersList[i]);
-        // currContinentNb = continentNb[i] - 1;
-        // map->registerWithContinent(_continentList[currContinentNb], _countryList[i]);
+    for (int i = 0; i < countryList.size(); i++) {
+        map->addTerritory(countryList[i], bordersList[i]);
+        currContinentNb = continentNb[i] - 1;
+        map->registerWithContinent(continentList[currContinentNb], countryList[i]);
     }
     cout << "\n";
     cout << "\n";
     return map;
 }
 
-vector<string> MapLoader::readMapFileForContinents(string _inputFileStream, vector<string> continentList) {
+vector<string> MapLoader::readMapFileForContinents() {
     cout << "\nREGISTERING CONTINENTS" << endl;
     string line;
-    ifstream inputFileStream(_inputFileStream);
+    ifstream inputFileStream(mapFileName);
 
     int armies;
     string territoryName, continentName, color;
@@ -313,7 +320,7 @@ vector<string> MapLoader::readMapFileForContinents(string _inputFileStream, vect
         inputFileStream.seekg(0, inputFileStream.beg);
 
         while (getline(inputFileStream, line) && line != "[continents]") {
-        };
+        }
 
         //first line
         inputFileStream >> continentName >> armies >> color;
@@ -341,40 +348,40 @@ vector<string> MapLoader::readMapFileForContinents(string _inputFileStream, vect
     exit(0);
 }
 
-vector<Territory *> MapLoader::readMapFileForCountries(string _inputFileStream, vector<Territory *> _countryList) {
+vector<Territory *> MapLoader::readMapFileForCountries() {
     cout << "\nREGISTERING COUNTRIES" << endl;
     string line;
-    ifstream inputFileStream(_inputFileStream);
+    ifstream inputFileStream(mapFileName);
 
     int index, continent, x, y;
     string territoryName;
 
     if (inputFileStream.is_open()) {
 
-        while (getline(inputFileStream, line) && line != "[countries]") {};
+        while (getline(inputFileStream, line) && line != "[countries]") {}
 
         //first line
         inputFileStream >> index >> territoryName >> continent >> x >> y;
         Territory *country = new Territory(territoryName);
         continentNb.push_back(continent);
-        _countryList.push_back(country);
+        countryList.push_back(country);
 
         while (getline(inputFileStream, line) && line != "[countries]") {
 
             inputFileStream >> index >> territoryName >> continent >> x >> y;
-            if (territoryName == "[borders]" || territoryName == _countryList.at(_countryList.size() - 1)->getName()) {
+            if (territoryName == "[borders]" || territoryName == countryList.at(countryList.size() - 1)->getName()) {
                 break;
             }
 
             Territory *country = new Territory(territoryName);
             continentNb.push_back(continent);
-            _countryList.push_back(country);
+            countryList.push_back(country);
         }
 
         inputFileStream.close();
         inputFileStream.clear();
-        cout << "Country list size: " << _countryList.size() << endl;
-        return _countryList;
+        cout << "Country list size: " << countryList.size() << endl;
+        return countryList;
     }
 
     cout << "File is not open " << "\n";
@@ -382,12 +389,11 @@ vector<Territory *> MapLoader::readMapFileForCountries(string _inputFileStream, 
 }
 
 vector<vector<Territory *> >
-MapLoader::readMapFileForBorders(string _inputFileStream, vector<vector<Territory *> > _bordersList,
-                                 vector<Territory *> _countryList) {
+MapLoader::readMapFileForBorders() {
     cout << "\nREGISTERING BORDERS" << endl;
 
     string line;
-    ifstream inputFileStream(_inputFileStream);
+    ifstream inputFileStream(mapFileName);
 
     vector<Territory *> nList;
     int i_subs;
@@ -404,7 +410,7 @@ MapLoader::readMapFileForBorders(string _inputFileStream, vector<vector<Territor
         //first number
         inputFileStream >> line;
         i_subs = stoi(line, &sz);
-        Territory *current = _countryList[i_subs - 1];
+        Territory *current = countryList[i_subs - 1];
         nList.push_back(current);
 
 
@@ -415,7 +421,7 @@ MapLoader::readMapFileForBorders(string _inputFileStream, vector<vector<Territor
             do {
                 iss >> subs;
                 i_subs = stoi(subs, &sz);
-                Territory *current = _countryList[i_subs - 1];
+                Territory *current = countryList[i_subs - 1];
                 nList.push_back(current);
 
             } while (iss);
@@ -424,26 +430,27 @@ MapLoader::readMapFileForBorders(string _inputFileStream, vector<vector<Territor
                 nList.pop_back();
             }
 
-            _bordersList.push_back(nList);
+            bordersList.push_back(nList);
         }
 
         inputFileStream.close();
         inputFileStream.clear();
 
-        cout << "Borders list size: " << _bordersList.size() << endl;
-        return _bordersList;
+        cout << "Borders list size: " << bordersList.size() << endl;
+        return bordersList;
     }
 
     cout << "File is not open " << "\n";
     exit(0);
 }
 
-MapLoader::MapLoader() {
-    vector<string> continentList;
-    vector<Territory *> countryList;
-    vector<vector<Territory *> > bordersList; //Vector of vector of territories to store borders lists
-    vector<int> continentNb; //To store the index of each continent associated to each country
-    vector<int> armiesNb; //To store the nb of armies for each continent
+MapLoader::MapLoader(string mapFile) {
+//    vector<string> continentList;
+//    vector<Territory *> countryList;
+//    vector<vector<Territory *> > bordersList; //Vector of vector of territories to store borders lists
+//    vector<int> continentNb; //To store the index of each continent associated to each country
+//    vector<int> armiesNb; //To store the nb of armies for each continent
+    mapFileName = mapFile;
 }
 
 
