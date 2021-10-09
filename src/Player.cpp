@@ -1,58 +1,75 @@
 #include "Player.h"
-#include "orders.hpp"
 #include <iostream>
 
 using namespace std;
 
-Player::Player() 
+Player::Player()
 {
-	vector<Territory*> territories;
-	Hand* hand;
-	OrderList* orderList;
+    string name;
+    vector<Territory*> territories;
+    Hand* hand;
+    OrderList* orderList;
 }
 
-Player::Player(vector<Territory*> t, Hand* h, OrderList* o) 
+Player::Player(string n, vector<Territory*> t, Hand* h, OrderList* o)
 {
-	this->territories = t;
-	this->hand = h;
-	this->orderList = o;
+    this->name = n;
+    this->territories = t;
+    this->hand = h;
+    this->orderList = o;
 }
 
-//not deep copy
-Player::Player(const Player& p) 
+Player::Player(const Player& p)
 {
-	this->territories = p.territories;
-	this->hand = p.hand;
-	this->orderList = p.orderList;
+    this->name = p.name;
+    this->territories = p.territories;
+    this->hand = p.hand;
+    this->orderList = p.orderList;
 }
 
 Player::~Player()
 {
-	territories.clear();
-	delete orderList;
-	delete hand;
+    territories.clear();
+    delete orderList;
+    delete hand;
 }
 
 void Player::toAttack()
 {
-	for (int i = 0; i < territories.size(); i++) 
-	{
-		cout << territories[i] << "";
-	}
-	
+    for (int i = 0; i < territories.size(); i++)
+    {
+        cout << territories[i] << "";
+    }
+
 }
 
-void Player::toDefend() 
+void Player::toDefend()
 {
-	for (int i = 0; i < territories.size(); i++)
-	{
-		cout << territories[i] << "";
-	}
+    for (int i = 0; i < territories.size(); i++)
+    {
+        cout << territories[i] << "";
+    }
 }
 
 
-void Player::issueOrder(string order) 
+void Player::issueOrder(string order, string details)
 {
-	Order o = Order(order);
-	orderList->add(o);
+    Order* o = new Order(order, details);
+    orderList->add(o);
+}
+
+Hand *Player::getHand() {
+    return hand;
+}
+
+vector<Territory *> Player::getTerritories() {
+    return territories;
+}
+
+string Player::getName() {
+    return name;
+}
+
+OrderList *Player::getOrderList() {
+    return orderList;
 }

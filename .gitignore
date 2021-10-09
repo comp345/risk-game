@@ -2,3 +2,5 @@
 !/build/**/.gitkeep
 .vscode
 /src/main.dSYM
+.idea
+cmake-build-debug
