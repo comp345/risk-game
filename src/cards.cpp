@@ -17,6 +17,11 @@ Card::Card(const Card& other)
     m_effect = other.m_effect;
 }
 
+Card::Card()
+{
+
+}
+
 Card::~Card()
 {
     delete m_effect;
@@ -34,6 +39,12 @@ Card::Effect* Card::getEffect()
     return m_effect;
 }
 
+std::ostream& Card::write(std::ostream &os) const
+{
+    cout << m_effect;
+    return os;
+}
+
 std::ostream& operator<<(std::ostream& lhs, Card::Effect* e) 
 {
     switch (*e)
@@ -42,16 +53,16 @@ std::ostream& operator<<(std::ostream& lhs, Card::Effect* e)
         return lhs << "Bomb";
         break;
     case Card::Effect::REINFORCEMENT:
-        return lhs << "reinforcement";
+        return lhs << "Reinforcement";
         break;
     case Card::Effect::BLOCKADE:
-        return lhs << "blockade";
+        return lhs << "Blockade";
         break;
     case Card::Effect::AIRLIFT:
-        return lhs << "airlift";
+        return lhs << "Airlift";
         break;
     case Card::Effect::DIPLOMACY:
-        return lhs << "diplomacy";
+        return lhs << "Diplomacy";
         break;
     }
     return lhs;
@@ -59,6 +70,11 @@ std::ostream& operator<<(std::ostream& lhs, Card::Effect* e)
 std::ostream& operator<<(std::ostream& lhs, Card* card) 
 {
     return lhs << card->m_effect;
+}
+
+std::ostream& operator<<(std::ostream& lhs, Card& card) 
+{
+    return card.write(lhs);
 }
 
 Card& Card::operator=(const Card& rhs)
@@ -71,7 +87,95 @@ Card& Card::operator=(const Card& rhs)
     return *this;
 }
 
+// **************** //
+// Bomb functions:  //
+// **************** //
+Bomb::Bomb(Card::Effect effect)
+{
+    m_effect = new Card::Effect(effect);
+}
+Bomb::~Bomb()
+{
+    delete m_effect;
+}
 
+std::ostream& Bomb::write(std::ostream &os) const
+{
+    cout << m_effect;
+    return os;
+}
+
+// **************** //
+// Reinforcment functions:  //
+// **************** //
+Reinforcment::Reinforcment(Card::Effect effect)
+{
+    m_effect = new Card::Effect(effect);
+}
+Reinforcment::~Reinforcment()
+{
+    delete m_effect;
+}
+
+std::ostream& Reinforcment::write(std::ostream &os) const
+{
+    cout << m_effect;
+    return os;
+}
+
+// **************** //
+// Blockade functions:  //
+// **************** //
+Blockade::Blockade(Card::Effect effect)
+{
+    m_effect = new Card::Effect(effect);
+}
+Blockade::~Blockade()
+{
+    delete m_effect;
+}
+
+std::ostream& Blockade::write(std::ostream &os) const
+{
+    cout << m_effect;
+    return os;
+}
+
+// **************** //
+// Airlift functions:  //
+// **************** //
+Airlift::Airlift(Card::Effect effect)
+{
+    m_effect = new Card::Effect(effect);
+}
+Airlift::~Airlift()
+{
+    delete m_effect;
+}
+
+std::ostream& Airlift::write(std::ostream &os) const
+{
+    cout << m_effect;
+    return os;
+}
+
+// **************** //
+// Diplomacy functions:  //
+// **************** //
+Diplomacy::Diplomacy(Card::Effect effect)
+{
+    m_effect = new Card::Effect(effect);
+}
+Diplomacy::~Diplomacy()
+{
+    delete m_effect;
+}
+
+std::ostream& Diplomacy::write(std::ostream &os) const
+{
+    cout << m_effect;
+    return os;
+}
 
 
 
@@ -89,7 +193,24 @@ void Deck::initialize(int size)
     {
         int randomNumber = rand() % 5;
         Card::Effect card = static_cast<Card::Effect>(randomNumber);
-        m_cards.push_back(new Card(card));
+        switch (card)
+        {
+        case Card::Effect::BOMB:
+            m_cards.push_back(new Bomb(card));
+            break;
+        case Card::Effect::REINFORCEMENT:
+            m_cards.push_back(new Reinforcment(card));
+            break;
+        case Card::Effect::BLOCKADE:
+            m_cards.push_back(new Blockade(card));
+            break;
+        case Card::Effect::AIRLIFT:
+            m_cards.push_back(new Airlift(card));
+            break;
+        case Card::Effect::DIPLOMACY:
+            m_cards.push_back(new Diplomacy(card));
+            break;
+        }
     }
 
     while (!validate(m_cards))
@@ -141,6 +262,7 @@ void Deck::showDeck()
     {
         std::cout << count++ << ": " << i << "\n";
     }
+    cout << "\n";
 }
 
 void Deck::draw(Player& player)
@@ -214,7 +336,10 @@ void Hand::drawCard(Card* card)
 void Hand::showCards(Player player)
 {
     cout << "\nPlayer: " << player.getName() << " currently has the following cards\n";
-    cout << this;
+    for(Card* c: m_cards)
+    {
+        std::cout << c << "\n";
+    }
 
 }
 Card* Hand::useLast()

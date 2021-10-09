@@ -14,21 +14,83 @@ public:
     //Constructors
     Card(Effect m_effect);
     Card(const Card& other);
+    Card();
     ~Card();
 
     // Methods
     void play(Player& player, Deck& deck);
     Effect* getEffect();
 
+    virtual std::ostream& write(std::ostream &os) const;
+
     // Operator functions
+    friend std::ostream& operator<<(std::ostream& lhs, Card& c);
     friend std::ostream& operator<<(std::ostream& lhs, Card* c);
     friend std::ostream& operator<<(std::ostream& lhs, Effect* e);
     Card& operator=(const Card& rhs);
 
-private:
+protected:
     Effect* m_effect;
 
 };
+
+
+class Bomb: virtual public Card
+{
+private:
+    
+public:
+    Bomb(Effect effect);
+    ~Bomb();
+
+    std::ostream& write(std::ostream &os) const;
+};
+
+class Reinforcment: virtual public Card
+{
+private:
+    
+public:
+    Reinforcment(Effect effect);
+    ~Reinforcment();
+
+    std::ostream& write(std::ostream &os) const;
+};
+
+class Blockade: virtual public Card
+{
+private:
+    
+public:
+    Blockade(Effect effect);
+    ~Blockade();
+
+    std::ostream& write(std::ostream &os) const;
+};
+
+class Airlift: virtual public Card
+{
+private:
+    
+public:
+    Airlift(Effect effect);
+    ~Airlift();
+
+    std::ostream& write(std::ostream &os) const;
+};
+
+class Diplomacy: virtual public Card
+{
+private:
+    
+public:
+    Diplomacy(Effect effect);
+    ~Diplomacy();
+
+    std::ostream& write(std::ostream &os) const;
+};
+
+
 
 
 class Deck
@@ -60,6 +122,7 @@ class Hand
 {
 private:
     std::vector<Card*> m_cards;
+    
 public:
     //Constructors
     Hand(/* args */);
