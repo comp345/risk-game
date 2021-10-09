@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include "orders.hpp"
+#include "Player.h"
 #include <map>
 using namespace std;
 
@@ -28,10 +29,7 @@ using namespace std;
     class Map {
 
     };
-    // Temp adjustment until other classes are ready
-    class Players {
 
-    };
     class GameEngine 
     {
 
@@ -42,11 +40,12 @@ using namespace std;
         string userInput;
         //LoadMap should return a Map OBJ (currently has to be a string to test)
         string loadMap(string filePath);
-        int currentPlayers;
+        int numPlayers;
+        vector<Player*> currentPlayers;
         // Need to pass a map
         bool validateMap(Map myMap);
         // Need to pass some players
-        bool addPlayer(Players currentPlayers);
+        vector<Player*> addPlayer(int numberOfPlayers);
         void assignReinformentPhase();
         void issueOrderPhase();
         void executeOrderPhase();
