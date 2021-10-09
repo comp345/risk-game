@@ -7,8 +7,6 @@
 using namespace std;
 
 
-namespace GameEngine 
-{
     void testEngineLink();
 
     enum STATES {
@@ -26,7 +24,6 @@ namespace GameEngine
         end
     };
 
-
     // Temp adjustment until other classes are ready
     class Map {
 
@@ -35,48 +32,36 @@ namespace GameEngine
     class Players {
 
     };
+    class GameEngine 
+    {
 
-    class StartupPhase
-    {   
     private:
+        
+        string command;
        // Input attribyte
         string userInput;
         //LoadMap should return a Map OBJ (currently has to be a string to test)
         string loadMap(string filePath);
         int currentPlayers;
         // Need to pass a map
-        bool validatemap(Map myMap);
+        bool validateMap(Map myMap);
         // Need to pass some players
-        bool addplayer(Players currentPlayers);
-
-
+        bool addPlayer(Players currentPlayers);
+        void assignReinformentPhase();
+        void issueOrderPhase();
+        void executeOrderPhase();
+        void gameLoop();
     public:
         string currentState;
         map<string, int> gameState;
         map<string, int>::iterator checker;
         string mapPath;
-        StartupPhase &operator=(const StartupPhase &o);
-        friend std::ostream &operator<<(std::ostream &out, const StartupPhase &o);
-        friend std::istream &operator>>(std::istream &in, StartupPhase& o);
-        StartupPhase();
+        GameEngine &operator=(const GameEngine &o);
+        friend std::ostream &operator<<(std::ostream &out, const GameEngine &o);
+        friend std::istream &operator>>(std::istream &in, GameEngine& o);
+        GameEngine();
         void startUpLoop();
-        bool mapUserInputToCommand(string input);
+        string mapUserInputToCommand(string input);
         void changeState();
-        void testEngineLink();
         void testEngineDriver();
     };
-
-    class GameLoopPhase
-    {
-    private: 
-        void assignReinformentPhase();
-        void issueOrderPhase();
-        void executeOrderPhase();
-        void gameLoopTemplate();
-    public:
-        map<string, int> gameState;
-        map<string, int>::iterator checker;
-    };
-
-
-}

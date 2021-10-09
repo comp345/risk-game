@@ -2,11 +2,12 @@
 #include <vector>
 #include <string>
 #include "GameEngine.h"
-//using namespace GameEngine;
+//using namespace GameEngineSpace;
 
-StartupPhase::StartupPhase()
+GameEngine::GameEngine()
 {
     // Initialize Engine level variables or env variables..
+    command = "";
     currentState = "start";
     currentPlayers = 0;
     // StartupPhase::gameState['start'] = 0;
@@ -24,7 +25,7 @@ StartupPhase::StartupPhase()
 }
 
 // Replace with Map function from other parts when ready
-string StartupPhase::loadMap(string myMap)
+string GameEngine::loadMap(string myMap)
 {
     //Assumption that the map is loaded in project directory 
 
@@ -32,34 +33,48 @@ string StartupPhase::loadMap(string myMap)
 }
 
 // We can use something like this on next iteration to automate the startup process
-void StartupPhase::startUpLoop() 
+void GameEngine::startUpLoop() 
 {
     cout << "Welcome to Warzone. Terminal style!\n";
-    cout << "To start playing, enter the name of the Map you want to load\n";
+    cout << "============================================\n";
+    cout << "To start playing, enter loadmap\n";
     cin >> userInput;
     mapPath = loadMap(userInput);
     cout << "To validate map enter: validatemap\n";
-    cin >> userInput
-    validateMap()
+    cin >> userInput;
+    //validateMap();
     cout << "To add players enter: addplayer\n";
-    cin >> userInput
+    cin >> userInput;
     cout << "Startup Phase complete. Starting the game...\n";
     //validateMap() - auto
     //playerAdd() - manual entry
     //changeState() - enter gameloop
-}
+};
 
-bool addplayer(Players currentPlayers)
+
+bool GameEngine::addPlayer(Players currentPlayers)
 {
     return true;
-}
+};
 
-bool validatemap(Map myMap)
+bool GameEngine::validateMap(Map myMap)
 {
     return true;
-}
+};
 
-void mapUserInputToCommand(string input)
+string GameEngine::mapUserInputToCommand(string input)
 {
+    return "mapping";
+};
 
-}
+void GameEngine::gameLoop()
+{
+    cout << "============================================\n";
+    cout << "To start assigning countries, enter loadmap\n";
+    for(int i = 0; i < currentPlayers; i++)
+    {
+        assignCountries()
+    }
+
+    
+};
