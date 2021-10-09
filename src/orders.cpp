@@ -117,14 +117,14 @@ void Order::setDetails(std::string orderDetails)
 {
     details = orderDetails;
 }
-bool Order::validate()
-{
-    return true;
-}
-bool Order::execute()
-{
-    return true;
-}
+// bool Order::validate()
+// {
+//     return true;
+// }
+// bool Order::execute()
+// {
+//     return true;
+// }
 
 Deploy::Deploy() : Order("Deploy type", "")
 {
@@ -290,8 +290,7 @@ vector<Order *> OrderList ::getList()
     {
         // Need the copy constructor of Order and its subclasses
         Order *ptrOrder = *(list.begin() + i);
-        Order *o = new Order(*ptrOrder);
-        copyList.push_back(o);
+        copyList.push_back(ptrOrder);
         // cout << **(copyList->begin() + i); // Debug: print newly added OrderPtr's object
     }
 
@@ -317,9 +316,8 @@ ostream &operator<<(ostream &out, const OrderList &ol)
     out << "OrderList: {";
     for (vector<Order *>::iterator it = copyList.begin(); it != copyList.end(); ++it)
     {
-        Order o = **it;
         out << " "
-            << o.getCommand();
+            << (**it).getCommand();
     }
     out << "}";
     return out;
@@ -351,9 +349,8 @@ void OrderList::printList()
     cout << "Printing an order list!";
     for (vector<Order *>::iterator it = list.begin(); it != list.end(); ++it)
     {
-        Order eachOrder = **it;
         cout << " "
-             << eachOrder.getCommand();
+             << (**it).getCommand();
         // << *it;
     }
     cout << "\n";

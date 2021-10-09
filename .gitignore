@@ -9,3 +9,5 @@ Dart*
 Ctest**/**
 Makefile
 build/**/**.**
+.idea
+cmake-build-debug
