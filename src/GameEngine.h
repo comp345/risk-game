@@ -6,8 +6,27 @@
 #include <map>
 using namespace std;
 
-namespace GameEngine
+
+namespace GameEngine 
 {
+    void testEngineLink();
+
+    enum STATES {
+        start,
+        loadmap,
+        validateMap,
+        addplayer,
+        assignCountries,
+        issueorder,
+        endissueorders,
+        execorder,
+        endexecorders,
+        win,
+        play,
+        end
+    };
+
+
     // Temp adjustment until other classes are ready
     class Map {
 
@@ -22,21 +41,29 @@ namespace GameEngine
     private:
        // Input attribyte
         string userInput;
-        void loadMap(string filePath);
+        //LoadMap should return a Map OBJ (currently has to be a string to test)
+        string loadMap(string filePath);
+        int currentPlayers;
         // Need to pass a map
-        bool mapValidated(Map myMap);
+        bool validatemap(Map myMap);
         // Need to pass some players
-        bool PlayersAdded(Players currentPlayers);
+        bool addplayer(Players currentPlayers);
 
 
     public:
         string currentState;
-        map<string, int> gameStates;
+        map<string, int> gameState;
         map<string, int>::iterator checker;
+        string mapPath;
+        StartupPhase &operator=(const StartupPhase &o);
+        friend std::ostream &operator<<(std::ostream &out, const StartupPhase &o);
+        friend std::istream &operator>>(std::istream &in, StartupPhase& o);
         StartupPhase();
-        void StartupPhaseTemplate();
+        void startUpLoop();
         bool mapUserInputToCommand(string input);
-        void changeState(int phase)
+        void changeState();
+        void testEngineLink();
+        void testEngineDriver();
     };
 
     class GameLoopPhase
@@ -51,4 +78,5 @@ namespace GameEngine
         map<string, int>::iterator checker;
     };
 
-};
+
+}
