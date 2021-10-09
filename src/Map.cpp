@@ -63,7 +63,7 @@ Territory::Territory(string n) {
 //    name = "";
 //    numOfTerritories == 0;
 //}
-
+//
 //Continent::~Continent() {}
 
 std::vector<Territory *> Map::getTerritories() {
@@ -343,6 +343,7 @@ Map *MapLoader::readMapFile() {
         cout << "\nMap file is invalid. Returning an empty map." << endl;
         return map;
     }
+    return map;
 }
 
 Map *MapLoader::combineInfos() {
@@ -427,9 +428,9 @@ vector<Territory *> MapLoader::readMapFileForCountries() {
                 break;
             }
 
-            Territory *country = new Territory(territoryName);
+            Territory *territoryCountry = new Territory(territoryName);
             continentNb.push_back(continent);
-            countryList.push_back(country);
+            countryList.push_back(territoryCountry);
         }
 
         inputFileStream.close();
@@ -496,15 +497,3 @@ vector<vector<Territory *> > MapLoader::readMapFileForBorders() {
     cout << "File is not open " << "\n";
     return bordersList;
 }
-
-
-////TODO: maybe they're already implemented?
-//void Map::addTerritory(Territory* territory, vector<Territory*> neighborList) {
-//    territories.push_back(territory);
-//    territoryNeighbors[territory->getName()] = neighborList;
-//}
-//
-//void Map::registerWithContinent(string continent, int bonusArmyCount, Territory* territory) {
-//    continents[continent].push_back(territory);
-//    continentArmies[continent] = bonusArmyCount;
-//}
