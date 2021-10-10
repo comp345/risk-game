@@ -57,7 +57,7 @@ struct Continent {
 
     std::string name;
     int numOfTerritories;
-
+    int numOfArmies;
 };
 
 class Map {
@@ -73,71 +73,45 @@ public:
     Territory *createTerritoryNode();
 
     void addEdge(Territory *u, Territory *v);//to create edges between territory nodes
-    void createContinent(std::string cName, int numOfCountries);
+    void createContinent(std::string cName, int numOfCountries, int armyNum);
 
     void addToContinent(int index, Territory *u);
 
     void DFS(Territory *currentTNode, std::vector<Territory *> *tNodeVec); //to traverse through the territory nodes
     bool isIn(Territory *currentTNode, std::vector<Territory *> *tNodeVec); //for checking if territory
-    int territorySizeCheck();
+    int getTerritorySize();
+    int initList();
 
-    void subgraphCheck(int continentIdx, std::vector<Territory *> *graphVec);
+    bool isAConnectedSubgraph(int continentIdx, std::vector<Territory *> *graphVec);
 
-    void validate();
+    bool isAValidMap();
 
-    void duplicateCheck();
+    bool containsDuplicateTerritories();
 
     std::vector<Territory *> getTerritories();
 
 private:
     int counter;
 };
-
 class MapLoader {
-private:
-    string mapFileName;
-    vector<string> continentList;
-    vector<Territory *> countryList;
-    vector<vector<Territory *> > bordersList; //Vector of vector of territories to store borders lists
-    vector<int> continentNb; //To store the index of each continent associated to each country
-    vector<int> armiesNb; //To store the nb of armies for each continent
-
 public:
     MapLoader();
-
-    MapLoader(const MapLoader &other);
-
-    MapLoader(string mapFile);
-
     ~MapLoader();
+    //copy constructor
+    MapLoader(const MapLoader& ml1);
 
-    // Operator functions
-    friend std::ostream &operator<<(std::ostream &lhs, MapLoader *d);
+    //Assignment operator
+    MapLoader& operator=(const MapLoader& ml);
+    friend std::ostream& operator<<(std::ostream& out, const MapLoader& ml);
+    friend std::istream& operator>>(std::istream& in, MapLoader& ml);
 
-    MapLoader &operator=(const MapLoader &rhs);
+    std::vector<std::string> splitString(std::string str, const char separator);
+    Map* loadMap(std::string fileName);
+    int ID;
+    bool getMapStatus();
 
-
-    virtual bool checkValidity();
-
-    virtual Map *readMapFile(); //stores all information into map
-    virtual vector<string> readMapFileForContinents(); //reads file & return list of continents
-    virtual vector<vector<Territory *> > readMapFileForBorders(); //reads file & return list of borders for each country
-    virtual vector<Territory *> readMapFileForCountries(); //reads file & return list of countries
-    virtual Map *combineInfos(); //stores all information into map
-
-    vector<string> getContinentList();
-
-    vector<Territory *> getCountryList();
-
-    vector<vector<Territory *> > getBordersList();
-
-    vector<int> getContinentNb();
-
-    void setArmiesNb(vector<int> *armiesNumList);
-
-    vector<int> getArmiesNb();
-
-    void setMapFileName(string mapFile);
-
-    string getMapFileName();
+private:
+    void goTo(std::fstream& infile, std::string header);
+    bool containsHeader(std::fstream& infile, std::string header);
+    bool mapStatus = true;
 };
