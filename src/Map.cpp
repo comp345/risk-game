@@ -85,28 +85,25 @@ Territory *Map::createTerritoryNode() {
 }
 
 //add edge between territories
-int Map::addEdge(Territory *u, Territory *v) {
-    neightborsList[u->getID()].push_back(v); //adds new territory V after the territory u in the vector
-    return 0;
+void Map::addEdge(Territory *u, Territory *v) {
+    neighborsList[u->getID()].push_back(v); //adds new territory V after the territory u in the vector
 }
 
 //create a continent with name and list of countries
-int Map::createContinent(std::string cName, int numOfCountries) {
+void Map::createContinent(std::string cName, int numOfCountries) {
     Continent *c = new Continent();
     c->name = cName;
     c->numOfTerritories = numOfCountries;
     continentList.push_back(c);
     c = nullptr;
-    return 0;
 }
 
 //add territories to created continent
-int Map::addToContinent(int index, Territory *u) {
+void Map::addToContinent(int index, Territory *u) {
     Continent *c = continentList.at(index);
     c->territories.push_back(u);
     c->numOfTerritories++;
     c = nullptr;
-    return 0;
 }
 
 //helper method for graph traversal-> check territory size
@@ -130,21 +127,21 @@ bool Map::isIn(Territory *currentTNode, std::vector<Territory *> *tNodeVec) {
 }
 
 //traverse using DFS & compare current territory node to the territory node vector
-int Map::DFS(Territory *currentTNode, std::vector<Territory *> *tNodeVec) {
+void Map::DFS(Territory *currentTNode, std::vector<Territory *> *tNodeVec) {
     if (isIn(currentTNode, tNodeVec)) {//no need to traverse current node
-        return false;
+        return;
     }
     (*tNodeVec).push_back(currentTNode);//add territories that have been traversed
 
-    for (int i = 0; i < neightborsList[currentTNode->getID()].size(); i++) {
-        if (!isIn(neightborsList[currentTNode->getID()].at(i), tNodeVec)) {
-            DFS(neightborsList[currentTNode->getID()].at(i), tNodeVec);
+    for (int i = 0; i < neighborsList[currentTNode->getID()].size(); i++) {
+        if (!isIn(neighborsList[currentTNode->getID()].at(i), tNodeVec)) {
+            DFS(neighborsList[currentTNode->getID()].at(i), tNodeVec);
         }
     }
 }
 
 //helper method for duplicate territory check
-int Map::duplicateCheck() {
+void Map::duplicateCheck() {
     printf("\n Checking for non duplicate territories: \n");
 
     for (int i = 0; i < continentList.size() - 1; i++) {
@@ -161,11 +158,10 @@ int Map::duplicateCheck() {
         }
     }
     printf("\n Map is valid: No duplicate territories found! \n");
-    return 0;
 }
 
 //helper method check if subgraph is connected
-int Map::subgraphCheck(int continentIdx, std::vector<Territory *> *graphVec) {
+void Map::subgraphCheck(int continentIdx, std::vector<Territory *> *graphVec) {
     for (int i = 0; i < continentList.size(); i++) {
         if (i != continentIdx) {
             for (int j = 0; j < continentList[i]->territories.size(); j++) {
@@ -177,11 +173,10 @@ int Map::subgraphCheck(int continentIdx, std::vector<Territory *> *graphVec) {
     if (graphVec->size() == territorySizeCheck()) {
         std::cout << "\n" << continentList[continentIdx]->name << ": is a connected subgraph" << std::endl;
     }
-    return 0;
 }
 
 //map validation method
-int Map::validate() {
+void Map::validate() {
     std::vector<Territory *> visitedTerritory;
     int tSize = territorySizeCheck();
 
@@ -197,9 +192,6 @@ int Map::validate() {
     }
     duplicateCheck();
     printf("\n");
-
-    return 0;
-
 }
 
 // ********************** //
@@ -350,10 +342,15 @@ Map *MapLoader::combineInfos() {
     Map *map = new Map();
     int currContinentNb;
 
-    for (int i = 0; i < countryList.size(); i++) {
+    for (int i = 0; i < continentList.size(); i++) {
+        map->createContinent(continentList[i], 0);
+    }
+
+    for (int i = 0; i < countryList.size()-1; i++) {
+        map->addEdge(countryList[i], countryList[i+1]);
 //        map->addTerritory(countryList[i], bordersList[i]);
-//        currContinentNb = continentNb[i] - 1;
-//        map->registerWithContinent(continentList[currContinentNb], countryList[i]);
+        //currContinentNb = continentNb[i] - 1;
+        map->addToContinent(continentNb[i]-1, countryList[i]);
     }
     cout << "\n";
     cout << "\n";
@@ -469,7 +466,6 @@ vector<vector<Territory *> > MapLoader::readMapFileForBorders() {
 
 
         while (getline(inputFileStream, line) && line.find("[borders]") == std::string::npos) {
-            nList.empty();
             istringstream iss(line);
 
             do {
@@ -485,6 +481,7 @@ vector<vector<Territory *> > MapLoader::readMapFileForBorders() {
             }
 
             bordersList.push_back(nList);
+            nList.clear();
         }
 
         inputFileStream.close();

@@ -44,7 +44,7 @@ public:
 private:
     int ID;
     string name;
-    //Player* owner;
+//    Player* owner;
     int numArmies = 0;
     int neighbors = 0;
 };
@@ -66,33 +66,28 @@ public:
 
     ~Map();
 
-    std::vector<Territory *> neightborsList[MAX_SIZE];
+    std::vector<Territory *> neighborsList[MAX_SIZE];
     std::vector<Territory *> territoryNodeList;
     std::vector<Continent *> continentList;
-    std::vector<Territory *> continentNeightborsList;
 
     Territory *createTerritoryNode();
 
-    int addEdge(Territory *u, Territory *v);//to create edges between territory nodes
-    int createContinent(std::string cName, int numOfCountries);
+    void addEdge(Territory *u, Territory *v);//to create edges between territory nodes
+    void createContinent(std::string cName, int numOfCountries);
 
-    int addToContinent(int index, Territory *u);
+    void addToContinent(int index, Territory *u);
 
-    int DFS(Territory *currentTNode, std::vector<Territory *> *tNodeVec); //to traverse through the territory nodes
+    void DFS(Territory *currentTNode, std::vector<Territory *> *tNodeVec); //to traverse through the territory nodes
     bool isIn(Territory *currentTNode, std::vector<Territory *> *tNodeVec); //for checking if territory
     int territorySizeCheck();
 
-    int subgraphCheck(int continentIdx, std::vector<Territory *> *graphVec);
+    void subgraphCheck(int continentIdx, std::vector<Territory *> *graphVec);
 
-    int validate();
+    void validate();
 
-    int duplicateCheck();
+    void duplicateCheck();
 
     std::vector<Territory *> getTerritories();
-
-    void registerWithContinent(string continent, int bonusArmyCount, Territory *territory);
-
-    void addTerritory(Territory *territory, vector<Territory *> neighborList);
 
 private:
     int counter;
