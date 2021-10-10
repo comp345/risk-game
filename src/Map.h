@@ -50,8 +50,8 @@ private:
 };
 
 struct Continent {
-    // Continent();
-    // ~Continent();
+     Continent();
+     ~Continent();
 
     std::vector<Territory *> territories; //to show list of territories on creating a continent
 

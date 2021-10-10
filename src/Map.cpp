@@ -60,12 +60,12 @@ Territory::Territory(string n) {
     name = n;
 }
 
-//Continent::Continent() {
-//    name = "";
-//    numOfTerritories == 0;
-//}
-//
-//Continent::~Continent() {}
+Continent::Continent() {
+    name = "";
+    numOfTerritories = 0;
+}
+
+Continent::~Continent() {}
 
 std::vector<Territory *> Map::getTerritories() {
     return territoryNodeList;
