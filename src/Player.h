@@ -3,9 +3,12 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "orders.hpp"
+#include "Orders.hpp"
 #include "Card.h"
 #include "Map.h"
+
+class Territory;
+class Hand;
 
 using namespace std;
 
@@ -17,11 +20,13 @@ public:
     Player(string, vector<Territory *>, Hand *, OrderList *);
 
     ~Player(); //destructor
-    void toAttack();
+    vector<Territory *> toAttack();
 
-    void toDefend();
+    vector<Territory *> toDefend();
 
     void issueOrder(string, string);
+
+    void issueOrder(Order *o);
 
     // Getters
     vector<Territory *> getTerritories();
@@ -31,6 +36,17 @@ public:
     Hand *getHand();
 
     OrderList *getOrderList();
+
+    void setTerritories(vector<Territory *> vector1);
+
+    void setCards(Hand *pHand);
+
+    //operator overloading
+    //assignment operator overloading
+    void operator=(const Player& p);
+    //stream insertion operator overloading
+    friend ostream& operator<<(ostream& out, const Player& p);
+    friend istream& operator>>(istream& in, Player& p);
 
 private:
     string name;

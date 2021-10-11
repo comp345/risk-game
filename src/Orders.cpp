@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <string>
-#include "orders.hpp"
+#include "Orders.hpp"
 
 using namespace std;
 
@@ -117,14 +116,16 @@ void Order::setDetails(std::string orderDetails)
 {
     details = orderDetails;
 }
-// bool Order::validate()
-// {
-//     return true;
-// }
-// bool Order::execute()
-// {
-//     return true;
-// }
+
+//TODO: implement these
+ bool Order::validate()
+ {
+     return true;
+ }
+ bool Order::execute()
+ {
+     return true;
+ }
 
 Deploy::Deploy() : Order("Deploy type", "")
 {

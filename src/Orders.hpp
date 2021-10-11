@@ -7,7 +7,10 @@
 // - Player ptr
 // - Territory ptr
 // - Armies number data member (Deploy, Advance) ?
-// 
+//
+
+class OrderList;
+class Order;
 
 void testOrdersLink();
 
