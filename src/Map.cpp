@@ -73,7 +73,7 @@ int Territory::getNumberOfArmies() {
     return numArmies;
 }
 
-Player* Territory::getOwner() {
+Player *Territory::getOwner() {
     return owner;
 }
 
@@ -85,7 +85,7 @@ void Territory::setName(string n) {
     name = n;
 }
 
-void Territory::setOwner(Player* p) {
+void Territory::setOwner(Player *p) {
     owner = p;
 }
 
@@ -194,16 +194,18 @@ bool Map::containsDuplicateTerritories() {
             for (int k = i + 1; k < continentList.size(); k++) {
                 for (int l = 0; l < continentList[k]->territories.size(); l++) {
                     if (continentList[i]->territories[j] == continentList[k]->territories[l]) {
-                        printf("ERROR: Duplicate territory found! ");
-                        std::cout << continentList[i]->name << continentList[i]->territories[j]->getName() << "\t";
-                        std::cout << continentList[k]->name << continentList[k]->territories[l]->getName() << std::endl;
+                        printf("ERROR: Duplicate territory found! \n");
+                        std::cout << continentList[i]->name << "--->" << continentList[i]->territories[j]->getName()
+                                  << "\t";
+                        std::cout << continentList[k]->name << "--->" << continentList[k]->territories[l]->getName()
+                                  << std::endl;
                         return true;
                     }
                 }
             }
         }
     }
-    printf("\nNo duplicate territories found! \n");
+    printf("\nNo duplicate territories found!\n");
     return false;
 }
 
@@ -239,6 +241,13 @@ bool Map::validate() {
 
     if (visitedTerritory.size() == tSize) {
         printf("This is a connected graph \n");
+    } else {
+        printf("The map is not connected! \n");
+    }
+
+
+    if (containsDuplicateTerritories()) {
+        return false;
     }
 
     for (int i = 0; i < continentList.size(); i++) {
@@ -246,9 +255,6 @@ bool Map::validate() {
         if (!isAConnectedSubgraph(i, &sub)) {
             return false;
         }
-    }
-    if (containsDuplicateTerritories()) {
-        return false;
     }
     printf("\n");
     return true;
@@ -263,8 +269,7 @@ MapLoader::MapLoader() {
 MapLoader::~MapLoader() {
 }
 
-std::vector<std::string> MapLoader::splitString(std::string str, const char separator)
-{
+std::vector<std::string> MapLoader::splitString(std::string str, const char separator) {
     vector<string> parts;
     stringstream lineStringStream(str);
     string part;
@@ -277,44 +282,36 @@ std::vector<std::string> MapLoader::splitString(std::string str, const char sepa
     return parts;
 }
 
-bool MapLoader::getMapStatus()
-{
+bool MapLoader::getMapStatus() {
     return mapStatus;
 }
 
-void MapLoader::goTo(std::fstream& infile, std::string header)
-{
+void MapLoader::goTo(std::fstream &infile, std::string header) {
     infile.clear();
     infile.seekg(0);
 
     string line;
-    while (std::getline(infile, line))
-    {
-        if (line.find(header) != std::string::npos)
-        {
+    while (std::getline(infile, line)) {
+        if (line.find(header) != std::string::npos) {
             break;
         }
     }
 }
 
-bool MapLoader::containsHeader(std::fstream& infile, std::string header)
-{
+bool MapLoader::containsHeader(std::fstream &infile, std::string header) {
     infile.clear();
     infile.seekg(0);
 
     string line;
     bool found = false;
 
-    while (std::getline(infile, line))
-    {
-        if (line.find(header) != std::string::npos)
-        {
+    while (std::getline(infile, line)) {
+        if (line.find(header) != std::string::npos) {
             found = true;
         }
     }
 
-    if (!found)
-    {
+    if (!found) {
         cout << "Warning: File doesn't contain " << header << endl;
     }
 
@@ -325,47 +322,43 @@ bool MapLoader::containsHeader(std::fstream& infile, std::string header)
 }
 
 //copy constructor
-MapLoader::MapLoader(const MapLoader& ml1)
-{
+MapLoader::MapLoader(const MapLoader &ml1) {
     ID = ml1.ID;
 }
 
 //operator overload
-MapLoader& MapLoader::operator=(const MapLoader& ml)
-{
-    if(this == &ml)
+MapLoader &MapLoader::operator=(const MapLoader &ml) {
+    if (this == &ml)
         return *this;
 
     ID = ml.ID;
     return *this;
 }
 
-ostream& operator<<(ostream& out, const MapLoader& ml)
-{
+ostream &operator<<(ostream &out, const MapLoader &ml) {
     out << endl << "\tMapLoader ID: " << ml.ID << endl;
     return out;
 }
 
-istream& operator>>(std::istream& in, MapLoader& ml) {
+istream &operator>>(std::istream &in, MapLoader &ml) {
     std::cout << "Enter MapLoader ID: ";
     in >> ml.ID;
     return in;
 }
 
 //Method to load map from a .map file
-Map* MapLoader::loadMap(string fileName) {
+Map *MapLoader::loadMap(string fileName) {
     cout << "\n -----------------------------" << endl;
     cout << "\nLoading map from file..... " << fileName << endl;
     fstream infile;
     infile.open(fileName);
-    Map* graph = new Map();
+    Map *graph = new Map();
 
     //check if the map follows the conquest map format
     if (!containsHeader(infile, "[files]")
         || !containsHeader(infile, "[continents]")
         || !containsHeader(infile, "[countries]")
-        || !containsHeader(infile, "[borders]"))
-    {
+        || !containsHeader(infile, "[borders]")) {
         mapStatus = false;
         return graph;
     }
@@ -378,8 +371,7 @@ Map* MapLoader::loadMap(string fileName) {
 
     int continentIndex = 1;
     //while haven't reached [countries]
-    while (getline(infile, line) && line.compare("[countries]"))
-    {
+    while (getline(infile, line) && line.compare("[countries]")) {
         if (line.empty()) { continue; } //skip empty lines
         std::vector<std::string> lineVector = splitString(line, ' ');
         string continentName = lineVector.at(0);
@@ -392,8 +384,7 @@ Map* MapLoader::loadMap(string fileName) {
     goTo(infile, "[countries]");
 
     //set countries in continent from [countries] to
-    while (getline(infile, line) && line.compare("[borders]"))
-    {
+    while (getline(infile, line) && line.compare("[borders]")) {
         //skip empty lines
         if (line.empty()) { continue; }
 
@@ -404,25 +395,23 @@ Map* MapLoader::loadMap(string fileName) {
         int continentIndex = stoi(lineVector.at(2));
 
         //set country in corresponding continent
-        graph->territoryNodeList[countryIndex-1]->setName(countryName);
-        graph->addToContinent(continentIndex-1, graph->territoryNodeList[countryIndex-1]);
+        graph->territoryNodeList[countryIndex - 1]->setName(countryName);
+        graph->addToContinent(continentIndex - 1, graph->territoryNodeList[countryIndex - 1]);
     }
 
     //go to [borders]
     goTo(infile, "[borders]");
 
     //set borders
-    while (getline(infile, line))
-    {
+    while (getline(infile, line)) {
         std::vector<std::string> lineVector = splitString(line, ' ');
 
         int countryIndex = stoi(lineVector.at(0));
         lineVector.erase(lineVector.begin());
 
-        for (const string& stringNeighbor : lineVector)
-        {
+        for (const string &stringNeighbor: lineVector) {
             int neighbor = stoi(stringNeighbor);
-            graph->addEdge(graph->territoryNodeList[countryIndex-1], graph->territoryNodeList[neighbor-1]);
+            graph->addEdge(graph->territoryNodeList[countryIndex - 1], graph->territoryNodeList[neighbor - 1]);
         }
     }
 

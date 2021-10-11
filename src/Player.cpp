@@ -49,10 +49,14 @@ Player::~Player()
 
 //operator overloading
 //assignment operator overloading
-void Player::operator=(const Player& p) {
+Player& Player::operator=(const Player& p) {
+    if (this == &p)
+        return *this;
+
     territories = p.territories;
     hand = new Hand(*(p.hand));
     orderList = new OrderList(*(p.orderList));
+    return *this;
 }
 
 //stream insertion operator overloading
@@ -75,6 +79,7 @@ ostream& operator<<(ostream& out, const Player& p) {
 
     if (p.hand != nullptr) {
         for (Card* c : p.hand->getCards()) {
+            //TODO: fix this
             out << "\nCard: " << *c << endl;
         }
     }
@@ -144,7 +149,6 @@ void Player::printOrders()
     cout << "\nPlayer: " << name << " Has the following ordered queued\n";
     for(Order* o : orderList->getList())
     {
-        //TODO: fix this
-        cout << new Card(static_cast<Card::Effect>(id)) << "\n";
+        cout << *o << "\n";
     }
 }

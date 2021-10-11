@@ -46,7 +46,7 @@ public:
 
     //operator overloading
     //assignment operator overloading
-    void operator=(const Player& p);
+    Player& operator=(const Player& p);
     //stream insertion operator overloading
     friend ostream& operator<<(ostream& out, const Player& p);
     friend istream& operator>>(istream& in, Player& p);
