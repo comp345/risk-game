@@ -2,20 +2,22 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include "orders.hpp"
-#include "Player.h"
 #include <map>
 using namespace std;
 
 
     void testEngineLink();
 
-    enum STATES {
+
+    enum STARTUP_STATES {
         start,
         loadmap,
         validateMap,
         addplayer,
-        assignCountries,
+        assigncountries
+    };
+
+    enum GAME_STATES {
         issueorder,
         endissueorders,
         execorder,
@@ -27,32 +29,42 @@ using namespace std;
 
     // Temp adjustment until other classes are ready
     class Map {
+        public: 
+            Map(){}
+    };
 
+    class Player {
+        public: 
+            Player(){}
     };
 
     class GameEngine 
     {
 
     private:
-        
         string command;
        // Input attribyte
-        string userInput;
+        int intInput;
+        string stringInput;
+        vector<string> maps;
         //LoadMap should return a Map OBJ (currently has to be a string to test)
         string loadMap(string filePath);
         int numPlayers;
-        vector<Player*> currentPlayers;
+        //vector<Player> currentPlayers;
+        vector<int> currentPlayers;
         // Need to pass a map
-        bool validateMap(Map myMap);
+        bool validateMap(string myMap);
         // Need to pass some players
-        vector<Player*> addPlayer(int numberOfPlayers);
+        vector<int> addPlayers(int numberOfPlayers);
+        //vector<Player> addPlayer(int numberOfPlayers);
         void assignReinformentPhase();
         void issueOrderPhase();
         void executeOrderPhase();
         void gameLoop();
     public:
         string currentState;
-        map<string, int> gameState;
+        typedef std::map<STARTUP_STATES, std::string> startUpStateMap;
+        typedef std::map<GAME_STATES, std::string> gamesStateMap;
         map<string, int>::iterator checker;
         string mapPath;
         GameEngine &operator=(const GameEngine &o);
@@ -60,7 +72,8 @@ using namespace std;
         friend std::istream &operator>>(std::istream &in, GameEngine& o);
         GameEngine();
         void startUpLoop();
-        string mapUserInputToCommand(string input);
         void changeState();
         void testEngineDriver();
+        void setupMaps();
+
     };
