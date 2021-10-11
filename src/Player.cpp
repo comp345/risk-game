@@ -16,7 +16,7 @@ Player::Player(string n)
     this->name = n;
 }
 
-
+//parametrized constructor
 Player::Player(string n, vector<Territory*> t, Hand* h, OrderList* o)
 {
     this->name = n;
@@ -25,6 +25,7 @@ Player::Player(string n, vector<Territory*> t, Hand* h, OrderList* o)
     this->orderList = o;
 }
 
+//copy constructor
 Player::Player(const Player& p)
 {
     this->name = p.name;
@@ -33,6 +34,7 @@ Player::Player(const Player& p)
     this->orderList = p.orderList;
 }
 
+//destructor
 Player::~Player()
 {
     territories.clear();
@@ -95,24 +97,28 @@ istream& operator>>(istream& in, Player& p) {
     return in;
 }
 
+//returns a list of territories to attack
 vector<Territory *> Player::toAttack()
 {
     return territories;
 
 }
 
+//returns a list of territories to defend
 vector<Territory *> Player::toDefend()
 {
     return territories;
 }
 
-
+//adds order to a player's list of orders
 void Player::issueOrder(string order, string details)
 {
+    //TODO: delete?
 //    Order* o = new Order(order, details);
 //    orderList->add(o);
 }
 
+//adds order to a player's list of orders
 void Player::issueOrder(Order* o)
 {
     orderList->add(o);
@@ -142,7 +148,7 @@ void Player::setCards(Hand *pHand) {
     hand = pHand;
 }
 
-//Goes through all the orders that are in the list of orders of a given player
+//Goes through all the orders that are in the list of orders of a given player and prints them
 void Player::printOrders()
 {
     cout << "\nPlayer: " << name << " Has the following ordered queued\n";
