@@ -33,8 +33,6 @@ public:
     virtual std::ostream &write(std::ostream &os) const;
 
     // Operator functions
-    friend std::ostream &operator<<(std::ostream &lhs, Card &c);
-
     friend std::ostream &operator<<(std::ostream &lhs, Card *c);
 
     friend std::ostream &operator<<(std::ostream &lhs, Effect *e);
@@ -58,13 +56,13 @@ public:
     std::ostream &write(std::ostream &os) const;
 };
 
-class Reinforcment : virtual public Card {
+class Reinforcement : virtual public Card {
 private:
 
 public:
-    Reinforcment(Effect effect);
-
-    ~Reinforcment();
+    Reinforcement(Effect effect);
+    Reinforcement(const Reinforcement& reinforcement);
+    ~Reinforcement();
 
     std::ostream &write(std::ostream &os) const;
 };
@@ -74,7 +72,7 @@ private:
 
 public:
     CardBlockade(Effect effect);
-
+    CardBlockade(const CardBlockade& blockade);
     ~CardBlockade();
 
     std::ostream &write(std::ostream &os) const;
@@ -85,7 +83,7 @@ private:
 
 public:
     Airlift(Effect effect);
-
+    Airlift(const Airlift& airlift);
     ~Airlift();
 
     std::ostream &write(std::ostream &os) const;
@@ -96,7 +94,7 @@ private:
 
 public:
     Diplomacy(Effect effect);
-
+    Diplomacy(const Diplomacy& diplomacy);
     ~Diplomacy();
 
     std::ostream &write(std::ostream &os) const;
@@ -140,7 +138,7 @@ private:
 
 public:
     //Constructors
-    Hand(/* args */);
+    Hand();
 
     Hand(const Hand &other);
 

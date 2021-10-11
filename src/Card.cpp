@@ -52,19 +52,14 @@ std::ostream& operator<<(std::ostream& lhs, Card::Effect* e)
     {
         case Card::Effect::BOMB:
             return lhs << "Bomb";
-            break;
         case Card::Effect::REINFORCEMENT:
             return lhs << "Reinforcement";
-            break;
         case Card::Effect::BLOCKADE:
             return lhs << "Blockade";
-            break;
         case Card::Effect::AIRLIFT:
             return lhs << "Airlift";
-            break;
         case Card::Effect::DIPLOMACY:
             return lhs << "Diplomacy";
-            break;
     }
     return lhs;
 }
@@ -107,18 +102,18 @@ std::ostream& CardBomb::write(std::ostream &os) const
 }
 
 // **************** //
-// Reinforcment functions:  //
+// Reinforcement functions:  //
 // **************** //
-Reinforcment::Reinforcment(Card::Effect effect)
+Reinforcement::Reinforcement(Card::Effect effect)
 {
     m_effect = new Card::Effect(effect);
 }
-Reinforcment::~Reinforcment()
+Reinforcement::~Reinforcement()
 {
     delete m_effect;
 }
 
-std::ostream& Reinforcment::write(std::ostream &os) const
+std::ostream& Reinforcement::write(std::ostream &os) const
 {
     cout << m_effect;
     return os;
@@ -200,7 +195,7 @@ void Deck::initialize(int size)
                 m_cards.push_back(new CardBomb(card));
                 break;
             case Card::Effect::REINFORCEMENT:
-                m_cards.push_back(new Reinforcment(card));
+                m_cards.push_back(new Reinforcement(card));
                 break;
             case Card::Effect::BLOCKADE:
                 m_cards.push_back(new CardBlockade(card));

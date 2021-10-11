@@ -11,6 +11,12 @@ Player::Player()
     OrderList* orderList;
 }
 
+Player::Player(string n)
+{
+    this->name = n;
+}
+
+
 Player::Player(string n, vector<Territory*> t, Hand* h, OrderList* o)
 {
     this->name = n;
@@ -130,4 +136,15 @@ void Player::setTerritories(vector<Territory *> terr) {
 
 void Player::setCards(Hand *pHand) {
     hand = pHand;
+}
+
+//Goes through all the orders that are in the list of orders of a given player
+void Player::printOrders()
+{
+    cout << "\nPlayer: " << name << " Has the following ordered queued\n";
+    for(Order* o : orderList->getList())
+    {
+        //TODO: fix this
+        cout << new Card(static_cast<Card::Effect>(id)) << "\n";
+    }
 }

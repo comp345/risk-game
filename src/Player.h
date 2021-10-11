@@ -17,6 +17,7 @@ public:
     Player();
 
     Player(const Player &); //copy constructor
+    Player(string);
     Player(string, vector<Territory *>, Hand *, OrderList *);
 
     ~Player(); //destructor
@@ -27,6 +28,8 @@ public:
     void issueOrder(string, string);
 
     void issueOrder(Order *o);
+
+    void printOrders();
 
     // Getters
     vector<Territory *> getTerritories();
