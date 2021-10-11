@@ -79,8 +79,7 @@ ostream& operator<<(ostream& out, const Player& p) {
 
     if (p.hand != nullptr) {
         for (Card* c : p.hand->getCards()) {
-            //TODO: fix this
-            out << "\nCard: " << *c << endl;
+            out << "\nCard: " << c << endl;
         }
     }
 

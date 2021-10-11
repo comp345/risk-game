@@ -242,7 +242,8 @@ bool Map::validate() {
     if (visitedTerritory.size() == tSize) {
         printf("This is a connected graph \n");
     } else {
-        printf("The map is not connected! \n");
+        printf("The map is not a connected graph! \n");
+        return false;
     }
 
 
