@@ -4,3 +4,7 @@
 /src/main.dSYM
 .idea
 cmake-build-debug
+build/,
+src/.DS_Store
+.gitignore
+.DS_Store
