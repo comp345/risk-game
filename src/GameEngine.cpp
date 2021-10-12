@@ -139,6 +139,7 @@ void GameEngine::startUpLoop()
                 cout << "Creating player: "+ to_string(i+1) + ".... Done."<< std::endl;
             }
             currentState = GAME_STATES::assigncountries;
+            break;
         }
     }
 
