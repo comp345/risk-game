@@ -40,10 +40,11 @@ Territory &Territory::operator=(const Territory &t) {
     ID = t.ID;
     name = t.name;
     numArmies = t.numArmies;
+    return *this;
 }
 
 std::ostream &operator<<(std::ostream &out, const Territory &t) {
-    out << std::endl << "\tTerritory ID: " << t.ID << std::endl;
+    out << "\tTerritory Name: " << t.name;
     out << "\tTerritory Number of Armies: " << t.numArmies;
     return out;
 }
