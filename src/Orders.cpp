@@ -92,8 +92,6 @@ istream &operator>>(istream &in, Order &o)
     cout << "Details: \n";
     in >> o.details;
     
-    //in >> o.details; 
-    
     // ... Add future data member
     // in >> o.player
     // in >> o.territory
@@ -118,14 +116,14 @@ void Order::setDetails(std::string orderDetails)
 }
 
 //TODO: implement these
- bool Order::validate()
- {
-     return true;
- }
- bool Order::execute()
- {
-     return true;
- }
+//  bool Order::validate()
+//  {
+//      return true;
+//  }
+//  bool Order::execute()
+//  {
+//      return true;
+//  }
 
 Deploy::Deploy() : Order("Deploy type", "")
 {
@@ -275,7 +273,6 @@ OrderList::OrderList()
     list = vector<Order *>();
 }
 // Copy constructor of OrderList
-// !! Warning, the copy constructor currently FAILS
 OrderList::OrderList(const OrderList &ol)
 {
     list = ol.list;
@@ -283,16 +280,12 @@ OrderList::OrderList(const OrderList &ol)
 // returns a deep copy of OrderList's list (vector of pointers to deep copies of Orders)
 vector<Order *> OrderList ::getList()
 {
-    // call a vector's =assignment operator -> does not work: vector<Order*> copyList = list;
     vector<Order *> copyList = vector<Order *>();
 
-    // Try loop over pointers' orders
     for (int i = 0; i < list.size(); i++)
     {
-        // Need the copy constructor of Order and its subclasses
         Order *ptrOrder = *(list.begin() + i);
         copyList.push_back(ptrOrder);
-        // cout << **(copyList->begin() + i); // Debug: print newly added OrderPtr's object
     }
 
     return copyList;
@@ -352,7 +345,6 @@ void OrderList::printList()
     {
         cout << " "
              << (**it).getCommand();
-        // << *it;
     }
     cout << "\n";
 }

@@ -14,6 +14,7 @@ Player::Player()
 Player::Player(string n)
 {
     this->name = n;
+    this->hand = new Hand();
 }
 
 //parametrized constructor

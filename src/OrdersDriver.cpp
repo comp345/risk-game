@@ -12,15 +12,7 @@ void testOrdersLink()
 
 void testOrdersDriver()
 {
-     cout << "abstract class test\n\n";
-     // Testing creation and init of order and their subtypes here
-     // Test stream insertion operator on Order object and all its subtypes
      cout << "Testing the stream insertion operators for each Order type/subtype: \n";
-
-     // Order *o1 = new Order("First order", "Nothing 1");
-     // cout << *o1 << "\n";
-
-     // Order *o2 = new Order("Second order", "Nothin 2");
 
      Deploy *deploy1 = new Deploy();
      deploy1->setDetails("deployig details!");
@@ -73,11 +65,6 @@ void testOrdersDriver()
      myFirstOrderList.add(negotiate1);
 
      myFirstOrderList.printList();
-
-     // check if we should add orders by pointer/ or directly ...
-     // add duplicate
-     // myFirstOrderList.add(advance1);
-
      // move orders
      cout << "============================================"
           << "\nTesting moving an order in the list: \n";
@@ -93,7 +80,6 @@ void testOrdersDriver()
           return exit(1);
      }
 
-     // check invalid moves (OutOfBound)
 
      // remove order by position (starting at position 0)
      cout << "============================================"
@@ -146,7 +132,7 @@ void testOrdersDriver()
      cout << "... Printing Second OrderList: " << mySecondOrderList << "\n";
      cout << "... Printing First OrderList: " << myFirstOrderList << "\n";
 
-     // (CURRENTLY FAILING) Testing the OrderList copy constructor
+     // Testing the OrderList copy constructor
      cout << "============================================\n";
      cout << "Testing OrderList copy constructor\n";
      OrderList myThirdOrderList = OrderList(myFirstOrderList);
@@ -160,19 +146,14 @@ void testOrdersDriver()
      cout << "===============================================\n";
      cout << "\nCheck if the copy constructor preserved the static classes of the objects: \n";
      cout << myFirstOrderList.getList().at(0)->getCommand() << ":"
-          // << typeid(myFirstOrderList.getList().at(0)).name() << ":"
           << myFirstOrderList.getList().at(0)->execute() << "\n";
      cout << myFirstOrderList.getList().at(1)->getCommand() << ":"
-          // << typeid(myFirstOrderList.getList().at(1)).name() << ":"
           << myFirstOrderList.getList().at(1)->execute() << "\n";
      cout << myFirstOrderList.getList().at(2)->getCommand() << ":"
-          // << typeid(myFirstOrderList.getList().at(2)).name() << ":"
           << myFirstOrderList.getList().at(2)->execute() << "\n";
      cout << myFirstOrderList.getList().at(3)->getCommand() << ":"
-          // << typeid(myFirstOrderList.getList().at(3)).name() << ":"
           << myFirstOrderList.getList().at(3)->execute() << "\n";
      cout << myFirstOrderList.getList().at(4)->getCommand() << ":"
-          // << typeid(myFirstOrderList.getList().at(4)).name() << ":"
           << myFirstOrderList.getList().at(4)->execute() << "\n";
 
      // Testing validate() and execute()
@@ -181,39 +162,21 @@ void testOrdersDriver()
      deploy1->execute();
      negotiate1->validate();
 
-     // Testing the istream operator on Order class
-     cout << "\n============================================\n"
-          << "User-create a new Order.\n";
-     // Order order2;
-     // cin >> order2;
-     // cout << "This is the new Order:";
-     // cout << order2;
+     // (deleted test: the istream operator on Order class)
 
-     //     cout << "\nUser-create a Deploy order\n";
-     //     Deploy deploy2;
-     //     cin >> deploy2;
-     //     cout << "This is the new Deploy:";
-     //     cout << deploy2;
-     //     cout << "Command: " << deploy2.getCommand()
-     //     << " Details: " << deploy2.getDetails() << "\n";
-
-     //     cout << "\nUser-create a Negotiate order\n";
-     //     Negotiate negotiate2;
-     //     cin >> negotiate2;
-     //     cout << "This is the new Negotiate:";
-     //     cout << negotiate2;
-     //     cout << "Command: " << negotiate2.getCommand()
-     //     << " Details: " << negotiate2.getDetails() << "\n";
-
-     // Test destructors/delete on o1, o2, and the subclasses of Order
+     // Test destructors/delete the subclasses of Order
      cout << "\n============================================\n";
      cout << "Testing destructor/delete\n";
-     // delete o1;
-     // delete o2;
      delete advance1;
      delete airlift1;
      delete deploy1;
      delete bomb1;
      delete blockade1;
      delete negotiate1;
+}
+
+int main()
+{
+     testOrdersDriver();
+     return 0;
 }

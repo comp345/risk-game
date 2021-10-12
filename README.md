@@ -29,4 +29,5 @@ then
 
 (path example to switch compiler for macOS)
 usr/local/bin/gcc-<version>
+/usr/local/Cellar/gcc/11.2.0/bin/g++-11
 *it's also possible to configure the compiler in vscode

@@ -7,7 +7,6 @@
 // - Player ptr
 // - Territory ptr
 // - Armies number data member (Deploy, Advance) ?
-//
 
 class OrderList;
 class Order;
@@ -15,7 +14,7 @@ class Order;
 void testOrdersLink();
 
 // The Order class is the base class for Advance, AirLift, Bomb, Blockade, Deploy, Negotiate
-// !Abstract class so that Order cannot be instantiated, and avoid object slicing when using polymorphism with vector
+// implemented as a pure virtual class to prevent object slicing when using polymorphism with vector
 class Order
 {
 private:
@@ -50,7 +49,6 @@ class Deploy : public Order
 public:
     Deploy();
     Deploy(std::string details);
-    // Copy constructor to-do
     Deploy(const Deploy &d);
 
     bool validate ();
@@ -62,7 +60,6 @@ class Advance : public Order
 public:
     Advance();
     Advance(std::string details);
-    // Copy constructor to-do
     Advance(const Advance &a);
 
     bool validate ();
@@ -86,7 +83,6 @@ class Blockade : public Order
 public:
     Blockade();
     Blockade(std::string details);
-    // Copy constructor to-do
     Blockade(const Blockade &b);
 
     bool validate ();
@@ -97,7 +93,6 @@ class AirLift : public Order
 public:
     AirLift();
     AirLift(std::string details);
-    // Copy constructor to-do
     AirLift(const AirLift &a);
 
     bool validate ();
@@ -120,7 +115,6 @@ class OrderList
 {
 public:
     OrderList();
-    // Copy constructor to-do
     OrderList(const OrderList& ol);
     // ~OrderList(); // no need to explicitely call destructor
 
@@ -130,11 +124,10 @@ public:
     friend std::istream &operator>>(std::istream &in, OrderList& ol);
 
     // adds an order ptr at the end of the orderlist
-    void add(Order *o);
-    
+    void add(Order *o); 
+
     // remove an order ptr by its position (positions start at 0).
-    // return the order ptr (?)
-    void remove(int i);
+    void remove(int i); 
     
     // move order from init to new position. Throws out_of_range exception.
     void move(int initPosition, int newPosition);
@@ -145,7 +138,6 @@ public:
     // returns a deep copy of the list (tested)
     std::vector<Order*> getList();
     
-    // to be tested
     void setList(std::vector<Order*> list);
 
 private:
