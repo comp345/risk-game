@@ -4,8 +4,8 @@
 #include <string>
 //using namespace GameEngineSpace;
 
-void testEngineLink() 
+void gameLoopEngineDriver() 
 {
-    cout << "Successfully linked engine.cpp and engine.hpp to main\n";
-    GameEngine* tester = new GameEngine();
+    GameEngine* engine = new GameEngine();
+    engine->run();
 }

@@ -6,7 +6,7 @@
 using namespace std;
 
 
-    void testEngineLink();
+    void gameLoopEngineDriver();
 
     enum GAME_STATES {
         start,
@@ -53,33 +53,31 @@ using namespace std;
         // Need to pass some players
         vector<int> addPlayers(int numberOfPlayers);
         //vector<Player> addPlayer(int numberOfPlayers);
+        void resetGame();
         void assignReinformentPhase();
         void assignCountries();
         void issueOrderPhase();
         void endissueorders();
         void executeOrderPhase();
         void endexecorders();
+        void win();
         void execPhase(string userMessage, int state, void (GameEngine::*passedFunc)());
-        void gameLoop();
     public:
         int currentState;
         int numOfMaps;
-        // typedef std::map<STARTUP_STATES, std::string> startUpStateMap;
         typedef std::map<std::string, GAME_STATES> stateMap;
         stateMap startUpMap;
         stateMap gameStateMap;
-        // typedef std::map<GAME_STATES, std::string> gamesStateMap;
-        // typedef std::map<GAME_STATES, std::string>::iterator checker;
         string mapPath;
-        int mapUserInputToCommand(string input, int currentState, stateMap stateMap);
+        int mapUserInputToCommand(string &input, int &currentState, stateMap stateMap);
         GameEngine &operator=(const GameEngine &o);
         friend std::ostream &operator<<(std::ostream &out, const GameEngine &o);
         friend std::istream &operator>>(std::istream &in, GameEngine& o);
         GameEngine();
         ~GameEngine();
+        void run();
         void startUpLoop();
-        void changeState();
-        void testEngineDriver();
+        void gameLoop();
         void setupMaps();
 
 
