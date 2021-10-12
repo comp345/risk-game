@@ -71,7 +71,7 @@ using namespace std;
         // typedef std::map<GAME_STATES, std::string> gamesStateMap;
         // typedef std::map<GAME_STATES, std::string>::iterator checker;
         string mapPath;
-        int mapUserInputToCommand(string &input, int &currentState, stateMap *stateMap);
+        int mapUserInputToCommand(string input, int currentState, stateMap stateMap);
         GameEngine &operator=(const GameEngine &o);
         friend std::ostream &operator<<(std::ostream &out, const GameEngine &o);
         friend std::istream &operator>>(std::istream &in, GameEngine& o);
