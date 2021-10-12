@@ -3,7 +3,8 @@
 
 using namespace std;
 
-int main() {
+void testMap()
+{
     MapLoader *mapLoader = new MapLoader();
     Map x = *mapLoader->loadMap("../maps/invalid1.map");
     Map *map = new Map(x);
@@ -26,7 +27,6 @@ int main() {
     Map *map4 = new Map(x4);
     map4->validate();
 
-
     Map x5 = *mapLoader->loadMap("../maps/france.map");
     Map *map5 = new Map(x5);
     map5->validate();
@@ -41,3 +41,8 @@ int main() {
     Map *map8 = new Map(x8);
     map8->validate();
 }
+
+// int main()
+// {
+//     testMap();
+// }

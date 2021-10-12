@@ -12,6 +12,7 @@ int main(int, char **)
 
     gameLoopEngineDriver();
     cout << "============================================\n";
+    cout << "Hello, world!\n";
 
     return 0;
 }

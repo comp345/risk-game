@@ -77,7 +77,7 @@ void testOrdersDriver()
      {
           cout << e.what()
                << "End program with failure\n";
-          return exit(1);
+          return;
      }
 
 
@@ -175,8 +175,8 @@ void testOrdersDriver()
      delete negotiate1;
 }
 
-int main()
-{
-     testOrdersDriver();
-     return 0;
-}
+// int main()
+// {
+//      testOrdersDriver();
+//      return 0;
+// }

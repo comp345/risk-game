@@ -187,14 +187,14 @@ void Map::DFS(Territory *currentTNode, std::vector<Territory *> *tNodeVec) {
 
 //helper method for duplicate territory check
 bool Map::containsDuplicateTerritories() {
-    printf("\nChecking for non duplicate territories: \n");
+    cout << "\nChecking for non duplicate territories: \n";
 
     for (int i = 0; i < continentList.size() - 1; i++) {
         for (int j = 0; j < continentList[i]->territories.size(); j++) {
             for (int k = i + 1; k < continentList.size(); k++) {
                 for (int l = 0; l < continentList[k]->territories.size(); l++) {
                     if (continentList[i]->territories[j] == continentList[k]->territories[l]) {
-                        printf("ERROR: Duplicate territory found! \n");
+                        cout << "ERROR: Duplicate territory found! \n";
                         std::cout << continentList[i]->name << "--->" << continentList[i]->territories[j]->getName()
                                   << "\t";
                         std::cout << continentList[k]->name << "--->" << continentList[k]->territories[l]->getName()
@@ -205,7 +205,7 @@ bool Map::containsDuplicateTerritories() {
             }
         }
     }
-    printf("\nNo duplicate territories found!\n");
+    cout << "\nNo duplicate territories found!\n";
     return false;
 }
 
@@ -240,9 +240,9 @@ bool Map::validate() {
     DFS(continentList[0]->territories[0], &visitedTerritory);
 
     if (visitedTerritory.size() == tSize) {
-        printf("This is a connected graph \n");
+        cout << "This is a connected graph \n";
     } else {
-        printf("The map is not a connected graph! \n");
+        cout << "The map is not a connected graph! \n";
         return false;
     }
 
@@ -257,7 +257,7 @@ bool Map::validate() {
             return false;
         }
     }
-    printf("\n");
+    cout << "\n";
     return true;
 }
 
