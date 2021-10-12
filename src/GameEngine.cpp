@@ -185,10 +185,7 @@ string GameEngine::loadMap(string mapName)
 
 void GameEngine::setupMaps()
 {
-    // Will use this after understanding how all maps get loaded.
     mapPath = loadMap("someMap");
-    //Update state after done loading maps
-    //currentState = STARTUP_STATES::validateMap;
 };
 
 bool GameEngine::validateMap(string myMap)
@@ -208,19 +205,6 @@ vector<int> GameEngine::addPlayers(int numberOfPlayers)
     }
     return currentPlayers;
 };
-
-// Adding a Player version
-// vector<Player> GameEngine::addPlayers(int numberOfPlayers)
-// {
-
-//     currentState = STATES::addplayer;
-//     currentPlayers.resize(numberOfPlayers);
-//     for(int i=0; i < numberOfPlayers; i++)
-//     {
-//         currentPlayers.push_back(i);
-//     }
-//     return currentPlayers;
-// };
 
 void GameEngine::assignCountries()
 {
@@ -330,20 +314,6 @@ void GameEngine::gameLoop()
 
 while(playing)
 {
-    // execPhase(issueOrderMessage, currentState, &GameEngine::issueOrderPhase);
-
-    // currentState = GAME_STATES::endissueorders;
-
-    // execPhase(endissueOrderMessage, currentState, &GameEngine::endissueorders);
-
-    // currentState = GAME_STATES::execorder;
-
-    // execPhase(execOrderMessage, currentState, &GameEngine::executeOrderPhase);
-
-    // currentState = GAME_STATES::endexecorders;
-
-    // execPhase(endExecOrderMessage, currentState, &GameEngine::endexecorders);
-
     while(true)
     {
         currentState = GAME_STATES::issueorder;
@@ -436,22 +406,4 @@ while(playing)
         cout << "Thanks for playing :) "<< std::endl;
         exit(0);
     }
-};
 
-    // switch((int) userInput)
-    // {
-    //     case GAME_STATES::issueorder:
-    //     cout << "Loading..."<< std::endl;;
-    //     case GAME_STATES::endissueorders:
-    //     cout << "Loading..."<< std::endl;;
-    //     case GAME_STATES::execorder:
-    //     cout << "Loading..."<< std::endl;;
-    //     case GAME_STATES::endexecorders:
-    //     cout << "Loading..."<< std::endl;;
-    //     case GAME_STATES::win:
-    //     cout << "Loading..."<< std::endl;;
-    //     case GAME_STATES::play:
-    //     cout << "Loading..."<< std::endl;;
-    //     case GAME_STATES::end:
-    //     cout << "Loading..."<< std::endl;;
-    // }    
