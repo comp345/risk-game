@@ -1,79 +1,93 @@
 #pragma once
-
 #include <vector>
 #include <string>
 #include <iostream>
-#include "Orders.hpp"
-#include "Player.h"
 #include <map>
-
 using namespace std;
 
 
-void testEngineLink();
+    void gameLoopEngineDriver();
 
-enum STATES {
-    start,
-    loadmap,
-    validateMap,
-    addplayer,
-    assignCountries,
-    issueorder,
-    endissueorders,
-    execorder,
-    endexecorders,
-    win,
-    play,
-    end
-};
+    enum GAME_STATES {
+        start,
+        loadmap,
+        validateMap,
+        addplayer,
+        assigncountries,
+        issueorder,
+        endissueorders,
+        execorder,
+        endexecorders,
+        win,
+        play,
+        end
+    };
 
-class GameEngine {
+    // Temp adjustment until other classes are ready
+    class Map {
+        public: 
+            Map(){}
+    };
 
-private:
+    class Player {
+        public: 
+            Player(){}
+    };
 
-    string command;
-    // Input attribute
-    string userInput;
+    class GameEngine 
+    {
 
-    //LoadMap should return a Map OBJ (currently has to be a string to test)
-    string loadMap(string filePath);
+    private:
+        int command;
+       // Input attribyte
+        int intInput;
+        string stringInput;
+        vector<string> maps;
+        //LoadMap should return a Map OBJ (currently has to be a string to test)
+        string loadMap(string filePath);
+        int numPlayers;
+        //vector<Player> currentPlayers;
+        vector<int> currentPlayers;
+        // Need to pass a map
+        bool validateMap(string myMap);
+        // Need to pass some players
+        vector<int> addPlayers(int numberOfPlayers);
+        //vector<Player> addPlayer(int numberOfPlayers);
+        void resetGame();
+        void assignReinformentPhase();
+        void assignCountries();
+        void issueOrderPhase();
+        void endissueorders();
+        void executeOrderPhase();
+        void endexecorders();
+        void win();
+        void execPhase(string userMessage, int state, void (GameEngine::*passedFunc)());
+    public:
+        int currentState;
+        int numOfMaps;
+        typedef std::map<std::string, GAME_STATES> stateMap;
+        stateMap startUpMap;
+        stateMap gameStateMap;
+        string mapPath;
+        int mapUserInputToCommand(string &input, int &currentState, stateMap stateMap);
+        GameEngine &operator=(const GameEngine &o);
+        friend std::ostream &operator<<(std::ostream &out, const GameEngine &o);
+        friend std::istream &operator>>(std::istream &in, GameEngine& o);
+        GameEngine();
+        ~GameEngine();
+        void run();
+        void startUpLoop();
+        void gameLoop();
+        void setupMaps();
 
-    int numPlayers;
-    vector<Player *> currentPlayers;
 
-    // Need to pass a map
-    bool validateMap(Map myMap);
+    // inline bool operator <(const STARTUP_STATES left, const STARTUP_STATES right)
+    // {
+    //     return static_cast<int>(left) < static_cast<int>(right);
+    // }
 
-    // Need to pass some players
-    vector<Player *> addPlayer(int numberOfPlayers);
-
-    void assignReinformentPhase();
-
-    void issueOrderPhase();
-
-    void executeOrderPhase();
-
-    void gameLoop();
-
-public:
-    string currentState;
-    map<string, int> gameState;
-    map<string, int>::iterator checker;
-    string mapPath;
-
-    GameEngine &operator=(const GameEngine &o);
-
-    friend std::ostream &operator<<(std::ostream &out, const GameEngine &o);
-
-    friend std::istream &operator>>(std::istream &in, GameEngine &o);
-
-    GameEngine();
-
-    void startUpLoop();
-
-    string mapUserInputToCommand(string input);
-
-    void changeState();
-
-    void testEngineDriver();
-};
+    // inline bool operator >(const STARTUP_STATES left, const STARTUP_STATES right)
+    // {
+    //     return static_cast<int>(left) > static_cast<int>(right);
+    // }
+    };

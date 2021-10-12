@@ -1,10 +1,15 @@
 # Build files
-!/build/**/.gitkeep
+!/build/**/.gitkeep!/build/**/.gitkeep
 .vscode
 /src/main.dSYM
+CMake*/**/**
+cmake*
+CPack**/**
+Dart*
+Ctest**/**
+Makefile
+build/**/**.**
 .idea
 cmake-build-debug
-build/,
 src/.DS_Store
-.gitignore
 .DS_Store
