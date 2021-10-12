@@ -406,4 +406,4 @@ while(playing)
         cout << "Thanks for playing :) "<< std::endl;
         exit(0);
     }
-
+}
