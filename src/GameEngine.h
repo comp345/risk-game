@@ -23,17 +23,6 @@ using namespace std;
         end
     };
 
-    // Temp adjustment until other classes are ready
-    class Map {
-        public: 
-            Map(){}
-    };
-
-    class Player {
-        public: 
-            Player(){}
-    };
-
     class GameEngine 
     {
 
@@ -79,15 +68,4 @@ using namespace std;
         void startUpLoop();
         void gameLoop();
         void setupMaps();
-
-
-    // inline bool operator <(const STARTUP_STATES left, const STARTUP_STATES right)
-    // {
-    //     return static_cast<int>(left) < static_cast<int>(right);
-    // }
-
-    // inline bool operator >(const STARTUP_STATES left, const STARTUP_STATES right)
-    // {
-    //     return static_cast<int>(left) > static_cast<int>(right);
-    // }
     };
