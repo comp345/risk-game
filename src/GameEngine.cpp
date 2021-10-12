@@ -14,8 +14,35 @@ GameEngine::GameEngine()
     currentState = GAME_STATES::start;
     numPlayers = 0;
     numOfMaps = 0;
+
+    stateMap startUpMap = {
+        { "loadmap", GAME_STATES::loadmap },
+        { "validatemap", GAME_STATES::validateMap },
+        { "addplayer", GAME_STATES::addplayer },
+        { "assigncountries", GAME_STATES::assigncountries }
+    };
+
+    stateMap gameStateMap = {
+        { "issueorder" ,GAME_STATES::issueorder },
+        { "endissueorders", GAME_STATES::endissueorders },
+        { "execorder", GAME_STATES::execorder},
+        { "endexecorders", GAME_STATES::endexecorders },
+        { "win", GAME_STATES::win},
+        { "play", GAME_STATES::play},
+        { "end", GAME_STATES::end}
+    };
+
     startUpLoop();
     gameLoop();
+}
+
+GameEngine::~GameEngine()
+{
+    // To update when integrating....
+    command = 0;
+    currentState = GAME_STATES::start;
+    numPlayers = 0;
+    numOfMaps = 0;
 }
 
 // We can use something like this on next iteration to automate the startup process
@@ -56,7 +83,7 @@ void GameEngine::startUpLoop()
                 cin.clear();
                 cout << "Load your maps with loadmap"<< std::endl;
                 cin >> stringInput;
-                command = mapUserInputToCommand(stringInput, currentState, startUpMap);
+                command = mapUserInputToCommand(stringInput, currentState, &startUpMap);
                 if(command == -1)
                 {
                     std::cout << "Forcing a restart on current iteration: " + to_string(i) << std::endl;
@@ -72,12 +99,16 @@ void GameEngine::startUpLoop()
         }
     }
 
+    // string validateMapMessage = "To start validating maps enter: validatemap";
+    // execPhase(validateMapMessage, currentState, &GameEngine::validateMap);
 
+    currentState = GAME_STATES::addplayer;
+    
     while(true)
     {
         cout << "To start validating maps enter: validatemap"<< std::endl;
         cin >> stringInput;
-        command = mapUserInputToCommand(stringInput, currentState, startUpMap);
+        command = mapUserInputToCommand(stringInput, currentState, &startUpMap);
         if(command == currentState)
         {
             validateMap("testMap");
@@ -115,7 +146,7 @@ void GameEngine::startUpLoop()
             cin.clear();
             cout << "Assign countries to player by entering: assigncountries"<< std::endl;
             cin >> stringInput;
-            command = mapUserInputToCommand(stringInput, currentState, startUpMap);
+            command = mapUserInputToCommand(stringInput, currentState, &startUpMap);
             if(command == currentState)
             {
             for(int i = 0; i < numPlayers; i++)
@@ -221,21 +252,45 @@ void GameEngine::assignCountries()
     cout << "Assigning Countries....";
 }
 
-void GameEngine::nextPhase(int state, function<void (int)> func) {
-    func(state);
+void GameEngine::execPhase(string userMessage, int state, void (GameEngine::*passedFunc)()) {
+
+    while(true)
+    {
+        cin.clear();
+        cout << userMessage << std::endl;
+        cin >> stringInput;
+        cout << "This is the state passed to me: " + to_string(state) + "value" << std::endl;
+        command = mapUserInputToCommand(stringInput, state, &gameStateMap);
+        if(command == state)
+        {
+            (this->*passedFunc)();
+            break;
+        }
+        else if(command == -1)
+        {
+            cout << "Not valid command..." << std::endl;
+            continue;
+        }
+    }
 }
 
-int GameEngine::mapUserInputToCommand(string &input, int &currentState, stateMap stateMap)
+int GameEngine::mapUserInputToCommand(string &input, int &currentState, stateMap* stateMap)
 {
     cout << "Passed values: "+input+" - input string"<< std::endl;;
     cout << "Passed values: "+to_string(currentState)+" - current state "<< std::endl;;
     
-    for (auto itr = stateMap.find(input); itr != stateMap.end(); itr++) 
+    for (auto itr = stateMap->find(input); itr != stateMap->end(); itr++) 
     {
         cout << itr->first << '\t' << itr->second << '\n';
 
         intInput = itr->second;
         break;
+    }
+
+    for (auto itr = stateMap->find(input); itr != stateMap->end(); itr++) 
+    {
+        cout << "printing whats in here...";
+        cout << itr->first << '\t' << itr->second << '\n';
     }
     
     if(currentState == intInput)
@@ -263,6 +318,11 @@ void GameEngine::endissueorders()
 
 }
 
+void GameEngine::endexecorders()
+{
+
+}
+
 void GameEngine::gameLoop()
 {
     cout << "============================================"<< std::endl;;
@@ -279,40 +339,39 @@ void GameEngine::gameLoop()
         { "end", GAME_STATES::end}
     };
 
+    string issueOrderMessage = "Issue orders by entering: issueorder";
+    string endissueOrderMessage ="End Issue orders by entering: endissueorders";
+    string execOrderMessage = "Start executing orders by entering: execorders";
+    string endExecOrderMessage = "End exec orders by entering: endexecorders";
+    //boolean isPlaying = true;
+
 while(true)
 {
-
     currentState = GAME_STATES::issueorder;
+
+    execPhase(issueOrderMessage, currentState, &GameEngine::issueOrderPhase);
+
+    // currentState = GAME_STATES::endissueorders;
+
+    // execPhase(endissueOrderMessage, currentState, &GameEngine::endissueorders);
+
+    // currentState = GAME_STATES::execorder;
+
+    // execPhase(execOrderMessage, currentState, &GameEngine::executeOrderPhase);
+
+    // currentState = GAME_STATES::endexecorders;
+
+    // execPhase(endExecOrderMessage, currentState, &GameEngine::endexecorders);
 
     while(true)
     {
         cin.clear();
-        cout << "Issue orders by entering: issueorder"<< std::endl;
+        cout << "End Issue orders by entering: issueorder"<< std::endl;
         cin >> stringInput;
-        command = mapUserInputToCommand(stringInput, currentState, gameStateMap);
+        command = mapUserInputToCommand(stringInput, currentState, &gameStateMap);
         if(command == currentState)
         {
             issueOrderPhase();
-            currentState = GAME_STATES::endissueorders;
-            break;
-        }
-        else if(command == -1)
-        {
-            cout << "Not valid command..." << std::endl;
-            continue;
-        }
-
-    }
-
-    while(true)
-    {
-        cin.clear();
-        cout << "End Issue orders by entering: endissueorders"<< std::endl;
-        cin >> stringInput;
-        command = mapUserInputToCommand(stringInput, currentState, gameStateMap);
-        if(command == currentState)
-        {
-            endissueorders();
             currentState = GAME_STATES::execorder;
             break;
         }
@@ -323,66 +382,7 @@ while(true)
         }
     }
 
-    while(true)
-    {
-        cin.clear();
-        cout << "End exec orders by entering: execorders"<< std::endl;
-        cin >> stringInput;
-        command = mapUserInputToCommand(stringInput, currentState, gameStateMap);
-        if(command == currentState)
-        {
-            executeOrderPhase();
-            currentState = GAME_STATES::endexecorders;
-            break;
-        }
-        else if(command == -1)
-        {
-            cout << "Not valid command..." << std::endl;
-            continue;
-        }
-
-    }
-
-    while(true)
-    {
-        cin.clear();
-        cout << "End exec orders by entering: endexecorders"<< std::endl;
-        cin >> stringInput;
-        command = mapUserInputToCommand(stringInput, currentState, gameStateMap);
-        if(command == currentState)
-        {
-            executeOrderPhase();
-            currentState = GAME_STATES::endexecorders;
-            break;
-        }
-        else if(command == -1)
-        {
-            cout << "Not valid command..." << std::endl;
-            continue;
-        }
-        continue;
-    }
     break;
 }
-
-
-    // switch((int) userInput)
-    // {
-    //     case GAME_STATES::issueorder:
-    //     cout << "Loading..."<< std::endl;;
-    //     case GAME_STATES::endissueorders:
-    //     cout << "Loading..."<< std::endl;;
-    //     case GAME_STATES::execorder:
-    //     cout << "Loading..."<< std::endl;;
-    //     case GAME_STATES::endexecorders:
-    //     cout << "Loading..."<< std::endl;;
-    //     case GAME_STATES::win:
-    //     cout << "Loading..."<< std::endl;;
-    //     case GAME_STATES::play:
-    //     cout << "Loading..."<< std::endl;;
-    //     case GAME_STATES::end:
-    //     cout << "Loading..."<< std::endl;;
-    // }
-
     
 };
