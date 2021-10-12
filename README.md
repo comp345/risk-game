@@ -1,3 +1,10 @@
+Team:
+Alexander Abrantes Figueiras, 40007320
+Gurinder Dheer, 40029441
+Rahimuz Zaman, 27771789
+Laila Chamma'a, 40107470
+Noah-James Dinh, 40128079
+
 # risk-game
 On Windows:
 Video for path variables:

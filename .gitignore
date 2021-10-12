@@ -11,3 +11,5 @@ Makefile
 build/**/**.**
 .idea
 cmake-build-debug
+src/.DS_Store
+.DS_Store
