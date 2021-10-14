@@ -15,6 +15,7 @@ Player::Player(string n)
 {
     this->name = n;
     this->hand = new Hand();
+    this->orderList = new OrderList();
 }
 
 //parametrized constructor

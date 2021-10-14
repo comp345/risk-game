@@ -34,6 +34,7 @@ public:
     friend std::ostream &operator<<(std::ostream &out, const Order &o);
     friend std::istream &operator>>(std::istream &in, Order& o);
 
+    Order* getOrder();
     std::string getCommand();
     void setCommand(std::string ordercommand);
     std::string getDetails();

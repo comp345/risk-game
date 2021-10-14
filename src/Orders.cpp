@@ -98,6 +98,10 @@ istream &operator>>(istream &in, Order &o)
 
     return in;
 }
+Order* Order::getOrder()
+{
+    return this;
+}
 string Order::getCommand()
 {
     return command;

@@ -10,7 +10,8 @@ class Player;
 
 using namespace std;
 
-class Card {
+class Card : virtual public Order
+{
 public:
     enum class Effect {
         BOMB, REINFORCEMENT, BLOCKADE, AIRLIFT, DIPLOMACY
@@ -29,6 +30,9 @@ public:
     void play(Player &player, Deck &deck);
 
     Effect *getEffect();
+
+    bool validate ();
+    bool execute ();
 
     virtual std::ostream &write(std::ostream &os) const;
 
@@ -49,8 +53,8 @@ class CardBomb : virtual public Card {
 private:
 
 public:
-    CardBomb(Effect effect);
-
+    CardBomb(Effect* effect);
+    CardBomb(const CardBomb &b);
     ~CardBomb();
 
     std::ostream &write(std::ostream &os) const;
@@ -60,7 +64,7 @@ class Reinforcement : virtual public Card {
 private:
 
 public:
-    Reinforcement(Effect effect);
+    Reinforcement(Effect* effect);
     Reinforcement(const Reinforcement& reinforcement);
     ~Reinforcement();
 
@@ -71,7 +75,7 @@ class CardBlockade : virtual public Card {
 private:
 
 public:
-    CardBlockade(Effect effect);
+    CardBlockade(Effect* effect);
     CardBlockade(const CardBlockade& blockade);
     ~CardBlockade();
 
@@ -82,7 +86,7 @@ class Airlift : virtual public Card {
 private:
 
 public:
-    Airlift(Effect effect);
+    Airlift(Effect* effect);
     Airlift(const Airlift& airlift);
     ~Airlift();
 
@@ -93,7 +97,7 @@ class Diplomacy : virtual public Card {
 private:
 
 public:
-    Diplomacy(Effect effect);
+    Diplomacy(Effect* effect);
     Diplomacy(const Diplomacy& diplomacy);
     ~Diplomacy();
 
@@ -149,7 +153,7 @@ public:
     // Functions
     void drawCard(Card *card);
 
-    void showCards(Player player);
+    void showCards();
 
     Card *useLast();
 
