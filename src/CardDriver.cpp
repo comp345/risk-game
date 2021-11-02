@@ -3,7 +3,7 @@
 
 using namespace std;
 
-int main(int args, char *argv[]) {
+void testCard() {
     // cout << "Initializing the deck\n";
     Deck deck(30);
     deck.showDeck();
@@ -42,6 +42,9 @@ int main(int args, char *argv[]) {
 
     int i;
     cin >> i;
-
-    return 0;
 }
+
+//int main()
+//{
+//    testCard();
+//}
