@@ -21,7 +21,7 @@ void testLogging()
     advance1->execute();
 }
 
- int main()
- {
-     testLogging();
- }
+// int main()
+// {
+//     testLogging();
+// }

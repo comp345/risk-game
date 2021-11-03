@@ -46,7 +46,6 @@ void testPlayer()
     }
 
     //5) Verifying that players can use the method .issueOrder() to add an order to their list of orders
-    //TODO: fix this
     cout << "\n===5) Verifying that players can use the method .issueOrder() to add an order to their list of orders===" << endl;
     Blockade *o = new Blockade();
     p->issueOrder(o);
