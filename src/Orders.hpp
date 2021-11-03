@@ -16,7 +16,7 @@ void testOrdersLink();
 
 // The Order class is the base class for Advance, AirLift, Bomb, Blockade, Deploy, Negotiate
 // implemented as a pure virtual class to prevent object slicing when using polymorphism with vector
-class Order
+class Order : public ILoggable, public Subject
 {
 private:
     // name of the order. Tool to debug. To delete later
@@ -55,6 +55,7 @@ public:
 
     bool validate ();
     bool execute ();
+    string stringToLog() override;
 };
 
 class Advance : public Order
@@ -66,6 +67,7 @@ public:
 
     bool validate ();
     bool execute ();
+    string stringToLog() override;
 };
 
 class Bomb : public Order
@@ -78,6 +80,7 @@ public:
 
     bool validate ();
     bool execute ();
+    string stringToLog() override;
 };
 
 class Blockade : public Order
@@ -89,6 +92,7 @@ public:
 
     bool validate ();
     bool execute ();
+    string stringToLog() override;
 };
 class AirLift : public Order
 {
@@ -99,6 +103,7 @@ public:
 
     bool validate ();
     bool execute ();
+    string stringToLog() override;
 };
 
 class Negotiate : public Order
@@ -111,6 +116,7 @@ public:
 
     bool validate ();
     bool execute ();
+    string stringToLog() override;
 };
 
 class OrderList : public ILoggable, public Subject
