@@ -297,6 +297,7 @@ bool Negotiate::execute()
     return true;
 }
 
+//when an order is executed, output the effect of the order to the log file
 string Negotiate::stringToLog() {
     return "TODO";
 }
@@ -384,6 +385,7 @@ void OrderList::printList()
     cout << "\n";
 }
 
+//when an order is added to the order list of a player, output the order to the log file
 string OrderList::stringToLog() {
-    return "TODO";
+    return "Order was added to the OrderList of a player. Order: " + this->list.back()->getCommand();
 }
