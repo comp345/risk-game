@@ -150,7 +150,12 @@ bool Deploy::validate()
 bool Deploy::execute()
 {
     cout << "Execute Deploy order.";
+    notify(this);
     return true;
+}
+
+string Deploy::stringToLog() {
+    return "TODO";
 }
 
 Advance::Advance() : Order("Advance type", "")
@@ -174,7 +179,12 @@ bool Advance::validate()
 bool Advance::execute()
 {
     cout << "Execute Advance order.";
+    notify(this);
     return true;
+}
+
+string Advance::stringToLog() {
+    return "TODO";
 }
 
 Bomb::Bomb() : Order("Bomb type", "")
@@ -198,7 +208,12 @@ bool Bomb::validate()
 bool Bomb::execute()
 {
     cout << "Execute Bomb order.";
+    notify(this);
     return true;
+}
+
+string Bomb::stringToLog() {
+    return "TODO";
 }
 
 Blockade::Blockade() : Order("Blockade type", "")
@@ -222,7 +237,12 @@ bool Blockade::validate()
 bool Blockade::execute()
 {
     cout << "Execute Blockade order.";
+    notify(this);
     return true;
+}
+
+string Blockade::stringToLog() {
+    return "TODO";
 }
 
 AirLift::AirLift() : Order("Airlift type", "")
@@ -245,7 +265,12 @@ bool AirLift::validate()
 bool AirLift::execute()
 {
     cout << "Execute AirLift order.";
+    notify(this);
     return true;
+}
+
+string AirLift::stringToLog() {
+    return "TODO";
 }
 
 Negotiate::Negotiate() : Order("Negotiate type", "")
@@ -268,7 +293,13 @@ bool Negotiate::validate()
 bool Negotiate::execute()
 {
     cout << "Execute Negotiate order.";
+    notify(this);
     return true;
+}
+
+//when an order is executed, output the effect of the order to the log file
+string Negotiate::stringToLog() {
+    return "TODO";
 }
 
 // Implementation of OrderList
@@ -324,6 +355,7 @@ ostream &operator<<(ostream &out, const OrderList &ol)
 void OrderList::add(Order *o)
 {
     list.push_back(o);
+    notify(this);
 }
 
 void OrderList::remove(int i)
@@ -351,4 +383,9 @@ void OrderList::printList()
              << (**it).getCommand();
     }
     cout << "\n";
+}
+
+//when an order is added to the order list of a player, output the order to the log file
+string OrderList::stringToLog() {
+    return "Order was added to the OrderList of a player. Order: " + this->list.back()->getCommand();
 }

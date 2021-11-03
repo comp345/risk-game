@@ -3,6 +3,7 @@
 #include<vector>
 #include<string>
 #include "Player.h"
+#include "LoggingObserver.h"
 
 class Deck;
 class Hand;
@@ -10,7 +11,7 @@ class Player;
 
 using namespace std;
 
-class Card : virtual public Order
+class Card : virtual public Order, public ILoggable, public Subject
 {
 public:
     enum class Effect {
@@ -42,6 +43,8 @@ public:
     friend std::ostream &operator<<(std::ostream &lhs, Effect *e);
 
     Card &operator=(const Card &rhs);
+
+    string stringToLog() override;
 
 protected:
     Effect *m_effect;

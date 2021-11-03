@@ -408,3 +408,7 @@ while(playing)
         exit(0);
     }
 }
+
+string GameEngine::stringToLog() {
+    return "TODO";
+}

@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include "LoggingObserver.h"
 
 // To implement for each Order class/subclass: 
 // - Player ptr
@@ -15,7 +16,7 @@ void testOrdersLink();
 
 // The Order class is the base class for Advance, AirLift, Bomb, Blockade, Deploy, Negotiate
 // implemented as a pure virtual class to prevent object slicing when using polymorphism with vector
-class Order
+class Order : public ILoggable, public Subject
 {
 private:
     // name of the order. Tool to debug. To delete later
@@ -54,6 +55,7 @@ public:
 
     bool validate ();
     bool execute ();
+    string stringToLog() override;
 };
 
 class Advance : public Order
@@ -65,6 +67,7 @@ public:
 
     bool validate ();
     bool execute ();
+    string stringToLog() override;
 };
 
 class Bomb : public Order
@@ -77,6 +80,7 @@ public:
 
     bool validate ();
     bool execute ();
+    string stringToLog() override;
 };
 
 class Blockade : public Order
@@ -88,6 +92,7 @@ public:
 
     bool validate ();
     bool execute ();
+    string stringToLog() override;
 };
 class AirLift : public Order
 {
@@ -98,6 +103,7 @@ public:
 
     bool validate ();
     bool execute ();
+    string stringToLog() override;
 };
 
 class Negotiate : public Order
@@ -110,9 +116,10 @@ public:
 
     bool validate ();
     bool execute ();
+    string stringToLog() override;
 };
 
-class OrderList
+class OrderList : public ILoggable, public Subject
 {
 public:
     OrderList();
@@ -140,6 +147,8 @@ public:
     std::vector<Order*> getList();
     
     void setList(std::vector<Order*> list);
+
+    string stringToLog() override;
 
 private:
     std::vector<Order*> list;

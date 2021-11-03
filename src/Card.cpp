@@ -92,6 +92,10 @@ std::ostream& operator<<(std::ostream& lhs, Card* card)
     return lhs << card->m_effect;
 }
 
+string Card::stringToLog() {
+    return "TODO";
+}
+
 std::ostream& operator<<(std::ostream& lhs, Card& card)
 {
     return card.write(lhs);

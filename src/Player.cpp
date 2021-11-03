@@ -5,10 +5,9 @@ using namespace std;
 
 Player::Player()
 {
-    string name;
-    vector<Territory*> territories;
-    Hand* hand;
-    OrderList* orderList;
+    territories = vector<Territory *>();
+    hand = new Hand();
+    orderList = new OrderList();
 }
 
 Player::Player(string n)

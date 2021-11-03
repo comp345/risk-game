@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include "LoggingObserver.h"
 using namespace std;
 
 
@@ -23,7 +24,7 @@ using namespace std;
         end
     };
 
-    class GameEngine 
+    class GameEngine : public ILoggable, public Subject
     {
 
     private:
@@ -68,4 +69,5 @@ using namespace std;
         void startUpLoop();
         void gameLoop();
         void setupMaps();
+        string stringToLog() override;
     };
