@@ -44,7 +44,7 @@ ILoggable::~ILoggable() {
 void LogObserver::update(ILoggable *iLoggable) {
     ofstream logFile;
     logFile.open("../gamelog.txt", std::ios_base::app);
-    logFile << iLoggable->stringToLog();
+    logFile << iLoggable->stringToLog() << endl;
     logFile.close();
 }
 
