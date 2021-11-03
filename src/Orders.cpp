@@ -352,3 +352,7 @@ void OrderList::printList()
     }
     cout << "\n";
 }
+
+string OrderList::stringToLog() {
+    return "TODO";
+}

@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include "LoggingObserver.h"
 
 // To implement for each Order class/subclass: 
 // - Player ptr
@@ -112,7 +113,7 @@ public:
     bool execute ();
 };
 
-class OrderList
+class OrderList : public ILoggable, public Subject
 {
 public:
     OrderList();
@@ -140,6 +141,8 @@ public:
     std::vector<Order*> getList();
     
     void setList(std::vector<Order*> list);
+
+    string stringToLog() override;
 
 private:
     std::vector<Order*> list;
