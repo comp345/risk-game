@@ -76,22 +76,30 @@ namespace A2
         friend class Transition;
 
     private:
-        State *currentState;
+        State *currentState; 
         std::vector<State *> states; // GameEngine maintains collection of all states
         std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
 
     public:
         GameEngine();
-        std::string getCurrentStateName(); // return name of current state
-        std::vector<std::string> getNextTransitions(); // return names of possible commands in current state
-        std::string getNextStateName(std::string command); // return state name if command is performed. TODO: throw exception if invalid command.
 
-        bool doTransition(std::string command); // check if 
+        // return name of current state
+        std::string getCurrentStateName(); 
+        
+        // return names of possible commands in current state
+        std::vector<std::string> getNextTransitions(); 
+        
+        // return state name if command is performed. TODO: throw exception if invalid command.
+        std::string getNextStateName(std::string command); 
+
+        // check if command is valid and updates current state accordingly
+        bool doTransition(std::string command);
+
+        // check if command is valid. no update.
         bool validateCommand(std::string command);
         
 
         static void testGameEngine();
-        // friend std::ostream &operator<<(std::ostream &out, const State &s);
     };
 
 }

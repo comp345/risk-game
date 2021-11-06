@@ -151,6 +151,11 @@ GameEngine::GameEngine()
     winState->addTransition(endTransition);
 }
 
+string GameEngine::getCurrentStateName()
+{
+    return currentState->nameState;
+}
+
 vector<string> GameEngine::getNextTransitions()
 {
     vector<string> transitionsNames;
@@ -161,9 +166,16 @@ vector<string> GameEngine::getNextTransitions()
     return transitionsNames;
 }
 
-string GameEngine::getCurrentStateName()
+string GameEngine::getNextStateName(string command)
 {
-    return currentState->nameState;
+    for (int i = 0; i < currentState->transitions.size(); ++i)
+    {
+        if (currentState->transitions.at(i)->nameTransition == command)
+        {
+            return currentState->transitions.at(i)->nextState->nameState;
+        }
+    }
+    return ""; //TODO: throw exception
 }
 
 // Only check if command is valid. Does NOT act upon the command, even if it is valid.
@@ -213,10 +225,11 @@ void GameEngine::testGameEngine()
             break;
         else
         {
-            cout << "\n***\n" << endl;
-            
-            // Acting on the command. The function doTransition internally validates the command. 
-            // Returns true if command was valid, in order to display correct message. 
+            cout << "\n***\n"
+                 << endl;
+
+            // Acting on the command. The function doTransition internally validates the command.
+            // Returns true if command was valid, in order to display correct message.
             // TODO: switch statement to have different message for each state
             bool isCommandValid = engine.doTransition(keyinput);
 
