@@ -11,6 +11,10 @@ class Player;
 
 using namespace std;
 
+// Helper functions
+void initializedRand();
+
+// Original declarations from A1
 class Card : virtual public Order
 {
 public:

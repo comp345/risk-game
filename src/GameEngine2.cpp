@@ -245,9 +245,9 @@ void GameEngine::testGameEngine()
     }
 }
 
-int main()
-{
-    GameEngine::testGameEngine();
+// int main()
+// {
+//     GameEngine::testGameEngine();
 
-    return 0;
-}
+//     return 0;
+// }

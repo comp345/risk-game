@@ -42,7 +42,7 @@ void testMap()
     map8->validate();
 }
 
-// int main()
-// {
-//     testMap();
-// }
+int main()
+{
+    testMap();
+}
