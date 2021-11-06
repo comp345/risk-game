@@ -148,7 +148,7 @@ GameEngine::GameEngine()
     winState->addTransition(endTransition);
 }
 
-void GameEngine::doTransition(string nameOfTransition)
+void GameEngine::doTransition(string command)
 {
     // check if command (nameOfTransition) match with existing transition
     for (int i = 0; i < currentState->transitions.size(); ++i)
@@ -158,23 +158,12 @@ void GameEngine::doTransition(string nameOfTransition)
             // Valid processing at the current state (whether new or not)
             currentState = currentState->transitions.at(i)->nextState;
             cout << "Valid command. Doing processing at current state: " << currentState->nameState << endl;
-            cout << "Hint: here are the valid transitions/commands: ";
-            for (int j = 0; j < currentState->transitions.size(); ++j)
-            {
-                cout << currentState->transitions.at(j)->nameTransition << "\t";
-            }
-            cout << endl;
             return;
         }
     }
     // if not, display error/invalid command message!
     cout << "Invalid comand. Restart current state: " << currentState->nameState << endl;
-    cout << "Hint: here are the valid transitions/commands: ";
-    for (int j = 0; j < currentState->transitions.size(); ++j)
-    {
-        cout << currentState->transitions.at(j)->nameTransition;
-    }
-    cout << endl;
+    
 }
 
 void GameEngine::testCopyandAssignmentInGameEngine()
@@ -293,7 +282,6 @@ void GameEngine::testGameEngine()
 
 int main()
 {
-    // GameEngine::testCopyandAssignmentInGameEngine();
     GameEngine::testGameEngine();
 
     return 0;
