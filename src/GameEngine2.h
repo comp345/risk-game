@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "LoggingObserver.h"
 
 /* The states and transitions are stored in a linked list like structure */
 
@@ -70,7 +71,7 @@ namespace A2
         friend std::ostream &operator<<(std::ostream &out, const State &s);
     };
 
-    class GameEngine
+    class GameEngine : public ILoggable, public Subject
     {
         friend class State;
         friend class Transition;
@@ -98,8 +99,20 @@ namespace A2
         // check if command is valid. no update.
         bool validateCommand(std::string command);
         
-
         static void testGameEngine();
+        string stringToLog() override;
+
+    /* A2 */
+
+        // A2 Part 2
+        void startupPhase();
+
+        // A2 Part 3
+        void mainGameLoop();
+        void reinforcementPhase();
+        void issueOrdersPhase();
+        void executeOrdersPhase();
+
     };
 
 }

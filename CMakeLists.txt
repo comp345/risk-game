@@ -11,9 +11,9 @@ file(GLOB SRC_FILES
 )
 
 
-add_executable(HelloWorld ${SRC_FILES} src/Card.cpp src/Card.h src/Map.cpp src/Map.h 
-src/CardDriver.cpp src/MapDriver.cpp src/main.cpp src/GameEngine.cpp src/GameEngine.h src/GameEngineDriver.cpp 
-src/GameEngine2.cpp src/GameEngine2.h
+add_executable(HelloWorld ${SRC_FILES} src/main.cpp src/Card.cpp src/Card.h src/Map.cpp src/Map.h 
+src/CardDriver.cpp src/MapDriver.cpp src/main.cpp 
+src/GameEngine2.cpp src/GameEngine2.h src/GameEngineDriver2.cpp
 src/LoggingObserver.cpp src/LoggingObserver.h src/LoggingObserverDriver.cpp)
 
 
