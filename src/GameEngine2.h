@@ -77,18 +77,21 @@ namespace A2
 
     private:
         State *currentState;
-        std::vector<State *> states;
-        std::vector<Transition *> transitions;
+        std::vector<State *> states; // GameEngine maintains collection of all states
+        std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
 
     public:
         GameEngine();
-        // ! todo: add abstraction layer, making it impossible to modify the states and transitions after instantiation
-        std::string getCurrentPossibleTransitions(); // based on current state, return valid transitions
-        State* getCurrentState(); 
-        std::string getCurrentStateName();
-        void doTransition(std::string command);
+        std::string getCurrentStateName(); // return name of current state
+        std::vector<std::string> getNextTransitions(); // return names of possible commands in current state
+        std::string getNextStateName(std::string command); // return state name if command is performed. TODO: throw exception if invalid command.
+
+        bool doTransition(std::string command); // check if 
+        bool validateCommand(std::string command);
+        
+
         static void testGameEngine();
-        friend std::ostream &operator<<(std::ostream &out, const State &s);
+        // friend std::ostream &operator<<(std::ostream &out, const State &s);
     };
 
 }

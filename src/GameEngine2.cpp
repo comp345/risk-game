@@ -75,6 +75,9 @@ Transition &Transition::operator=(const Transition &t)
     return *this;
 }
 
+// Creates the finite state machine that contains states and transitions
+// The GameEngine object has access to the current state with getCurrentState(), as well
+// as the valid transitions from that state with getCurrentPossibleTransitions()
 GameEngine::GameEngine()
 {
     // Create the states and add to states collection
@@ -148,134 +151,83 @@ GameEngine::GameEngine()
     winState->addTransition(endTransition);
 }
 
-void GameEngine::doTransition(string command)
+vector<string> GameEngine::getNextTransitions()
 {
-    // check if command (nameOfTransition) match with existing transition
+    vector<string> transitionsNames;
     for (int i = 0; i < currentState->transitions.size(); ++i)
     {
-        if (currentState->transitions.at(i)->nameTransition == nameOfTransition)
+        transitionsNames.push_back(currentState->transitions.at(i)->nameTransition);
+    }
+    return transitionsNames;
+}
+
+string GameEngine::getCurrentStateName()
+{
+    return currentState->nameState;
+}
+
+// Only check if command is valid. Does NOT act upon the command, even if it is valid.
+bool GameEngine::validateCommand(string command)
+{
+    for (int i = 0; i < currentState->transitions.size(); ++i)
+    {
+        if (currentState->transitions.at(i)->nameTransition == command)
         {
-            // Valid processing at the current state (whether new or not)
-            currentState = currentState->transitions.at(i)->nextState;
-            cout << "Valid command. Doing processing at current state: " << currentState->nameState << endl;
-            return;
+            return true;
         }
     }
-    // if not, display error/invalid command message!
-    cout << "Invalid comand. Restart current state: " << currentState->nameState << endl;
-    
+    return false;
 }
 
-void GameEngine::testCopyandAssignmentInGameEngine()
+// Check if command is valid. If it is, updates the state. Return true if command was valid, false if else.
+// The success and error messages are not implemented, to allow flexible implementation in differents parts of A2.
+bool GameEngine::doTransition(string command)
 {
-    // Test 1 : Behavior of the vector Copy Constructor when copying a vector of pointers to Transition objects.
-    // "t" is the original vector, "tshallow"is the shallow copy. This is desirable.
-    // When manipulating the elements of t or tshallow like this: t.at(0)->nextState = new State("End state");
-    // The Transition object manipulated is the same one pointed by the element 0 (a ptr) in "t" as in "tshallow",
-    // so the Transition element at 0 in both vectors will have the same new State object.
-
-    // But when an element is removed or inserted in "t" or "tshallow", only one vector is being manipulated
-
-    vector<Transition *> t = vector<Transition *>();
-    Transition t1 = Transition("One", new State("State 1"));
-    Transition t2 = Transition("Two", new State("State 2"));
-    Transition t3 = Transition("Three", new State("State 3"));
-    Transition t4 = Transition("Four", new State("State 4"));
-    t.push_back(&t1);
-    t.push_back(&t2);
-    t.push_back(&t3);
-    t.push_back(&t4);
-
-    for (vector<Transition *>::iterator it = t.begin(); it != t.end(); ++it)
+    for (int i = 0; i < currentState->transitions.size(); ++i)
     {
-        cout << *(*it) << endl;
+        if (currentState->transitions.at(i)->nameTransition == command)
+        {
+            currentState = currentState->transitions.at(i)->nextState;
+            return true;
+        }
     }
-    cout << "___________________________________" << endl;
-
-    // Shallow copy
-
-    vector<Transition *> tshallow = t;
-    cout << "Address of tshallow: " << &tshallow << endl; // Different from the original vector
-
-    // Test 1 on element 0
-    tshallow.erase(tshallow.begin());                                             // remove 0
-    tshallow.insert(tshallow.begin(), new Transition("Un", new State("Etat 1"))); // add new element at 0; will not be the same in og
-    // Test 2 on element 1
-    tshallow.at(1)->nextState = new State("Etat 5"); // modifying the value of the element: will be the same in og
-    // Test 3 on element 2
-    tshallow.at(2) = new Transition("lambda", new State("null")); // Will only change the pointer to Transition contained in tshallow, the
-    // Conclusion: copying a vector of pointer creates a new set of pointers, but towards the same Transition objects. The pointers in the vector are fundammentally different though.
-    // Illustration:
-    /* This is what happens
-        t: 0 ---> ---> Transition object 0 <--- <--- 0 : tshallow
-           1 ---> ---> Transition object 1 <--- <--- 1 : tshallow
-
-    This is incorrect: t and tshallow do not contain the address of the same pointers to Transitions
-        t: 0 ---> ---> Transition object 0
-                  ^--- 0 : tshallow
-        t: 1 ---> ---> Transition object 1
-                  ^--- 1: tshallow
-    */
-    for (vector<Transition *>::iterator it2 = tshallow.begin(); it2 != tshallow.end(); ++it2)
-    {
-        cout << *(*it2) << endl;
-    }
-    cout << "___________________________________" << endl;
-
-    cout << "Address of t: " << &t << endl;
-    for (vector<Transition *>::iterator it = t.begin(); it != t.end(); ++it)
-    {
-        cout << *(*it) << endl;
-    }
-
-    // Test 2: Assignment operator of vector
-    cout << "___________________________________" << endl;
-    cout << "___________________________________" << endl;
-    cout << "Testing operator=" << endl;
-
-    vector<Transition *> copy3 = vector<Transition *>(t);
-    cout << "Address of copy3: " << &copy3 << endl;
-    copy3.erase(copy3.begin());
-    copy3.insert(copy3.begin(), new Transition("0: copy3", new State("Stadt 33"))); // Update only in copy3, not t
-    copy3.at(1) = new Transition("1: copy3", new State("Stadt 22"));                // Update only in copy3
-    copy3.at(2)->nextState = new State("Stadt 55");                                 // Updates in both copy3 and t
-    copy3.at(3)->nameTransition = "New name";                                       // Updates in both copy3 and t
-
-    for (vector<Transition *>::iterator it3 = copy3.begin(); it3 != copy3.end(); ++it3)
-    {
-        cout << *(*it3) << endl;
-    }
-
-    cout << "___________________________________" << endl;
-    cout << "Address of t: " << &t << endl;
-    for (vector<Transition *>::iterator it = t.begin(); it != t.end(); ++it)
-    {
-        cout << *(*it) << endl;
-    }
-
-    // Deallocating
-    tshallow.clear();
-    t.clear();
+    return false;
 }
 
+// Game play implementation for A1.
+// TODO: Will need to divide game flow into StartUpPhase(), GameLoopPhase(), etc. for A2
 void GameEngine::testGameEngine()
 {
     GameEngine engine;
-    // Iterating through collection of states
-
-    cout << "Current state: " << *(engine.currentState) << endl;
+    cout << "Welcome to WarZone!" << endl;
 
     while (true)
     {
         string keyinput;
-        cout << "Prompt line: Enter a valid command to traverse the graph. (Enter x to quit)" << endl;
+
+        cout << "Enter a valid command to progress in the game."
+             << "(Enter x to quit or press any key when at final State)" << endl;
+
         cin >> keyinput;
-        if (keyinput == "x")
+        if (keyinput == "x" or engine.getCurrentStateName() == "final")
             break;
         else
         {
-            cout << "______________________________________________________________________________________" << endl;
-            engine.doTransition(keyinput);
+            cout << "\n***\n" << endl;
+            
+            // Acting on the command. The function doTransition internally validates the command. 
+            // Returns true if command was valid, in order to display correct message. 
+            // TODO: switch statement to have different message for each state
+            bool isCommandValid = engine.doTransition(keyinput);
+
+            if (isCommandValid)
+            {
+                cout << "Valid command. Current state is: " << engine.getCurrentStateName() << endl;
+            }
+            else
+            {
+                cout << "Invalid command. Replay current state: " << engine.getCurrentStateName() << endl;
+            }
         }
     }
 }
