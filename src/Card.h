@@ -11,7 +11,7 @@ class Player;
 
 using namespace std;
 
-class Card : virtual public Order, public ILoggable, public Subject
+class Card : virtual public Order
 {
 public:
     enum class Effect {
