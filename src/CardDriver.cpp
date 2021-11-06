@@ -4,13 +4,17 @@
 using namespace std;
 
 void testCard() {
+    // Debug
+    // rand() function implements pseudo randomness, this function initialize the sequence read by rand() at different point
+    initializedRand(); 
+
     // cout << "Initializing the deck\n";
     Deck deck(30);
     deck.showDeck();
 
     // cout << "\nInitializing players: \n";
     Player p1("Alexander");
-    deck.draw(p1);
+    deck.draw(p1); // Remove last card from deck and add to player hand
     deck.draw(p1);
     deck.draw(p1);
 

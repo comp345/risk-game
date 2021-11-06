@@ -245,9 +245,68 @@ void GameEngine::testGameEngine()
     }
 }
 
-int main()
-{
-    GameEngine::testGameEngine();
+string GameEngine::stringToLog() {
+    return "TODO";
+}
 
-    return 0;
+/**
+ * @A2 Part 2 
+ * 
+ */
+
+// Helper functions
+bool checkWinCondition()
+{
+    // Check if there is a player who wons every territory in map
+    return false;
+}
+void GameEngine::reinforcementPhase()
+{}
+void GameEngine::issueOrdersPhase()
+{}
+void GameEngine::executeOrdersPhase()
+{}
+
+// Two main phases
+void GameEngine::startupPhase()
+{
+    // loadmap <filename> to select map from list of map loaded
+
+    // validate map
+
+    // addplayer loop
+
+    // gamestart ->
+    /** 
+         * - distribute territories of map between players
+         * - determine order of play of players
+         * - initially: give 50 armies to the players (50 between them? or 50 each?)
+         * - each player draw 2 cards with deck.draw(2)
+         * - go to play phase
+         */
+}
+
+void GameEngine::mainGameLoop()
+{
+    //3 phases
+    bool noWin = true;
+
+    // main game loop: 3 phases repeat until game is won by someone
+    while (noWin)
+    {
+        /** Phases are performed in sequence:
+         * 1- Reinforcement phase: 
+         * 2- Issueing Orders phase:
+         * 3- Orders Execution phase:
+         */
+        reinforcementPhase(); // player do nothing: they receive reinforcements, depending on outcome from prev turns
+
+        issueOrdersPhase(); // players issue order and place them in list. This happens in round robin (switch between players)
+        // Using play order determined in startupPhase, switch between player's turn . In actual game, this happens in parallel usign multiprocessing
+
+        executeOrdersPhase(); // After both player have finished
+
+        // win condition: one player own every territory in map
+        noWin = checkWinCondition();
+    }
 }

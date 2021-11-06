@@ -1,18 +1,16 @@
 #include <iostream>
-#include "GameEngine.h"
-
+#include "Player.h"
+#include "Map.h"
+#include "Orders.hpp"
+#include "Card.h"
+#include "GameEngine2.h"
 
 using namespace std;
+using namespace A2;
 
-// int main(int, char **)
-// {
-//     //cout << "Hello, world!\n";
-//     // Test if orders.hpp and orders.cpp are properly linked/compiled
-//     //testEngineLink();
-
-//     gameLoopEngineDriver();
-//     cout << "============================================\n";
-//     cout << "Hello, world!\n";
-
-//     return 0;
-// }
+int main(int, char **)
+{
+    GameEngine engine;
+    engine.testGameEngine();
+    return 0;
+}

@@ -11,7 +11,11 @@ class Player;
 
 using namespace std;
 
-class Card : virtual public Order, public ILoggable, public Subject
+// Helper functions
+void initializedRand();
+
+// Original declarations from A1
+class Card : virtual public Order
 {
 public:
     enum class Effect {
