@@ -105,7 +105,7 @@ namespace A2
 
         //Alexanders additions:
         void mainGameLoop();
-        void reinforcementPhase(Player* p, Map* m);
+        void reinforcementPhase(Player* p);
         void issueOrdersPhase();
         void executeOrdersPhase();
 
