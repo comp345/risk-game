@@ -112,7 +112,7 @@ namespace A2
         vector<Player*> currentPlayers;
         Map* map;
 
-        Player* hasWinner(Map* m);
+        Player* hasWinner();
         void auditPlayers();
 
     };

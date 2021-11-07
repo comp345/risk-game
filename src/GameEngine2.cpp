@@ -285,6 +285,8 @@ void GameEngine::testGameEngine()
                 p2->reinforcementPool = 0;
 
                 mapsContinent = engine.map->continentList.front();
+                cout << "\n THERE ARE: " << engine.map->getTerritories().size() << " Territories\n";
+
                 vector<Territory*> p2Territories;
                 for(Territory* t : mapsContinent->territories){
                     p2Territories.push_back(t);
@@ -296,13 +298,22 @@ void GameEngine::testGameEngine()
                     cout << t->getName() << "\n";
                 engine.currentPlayers.push_back(p2);
                 cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
+            
+                //Empty player
+                Player *p3 = new Player("noob");
+                p3->reinforcementPool = 0;
+                vector<Territory*> p3Territories = vector<Territory*>();
+                p3->setTerritories(p3Territories);
+                cout << "\nNumber of territories: " << p3->getTerritories().size() << "\n";
+                engine.currentPlayers.push_back(p3);
             }
 
 
             
 
         }
-            engine.mainGameLoop();
+        
+        engine.mainGameLoop();
             
     }
 }
@@ -335,12 +346,13 @@ void GameEngine::mainGameLoop(){
             executeOrdersPhase();
         }
 
+        
 
         // loop shall continue until only one of the players owns all the territories
-        Player* winner = hasWinner(map);
+        Player* winner = hasWinner();
         if(winner != NULL){
             currentState = new State("win");
-            cout << "Player " << winner->getName() << " won the game!";
+            cout << "\nPlayer " << winner->getName() << " won the game!\n";
 
             //Restart the next game?
             currentState = new State("final");
@@ -355,7 +367,7 @@ void GameEngine::auditPlayers()
     for(Player * p : currentPlayers){
         if(p->getTerritories().size() == 0)
         {
-            cout << "Player " << p->getName() << " no longer has any territories left and will be removed from the game \n";
+            cout << "\nPlayer " << p->getName() << " no longer has any territories left and will be removed from the game \n";
             delete p;
             p = NULL;
         }
@@ -363,14 +375,15 @@ void GameEngine::auditPlayers()
     }
 }
 
-Player* GameEngine::hasWinner(Map* m)
+Player* GameEngine::hasWinner()
 {
-    //Get the list of all the Territories of the map
-    vector<Territory *> allTerritories = m->getTerritories();
+    // //Get the list of all the Territories of the map
+    vector<Territory *> allTerritories = map->getTerritories();
 
     //Get the players territories
     for(Player* p : currentPlayers)
     {
+    
         if(allTerritories.size() == p->getTerritories().size()){
             return p;
         }
