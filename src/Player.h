@@ -50,10 +50,14 @@ public:
     //stream insertion operator overloading
     friend ostream& operator<<(ostream& out, const Player& p);
     friend istream& operator>>(istream& in, Player& p);
-
+    
+    
+    int reinforcementPool;
+    
 private:
     string name;
     vector<Territory *> territories;
     Hand *hand;
     OrderList *orderList;
+    
 };

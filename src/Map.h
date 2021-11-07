@@ -63,8 +63,8 @@ struct Continent {
     std::vector<Territory *> territories; //to show list of territories on creating a continent
 
     std::string name;
-    int numOfTerritories;
-    int numOfArmies;
+    int numOfTerritories;       //numOfTerritories DOES NOT RETURN CORRECT NUMBER
+    int controlBonus;
 };
 
 class Map {

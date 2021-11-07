@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include <cmath>
 #include "GameEngine.h"
 
 //using namespace GameEngineSpace;

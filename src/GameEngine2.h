@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "Player.h"
 
 /* The states and transitions are stored in a linked list like structure */
 
@@ -100,6 +101,20 @@ namespace A2
         
 
         static void testGameEngine();
+
+
+        //Alexanders additions:
+        void mainGameLoop();
+        void reinforcementPhase(Player* p, Map* m);
+        void issueOrdersPhase();
+        void executeOrdersPhase();
+
+        vector<Player*> currentPlayers;
+        Map* map;
+
+        Player* hasWinner(Map* m);
+        void auditPlayers();
+
     };
 
 }

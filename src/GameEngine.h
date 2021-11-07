@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include "LoggingObserver.h"
+#include "Player.h"
 using namespace std;
 
 
@@ -36,7 +37,7 @@ using namespace std;
         //LoadMap should return a Map OBJ (currently has to be a string to test)
         string loadMap(string filePath);
         int numPlayers;
-        //vector<Player> currentPlayers;
+        vector<Player*> currentPlayersP;
         vector<int> currentPlayers;
         // Need to pass a map
         bool validateMap(string myMap);

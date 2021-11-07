@@ -1,7 +1,10 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cmath>
+#include <algorithm>
 #include "GameEngine2.h"
+
 
 using namespace std;
 
@@ -149,6 +152,9 @@ GameEngine::GameEngine()
     executeordersState->addTransition(winTransition);
     winState->addTransition(playTransition);
     winState->addTransition(endTransition);
+
+    //Initialization
+    currentPlayers = vector<Player*>();
 }
 
 string GameEngine::getCurrentStateName()
@@ -241,13 +247,210 @@ void GameEngine::testGameEngine()
             {
                 cout << "Invalid command. Replay current state: " << engine.getCurrentStateName() << endl;
             }
+
+            engine.currentState == new State("mapvalidated");
+
+            if(engine.currentState->nameState == "mapvalidated")
+            {
+                MapLoader *mapLoader = new MapLoader();
+                Map x5 = *mapLoader->loadMap("../maps/france.map");
+                Map *map5 = new Map(x5);
+                map5->validate();
+                engine.map = map5;
+            }
+
+            else if(engine.currentState->nameState == "playersadded")
+            {
+                Player *p = new Player("Alexander");
+                p->reinforcementPool = 0;
+
+                //Get the latest continent from the maps
+                Continent* mapsContinent = engine.map->continentList.back();
+                vector<Territory *> p1Territories;
+                for(Territory* t : mapsContinent->territories){
+                    p1Territories.push_back(t);
+                }
+                p->setTerritories(p1Territories);
+
+                //Show what we created
+                cout << "\n\n" << p->getName() << " was created!\n";
+                for(Territory* t : p->getTerritories())
+                    cout << t->getName() << "\n";
+                engine.currentPlayers.push_back(p);
+                cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
+
+
+                //Do the same for another player
+                Player *p2 = new Player("Andrew");
+                p2->reinforcementPool = 0;
+
+                mapsContinent = engine.map->continentList.front();
+                vector<Territory*> p2Territories;
+                for(Territory* t : mapsContinent->territories){
+                    p2Territories.push_back(t);
+                }
+                p2->setTerritories(p2Territories);
+
+                cout << "\n\n" << p2->getName() << " was created! \n";
+                for(Territory* t : p2->getTerritories())
+                    cout << t->getName() << "\n";
+                engine.currentPlayers.push_back(p2);
+                cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
+            }
+
+
+            
+
         }
+            engine.mainGameLoop();
+            
     }
 }
+
 
 int main()
 {
     GameEngine::testGameEngine();
 
     return 0;
+}
+
+void GameEngine::mainGameLoop(){
+    if(currentState->nameState == "assignreinforcement")
+        {
+            for (Player* p : currentPlayers)
+            {
+                reinforcementPhase(p, map);
+                cout << "\nPlayer: " << p->getName() << " has " << p->reinforcementPool << " in his reinforcement pool.\n";
+            }
+        }
+
+        if(currentState->nameState == "issueorder")
+        {
+            issueOrdersPhase();
+        }
+
+        if(currentState->nameState == "executeorders")
+        {
+            executeOrdersPhase();
+        }
+
+
+        // loop shall continue until only one of the players owns all the territories
+        Player* winner = hasWinner(map);
+        if(winner != NULL){
+            currentState = new State("win");
+            cout << "Player " << winner->getName() << " won the game!";
+
+            //Restart the next game?
+            currentState = new State("final");
+        }
+
+        // loop to check if a player should be removed from the game
+        auditPlayers();
+}
+
+void GameEngine::auditPlayers()
+{
+    for(Player * p : currentPlayers){
+        if(p->getTerritories().size() == 0)
+        {
+            cout << "Player " << p->getName() << " no longer has any territories left and will be removed from the game \n";
+            delete p;
+            p = NULL;
+        }
+
+    }
+}
+
+Player* GameEngine::hasWinner(Map* m)
+{
+    //Get the list of all the Territories of the map
+    vector<Territory *> allTerritories = m->getTerritories();
+
+    //Get the players territories
+    for(Player* p : currentPlayers)
+    {
+        if(allTerritories.size() == p->getTerritories().size()){
+            return p;
+        }
+        // for(Territory* playerTerritory : p->getTerritories())
+        // {
+        //     for(Territory* mapTerritoryies: allTerritories)
+        //     {
+        //         if(mapTerritoryies == playerTerritory)
+        //             return p;
+        //         //TODO:: Possible optimization? Just check the size, all territories means
+        //         //Player territories size would be equal to allTerritories size.
+        //     }
+        // }
+    }
+
+    return NULL;
+}
+
+void GameEngine::reinforcementPhase(Player* p, Map* m){
+    //Get players number of territories
+    vector<Territory *> playerT = p->getTerritories();
+
+    int numberOfArmies = floor(playerT.size()/3);
+
+    //Find if the player owns all the territories of an entire contenent:
+    int controlBonus = 0;
+    bool ownsContinent = false;
+
+    //Get all the contenents then their territories:
+    for(Continent* c : m->continentList){
+        int territoryCount = 0;
+        controlBonus = c->controlBonus;
+        vector<Territory*> listOfContentsTerritories = c->territories;
+
+        //Loop through what the player has to check if the owns the full continent
+        for(Territory* t : playerT){
+
+            //Count of how many of the players Territories we find of the continent
+            if(find(listOfContentsTerritories.begin(), listOfContentsTerritories.end(), t) != listOfContentsTerritories.end()){
+                territoryCount++;
+            }
+        }
+
+        //If both are equal sizes, then players owns continent.
+        if(territoryCount == listOfContentsTerritories.size())
+            ownsContinent = true;
+        
+        if(ownsContinent == true){
+            cout << "continent bonus has been applied! adding an addtional " << controlBonus << " units";
+            numberOfArmies += controlBonus;
+            ownsContinent = false;
+        }
+
+    }
+
+    //the minimal number of reinforcement armies per turn for any player is 3
+    if(numberOfArmies < 3)
+        numberOfArmies = 3;
+
+    // placed in the player’s reinforcement pool.
+    p->reinforcementPool += numberOfArmies;
+}
+
+
+void GameEngine::issueOrdersPhase(){
+    for(Player* players : currentPlayers){
+        for(Order* order : players->getOrderList()->getList()){
+            players->issueOrder(order);
+        }
+    }
+}
+
+void GameEngine::executeOrdersPhase(){
+    //players have signified that they are not issuing one more order
+
+    for(Player* players : currentPlayers)
+    {
+        for(Order* order : players->getOrderList()->getList())
+        {
+            order->execute();
+        }
+    }
 }

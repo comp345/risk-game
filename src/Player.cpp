@@ -122,7 +122,43 @@ void Player::issueOrder(string order, string details)
 //adds order to a player's list of orders
 void Player::issueOrder(Order* o)
 {
+
+    // decides which neighboring territories are to be attacked
+    for (Territory* toAttack : toAttack())
+    {
+        // Make a new list with users priority?
+    }
+
+
+    // decides which neighboring territories are to be defended
+    for (Territory* toDefend : toDefend())
+    {
+        // Make a new list with users priority?
+    }
+
+    // As long as the player has armies still to deploy
+    if(reinforcementPool != 0)
+    {
+        // it will issue a deploy order and no other order.
+        if(o->getCommand() != "deploy"){
+            cout << "Since there are still reinforcements in this players pool, you must places all arimies first.";
+            return;
+        }
+    }
+
+
+    // The player issues advance orders
+    if(o->getCommand() == "advance"){
+
+        // move armies from one of its own territory to the other in order to defend them
+        
+
+        // move armies from one of its territories to a neighboring enemy territory to attack them 
+    }
+
+
     orderList->add(o);
+    
 }
 
 Hand *Player::getHand() {

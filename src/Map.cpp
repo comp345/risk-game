@@ -139,7 +139,7 @@ void Map::createContinent(std::string cName, int numOfCountries, int armiesNum) 
     Continent *c = new Continent();
     c->name = cName;
     c->numOfTerritories = numOfCountries;
-    c->numOfArmies = armiesNum;
+    c->controlBonus = armiesNum;
     continentList.push_back(c);
     c = nullptr;
 }
