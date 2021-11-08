@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "LoggingObserver.h"
+#include "CommandProcessor.h"
 
 /* The states and transitions are stored in a linked list like structure */
 
@@ -13,7 +14,6 @@ namespace A2
     class GameEngine;
     class State
     {
-
         friend class GameEngine;
         friend class Transition;
 
@@ -75,11 +75,13 @@ namespace A2
     {
         friend class State;
         friend class Transition;
+        friend class CommandProcessor;
 
     private:
         State *currentState; 
         std::vector<State *> states; // GameEngine maintains collection of all states
         std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
+        CommandProcessor* commandProcessor;
 
     public:
         GameEngine();

@@ -86,7 +86,7 @@ GameEngine::GameEngine()
     State *maploadedState = new State("maploaded");
     State *mapvalidatedState = new State("mapvalidated");
     State *playersaddedState = new State("playersadded");
-    State *assignreinforcementState = new State("assignreinforcement");
+    State *assignreinforcementState = new State("assignreinfgamorcement");
     State *issueordersState = new State("issueorder");
     State *executeordersState = new State("executeorders");
     State *winState = new State("win");
@@ -111,14 +111,14 @@ GameEngine::GameEngine()
     Transition *loadmapTransition = new Transition("loadmap", maploadedState);
     Transition *validatemapTransition = new Transition("validatemap", mapvalidatedState);
     Transition *addplayerTransition = new Transition("addplayer", playersaddedState);
-    Transition *assigncountriesTransition = new Transition("assigncountries", assignreinforcementState);
+    Transition *gamestart = new Transition("gamestart", assignreinforcementState);
     Transition *issueorderTransition = new Transition("issueorder", issueordersState);
     Transition *endissueordersTransition = new Transition("endissueorders", executeordersState);
     Transition *execorderTransition = new Transition("execorder", executeordersState);
     Transition *endexecordersTransition = new Transition("endexecorders", assignreinforcementState);
     Transition *winTransition = new Transition("win", winState);
-    Transition *playTransition = new Transition("play", startState);
-    Transition *endTransition = new Transition("end", finalState);
+    Transition *playTransition = new Transition("replay", startState);
+    Transition *endTransition = new Transition("quit", finalState);
 
     // Add transition to collection of transitions
     transitions = vector<Transition *>();
