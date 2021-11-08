@@ -182,13 +182,19 @@ void Player::issueOrder(Order* o)
         cout << i << " : " << prioritisedDefend.at(i)->getName() << "\n";
     }
 
+
+
+
     // As long as the player has armies still to deploy
-    if(reinforcementPool != 0)
+    while(reinforcementPool != 0)
     {
         // it will issue a deploy order and no other order.
         if(o->getCommand() != "deploy"){
-            cout << "Since there are still reinforcements in this players pool, you must places all arimies first.";
-            return;
+            cout << "Since there are still reinforcements in this players pool, you must places all arimies first.\n"
+            << "There are " << reinforcementPool << " orders remaining \n";
+
+            Deploy* deployOrder = new Deploy("armies",this);
+            orderList->add(deployOrder);
         }
     }
 

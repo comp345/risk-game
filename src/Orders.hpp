@@ -11,6 +11,7 @@
 
 class OrderList;
 class Order;
+class Player;
 
 void testOrdersLink();
 
@@ -51,6 +52,7 @@ class Deploy : public Order
 public:
     Deploy();
     Deploy(std::string details);
+    Deploy(string orderDetails, Player* p);
     Deploy(const Deploy &d);
 
     bool validate ();

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "Orders.hpp"
+#include "Player.h"
 
 using namespace std;
 
@@ -134,6 +135,10 @@ Deploy::Deploy() : Order("Deploy type", "")
 }
 Deploy::Deploy(string orderdetails) : Order("Deploy type", orderdetails)
 {
+}
+Deploy::Deploy(string orderdetails, Player* p) : Deploy(orderdetails)
+{
+    p->reinforcementPool--;
 }
 Deploy::Deploy(const Deploy &d)
 {

@@ -223,7 +223,7 @@ void GameEngine::testGameEngine()
     {
         string keyinput;
 
-        cout << "Enter a valid command to progress in the game."
+        cout << "\nEnter a valid command to progress in the game."
              << "(Enter x to quit or press any key when at final State)" << endl;
 
         cin >> keyinput;
