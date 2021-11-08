@@ -1,7 +1,7 @@
 loadmap
-validatemap
-addplayer
-assigncountries
+validatemap 
+addplayer 
+assigncountries 
 issueorder
 endissueorders
 execorder

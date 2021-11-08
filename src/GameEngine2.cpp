@@ -261,57 +261,57 @@ void GameEngine::testGameEngine()
 
             else if(engine.currentState->nameState == "playersadded")
             {
-                // Player *p = new Player("Alexander");
-                // p->reinforcementPool = 0;
+                Player *p = new Player("Alexander");
+                p->reinforcementPool = 0;
 
-                // //Get the latest continent from the maps
-                // Continent* mapsContinent = engine.map->continentList.back();
-                // vector<Territory *> p1Territories;
-                // for(Territory* t : mapsContinent->territories){
-                //     p1Territories.push_back(t);
-                // }
-                // p->setTerritories(p1Territories);
+                //Get the latest continent from the maps
+                Continent* mapsContinent = engine.map->continentList.back();
+                vector<Territory *> p1Territories;
+                for(Territory* t : mapsContinent->territories){
+                    p1Territories.push_back(t);
+                }
+                p->setTerritories(p1Territories);
 
-                // //Show what we created
-                // cout << "\n\n" << p->getName() << " was created!\n";
-                // for(Territory* t : p->getTerritories())
-                //     cout << t->getName() << "\n";
-                // engine.currentPlayers.push_back(p);
-                // cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
+                //Show what we created
+                cout << "\n\n" << p->getName() << " was created!\n";
+                for(Territory* t : p->getTerritories())
+                    cout << t->getName() << "\n";
+                engine.currentPlayers.push_back(p);
+                cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
 
 
-                // //Do the same for another player
-                // Player *p2 = new Player("Andrew");
-                // p2->reinforcementPool = 0;
+                //Do the same for another player
+                Player *p2 = new Player("Andrew");
+                p2->reinforcementPool = 0;
 
-                // mapsContinent = engine.map->continentList.front();
-                // cout << "\n THERE ARE: " << engine.map->getTerritories().size() << " Territories\n";
+                mapsContinent = engine.map->continentList.front();
+                cout << "\n THERE ARE: " << engine.map->getTerritories().size() << " Territories\n";
 
-                // vector<Territory*> p2Territories;
-                // for(Territory* t : mapsContinent->territories){
-                //     p2Territories.push_back(t);
-                // }
-                // p2->setTerritories(p2Territories);
+                vector<Territory*> p2Territories;
+                for(Territory* t : mapsContinent->territories){
+                    p2Territories.push_back(t);
+                }
+                p2->setTerritories(p2Territories);
 
-                // cout << "\n\n" << p2->getName() << " was created! \n";
-                // for(Territory* t : p2->getTerritories())
-                //     cout << t->getName() << "\n";
-                // engine.currentPlayers.push_back(p2);
-                // cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
+                cout << "\n\n" << p2->getName() << " was created! \n";
+                for(Territory* t : p2->getTerritories())
+                    cout << t->getName() << "\n";
+                engine.currentPlayers.push_back(p2);
+                cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
             
-                // //Empty player
-                // Player *p3 = new Player("noob");
-                // p3->reinforcementPool = 0;
-                // vector<Territory*> p3Territories = vector<Territory*>();
-                // p3->setTerritories(p3Territories);
-                // cout << "\nNumber of territories: " << p3->getTerritories().size() << "\n";
-                // engine.currentPlayers.push_back(p3);
+                //Empty player
+                Player *p3 = new Player("noob");
+                p3->reinforcementPool = 0;
+                vector<Territory*> p3Territories = vector<Territory*>();
+                p3->setTerritories(p3Territories);
+                cout << "\nNumber of territories: " << p3->getTerritories().size() << "\n";
+                engine.currentPlayers.push_back(p3);
 
 
-                Player* winner = new Player("Pro");
-                vector<Territory*> allTerritories = engine.map->getTerritories();
-                winner->setTerritories(allTerritories);
-                engine.currentPlayers.push_back(winner);
+                // Player* winner = new Player("Pro");
+                // vector<Territory*> allTerritories = engine.map->getTerritories();
+                // winner->setTerritories(allTerritories);
+                // engine.currentPlayers.push_back(winner);
 
             }
 
@@ -345,6 +345,9 @@ void GameEngine::mainGameLoop(){
 
         if(currentState->nameState == "issueorder")
         {
+            //dummy order
+            Deploy* deployOrder = new Deploy("random order");
+            currentPlayers.front()->getOrderList()->add(deployOrder);
             issueOrdersPhase();
         }
 
@@ -462,4 +465,7 @@ void GameEngine::executeOrdersPhase(){
             order->execute();
         }
     }
+
+    //the main game loop goes back to the reinforcement phase
+    currentState = new State("assignreinforcement");
 }
