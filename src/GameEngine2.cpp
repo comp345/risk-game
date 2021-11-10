@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include "GameEngine2.h"
+#include "Map.h"
 
 using namespace std;
 
@@ -271,6 +272,21 @@ void GameEngine::executeOrdersPhase()
 void GameEngine::startupPhase()
 {
     // loadmap <filename> to select map from list of map loaded
+    GameEngine engine;
+    MapLoader *mapLoader= new MapLoader();
+    //if(engine.getCurrentStateName()=="start" || engine.getCurrentStateName()=="maploaded"){
+        cout <<"Initiating map loading stage: \n"<<endl;
+        cout<<"Type one of the following maps from this list: \n"<<endl;
+        //add methods to iterate through maps directory and show list of maps in the folder
+        string keyIn;
+        cin>>keyIn;
+        if(keyIn=="europe"){
+            Map x4 = *mapLoader->loadMap("../maps/europe.map");
+            Map *map4 = new Map(x4);
+            map4->validate();
+        }
+        //if map is validated, transition to map validated stage
+    //}
 
     // validate map
 

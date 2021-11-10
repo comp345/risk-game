@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 #include "LoggingObserver.h"
-
 /* The states and transitions are stored in a linked list like structure */
 
 // States are Nodes in the game flow

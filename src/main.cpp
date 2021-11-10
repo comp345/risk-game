@@ -11,6 +11,7 @@ using namespace A2;
 int main(int, char **)
 {
     GameEngine engine;
-    engine.testGameEngine();
+    //engine.testGameEngine();
+    engine.startupPhase();
     return 0;
 }
