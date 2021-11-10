@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
-#include "Orders.hpp"
+#include "Player.h"
+#include "Map.h"
+#include "Orders.h"
 
 using namespace std;
 

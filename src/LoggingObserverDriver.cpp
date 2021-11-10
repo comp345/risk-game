@@ -1,6 +1,8 @@
 #include "LoggingObserver.h"
 #include "GameEngine2.h"
-#include "Orders.hpp"
+#include "Player.h"
+#include "Map.h"
+#include "Orders.h"
 #include <iostream>
 
 using namespace std;

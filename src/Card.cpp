@@ -1,7 +1,7 @@
 #include<iostream>
 #include<string>
-#include"Card.h"
-#include"Orders.hpp"
+#include "Card.h"
+#include "Orders.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

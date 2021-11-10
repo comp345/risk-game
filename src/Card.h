@@ -1,9 +1,10 @@
 #pragma once
-
-#include<vector>
-#include<string>
+#include "Orders.h"
+#include <vector>
+#include <string>
 #include "Player.h"
 #include "LoggingObserver.h"
+
 
 class Deck;
 class Hand;
@@ -15,6 +16,7 @@ using namespace std;
 void initializedRand();
 
 // Original declarations from A1
+
 class Card : virtual public Order
 {
 public:
@@ -48,7 +50,9 @@ public:
 
     Card &operator=(const Card &rhs);
 
-    string stringToLog() override;
+    string stringToLog();
+    // string stringToLog() override; // TO OVERRIDE later
+
 
 protected:
     Effect *m_effect;
