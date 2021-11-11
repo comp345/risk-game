@@ -148,7 +148,7 @@ class OrderList : public ILoggable, public Subject
 public:
     OrderList();
     OrderList(const OrderList &ol);
-    // ~OrderList(); // no need to explicitely call destructor
+    ~OrderList(); // no need to explicitely call destructor
 
     OrderList &operator=(const OrderList &o);
 

@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "Orders.h"
+#include "Card.h"
 
 using namespace std;
 
@@ -179,8 +180,9 @@ void testOrdersA2()
      // ************************************************** //
      //   Initialize parameters for the orders to test...
      // ************************************************** //
-     int army = 4;
-     Player *p1 = new Player("Hoax", vector<Territory *>(), nullptr, new OrderList());
+     int army = 4; 
+     // Noah note: there is a bug in the constructors of Player that do not put Hand* and OrderList*to nullPtr
+     Player *p1 = new Player("Hoax", vector<Territory *>(), nullptr, nullptr);
 
      MapLoader *mapLoader = new MapLoader();
      Map x4 = *mapLoader->loadMap("../maps/europe.map");
@@ -309,7 +311,8 @@ void testAssignmentOperator()
      //   Initialize parameters for the orders to test...
      // ************************************************** //
      int army = 4;
-     Player *p1 = new Player("Hoax", vector<Territory *>(), nullptr, new OrderList());
+     // Player *p1 = new Player("Hoax", vector<Territory *>(), nullptr, nullptr);
+     Player *p1 = new Player("Hoax");
 
      MapLoader *mapLoader = new MapLoader();
      Map x4 = *mapLoader->loadMap("../maps/europe.map");

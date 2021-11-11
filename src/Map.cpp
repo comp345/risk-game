@@ -37,9 +37,13 @@ Territory::Territory(const Territory &t1) {
 
 Territory::~Territory() {}
 
+// Noah note for A2: copy owner (Player type)
 Territory &Territory::operator=(const Territory &t) {
+    if (this == &t)
+        return *this;
     ID = t.ID;
     name = t.name;
+    // owner = new Player(t.owner); 
     numArmies = t.numArmies;
     return *this;
 }

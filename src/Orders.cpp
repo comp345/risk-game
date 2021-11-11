@@ -123,7 +123,7 @@ void Order::setDetails(std::string orderDetails)
     details = orderDetails;
 }
 
-Deploy::Deploy() : Order("Deploy type", ""), armiesToMove(0), playerDeploying(nullptr), territoryTarget(nullptr)
+Deploy::Deploy() : Order("Deploy type", ""), armiesToMove(0), playerDeploying(new Player), territoryTarget(new Territory)
 {
 }
 // Do not use (A1 legacy)
@@ -163,7 +163,7 @@ Deploy &Deploy::operator=(const Deploy &d)
     if (playerDeploying) delete playerDeploying;
     if (territoryTarget) delete territoryTarget;
     
-    this->playerDeploying = new Player(*d.getPlayer());
+    this->playerDeploying = new Player(*d.getPlayer()); // Causes segmentation error
     this->territoryTarget = new Territory(*d.getTerritory());
     cout << "Exiting Deploy::operator=" <<endl;
     return *this;
@@ -346,13 +346,19 @@ string Negotiate::stringToLog()
 // Implementation of OrderList
 OrderList::OrderList()
 {
-    list = vector<Order *>();
+    // list = vector<Order *>();
 }
 // Copy constructor of OrderList
 OrderList::OrderList(const OrderList &ol)
 {
+    // list = vector<Order *>(ol.list);
     list = ol.list;
 }
+OrderList::~OrderList()
+{
+    list.clear();
+}
+
 // returns a deep copy of OrderList's list (vector of pointers to deep copies of Orders)
 vector<Order *> OrderList ::getList()
 {
@@ -376,7 +382,9 @@ OrderList &OrderList::operator=(const OrderList &o)
 {
     if (this == &o)
         return *this;
-    this->list = o.list;
+    // list.clear();
+    // list = vector<Order *>();
+    list = o.list;
     return *this;
 }
 
