@@ -28,12 +28,15 @@ Player::Player(string n, vector<Territory*> t, Hand* h, OrderList* o)
 }
 
 //copy constructor
-Player::Player(const Player& p)
+// Noah note for A2: Need to correct player constructor, causes segmentation error in Deploy operator=
+Player::Player(const Player& p) : name("todo"), territories(vector<Territory*>()),
+hand(nullptr), orderList(nullptr)
 {
-    this->name = p.name;
-    this->territories = p.territories;
-    this->hand = p.hand;
-    this->orderList = p.orderList;
+
+    // this->name = p.name;
+    // this->territories = p.territories;
+    // this->hand = p.hand;
+    // this->orderList = p.orderList;
 }
 
 //destructor
