@@ -20,6 +20,7 @@ Order::Order(const Order &o)
 }
 Order &Order::operator=(const Order &o)
 {
+    cout << "Entering Order::operator=" << endl;
     // self-assignment guard
     if (this == &o)
         return *this;
@@ -85,7 +86,8 @@ istream &operator>>(istream &in, Order &o)
         {
             o.command = "Negotiate type";
             invalidOrderType = false;
-        } else 
+        }
+        else
         {
             // continue loop until valid order type (command) entered
         }
@@ -93,18 +95,18 @@ istream &operator>>(istream &in, Order &o)
 
     cout << "Details: \n";
     in >> o.details;
-    
+
     // ... Add future data member
     // in >> o.player
     // in >> o.territory
 
     return in;
 }
-Order* Order::getOrder()
+Order *Order::getOrder()
 {
     return this;
 }
-string Order::getCommand()
+string Order::getCommand() const
 {
     return command;
 }
@@ -112,7 +114,7 @@ void Order::setCommand(std::string ordercommand)
 {
     command = ordercommand;
 }
-std::string Order::getDetails()
+std::string Order::getDetails() const
 {
     return details;
 }
@@ -121,28 +123,53 @@ void Order::setDetails(std::string orderDetails)
     details = orderDetails;
 }
 
-//TODO: implement these
-//  bool Order::validate()
-//  {
-//      return true;
-//  }
-//  bool Order::execute()
-//  {
-//      return true;
-//  }
-
-Deploy::Deploy() : Order("Deploy type", "")
+Deploy::Deploy() : Order("Deploy type", ""), armiesToMove(0), playerDeploying(nullptr), territoryTarget(nullptr)
 {
 }
+// Do not use (A1 legacy)
 Deploy::Deploy(string orderdetails) : Order("Deploy type", orderdetails)
 {
 }
-Deploy::Deploy(const Deploy &d)
+Deploy::Deploy(int armies, Player *player, Territory *territory)
 {
-    Deploy cpyDeploy = d;
-    setCommand(cpyDeploy.getCommand());
-    setDetails(cpyDeploy.getDetails());
+    armiesToMove = armies;
+    playerDeploying = player;
+    territoryTarget = territory;
+    string _command = "Deploy type";
+    string _details = "Player " + player->getName() + " deploys " + to_string(armies) 
+        + " army units to " + territory->getName();
+    string desc = _command + " = {" + _details + "}";
+    setDetails(desc);
 }
+// Deep copy. Value semantics -> cannot be used to execute duplicate orders?
+Deploy::Deploy(const Deploy &d) : Order(d.getCommand(), d.getDetails()), 
+armiesToMove(d.getArmies()), playerDeploying(d.getPlayer()), territoryTarget(d.getTerritory())
+{
+}
+Deploy::~Deploy()
+{
+    delete playerDeploying;
+    delete territoryTarget;
+}
+
+// Shallow copy. Reference semantic -> use to create duplicate orders that are executable
+Deploy &Deploy::operator=(const Deploy &d)
+{
+    cout << "Entering Deploy::operator=" << endl;
+
+    Order::operator=(d); // self-assign guard + assign base fields
+    cout << "Processing Deploy::operator=" << endl;
+    this->armiesToMove = d.getArmies();
+    if (playerDeploying) delete playerDeploying;
+    if (territoryTarget) delete territoryTarget;
+    
+    this->playerDeploying = new Player(*d.getPlayer());
+    this->territoryTarget = new Territory(*d.getTerritory());
+    cout << "Exiting Deploy::operator=" <<endl;
+    return *this;
+}
+// ostream& Deploy::operator<<(std::ostream& out, const Deploy& d) {}
+
 // Fake validate and execute methods to implement later
 bool Deploy::validate()
 {
@@ -155,8 +182,15 @@ bool Deploy::execute()
     notify(this);
     return true;
 }
+int Deploy::getArmies() const { return armiesToMove; }
+Player* Deploy::getPlayer() const { return playerDeploying; }
+Territory* Deploy::getTerritory() const { return territoryTarget; }
+void Deploy::setArmies(int armies) { armiesToMove = armies; }
+void Deploy::setPlayer(Player* p) { playerDeploying = p; }
+void Deploy::setTerritory(Territory* t) { territoryTarget = t; }
 
-string Deploy::stringToLog() {
+string Deploy::stringToLog()
+{
     return "TODO";
 }
 
@@ -185,7 +219,8 @@ bool Advance::execute()
     return true;
 }
 
-string Advance::stringToLog() {
+string Advance::stringToLog()
+{
     return "TODO";
 }
 
@@ -214,7 +249,8 @@ bool Bomb::execute()
     return true;
 }
 
-string Bomb::stringToLog() {
+string Bomb::stringToLog()
+{
     return "TODO";
 }
 
@@ -243,7 +279,8 @@ bool Blockade::execute()
     return true;
 }
 
-string Blockade::stringToLog() {
+string Blockade::stringToLog()
+{
     return "TODO";
 }
 
@@ -271,7 +308,8 @@ bool AirLift::execute()
     return true;
 }
 
-string AirLift::stringToLog() {
+string AirLift::stringToLog()
+{
     return "TODO";
 }
 
@@ -300,7 +338,8 @@ bool Negotiate::execute()
 }
 
 //when an order is executed, output the effect of the order to the log file
-string Negotiate::stringToLog() {
+string Negotiate::stringToLog()
+{
     return "TODO";
 }
 
@@ -333,7 +372,7 @@ void OrderList::setList(vector<Order *> olist)
     list = olist;
 }
 
-OrderList& OrderList::operator=(const OrderList &o)
+OrderList &OrderList::operator=(const OrderList &o)
 {
     if (this == &o)
         return *this;
@@ -388,6 +427,7 @@ void OrderList::printList()
 }
 
 //when an order is added to the order list of a player, output the order to the log file
-string OrderList::stringToLog() {
+string OrderList::stringToLog()
+{
     return "Order was added to the OrderList of a player. Order: " + this->list.back()->getCommand();
 }

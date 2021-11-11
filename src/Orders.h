@@ -31,18 +31,19 @@ private:
 
 public:
     Order();
+    // Do not use (A1 legacy)
     Order(std::string command, std::string details);
     Order(const Order &o);
-    // ~Order(); // Destructor to implement when ptr data members are added
+    // virtual ~Order(); // Destructor to implement when ptr data members are added
 
     Order &operator=(const Order &o);
     friend std::ostream &operator<<(std::ostream &out, const Order &o);
     friend std::istream &operator>>(std::istream &in, Order &o);
 
     Order *getOrder();
-    std::string getCommand();
+    std::string getCommand() const;
     void setCommand(std::string ordercommand);
-    std::string getDetails();
+    std::string getDetails() const;
     void setDetails(std::string orderDetails);
 
     // To implement
@@ -54,13 +55,27 @@ class Deploy : public Order
 {
 private:
     int armiesToMove;
-    Player* playerDeploying;
+    Player *playerDeploying;
     Territory *territoryTarget;
 
 public:
     Deploy();
     Deploy(std::string details);
-    Deploy(const Deploy &d);
+    Deploy(int armies, Player *player, Territory *territory);
+    // Deep copy. Use for value semantics (pass/return by value). Don't use to create orders to execute
+    Deploy(const Deploy &d); 
+    ~Deploy();
+    // Shallow copy. Reference semantics
+    Deploy& operator=(const Deploy& d);
+    
+    // friend std::ostream& operator<<(std::ostream& out, const Deploy& d);
+
+    int getArmies() const;
+    Player* getPlayer() const;
+    Territory* getTerritory() const;
+    void setArmies(int armies);
+    void setPlayer(Player* p);
+    void setTerritory(Territory* t);
 
     bool validate();
     bool execute();
@@ -165,3 +180,7 @@ private:
 
 // Test function (to delete)
 void testOrdersDriver();
+
+void testOrdersA2();
+
+void testAssignmentOperator();
