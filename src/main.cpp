@@ -14,6 +14,13 @@ int main(int, char **)
     /* A2 : Part 4 */
     // testOrdersA2();
 
-    testAssignmentOperator();
+    /* A2 : Debugging operator= from Deploy and Player */
+    // testAssignmentOperator();
+
+    /* A2 : Debugging Constructor and assignment operator defined in Map of A1 */
+    // testA2Map();
+
+    /* A2 : Testing Deploy exec */
+    testDeployExec();
     return 0;
 }

@@ -180,9 +180,8 @@ void testOrdersA2()
      // ************************************************** //
      //   Initialize parameters for the orders to test...
      // ************************************************** //
-     int army = 4; 
-     // Noah note: there is a bug in the constructors of Player that do not put Hand* and OrderList*to nullPtr
-     Player *p1 = new Player("Hoax", vector<Territory *>(), nullptr, nullptr);
+     int army = 4;
+     Player *p1 = new Player("Hoax");
 
      MapLoader *mapLoader = new MapLoader();
      Map x4 = *mapLoader->loadMap("../maps/europe.map");
@@ -191,10 +190,12 @@ void testOrdersA2()
 
      vector<Territory *> europeTerritories = map4->getTerritories();
      int numberOfTerritoryInEurope = map4->getTerritorySize();
+     Territory *t1 = europeTerritories.at(0);
 
      // ************************* //
      // Creating a Deploy order   //
      // ************************* //
+     // Creating 2 distinct Deploy objects with same parameters should result in orders that execute on same Player and Territory
      Deploy *d1 = new Deploy(army, p1, europeTerritories.at(0));
      Deploy *d1_0 = new Deploy(army, p1, europeTerritories.at(0)); // Creating two Deploy objects as pointer is OK
 
@@ -214,10 +215,9 @@ void testOrdersA2()
      // ************************* //
      //   Assignment operator     //
      // ************************* //
-     // Deploy *d2 = d1; // WRONG , NOT ASSIGNMENT! Shallow copy: assignment operator not called!
-     // Deep copy/Assignment operator
-     Deploy *d2;
-     *d2 = *d1; // Segmentation error!!
+     // Deep copy/Assignment operator: The created Deploy order has a different Player and Territory to original Deploy... wrong
+     Deploy *d2 = new Deploy; // Deploy *d2; *d2 = *d1; // -> Error since dereferencing wild pointer
+     *d2 = *d1;
      d2->setDetails(d2->getDetails() + ". ASSIGNMENT!");
      cout << "d2: " << d2->getDetails() << endl;
 
@@ -248,8 +248,8 @@ void testOrdersA2()
      // ******************************* //
      cout << "Checking for reference equality: " << endl;
      cout << "d1: " << d1->getDetails() << endl;
-     cout << "d2 (assignment to d1): " << d2->getDetails() << endl; // shallow copy?
-     cout << "d3 (copy of d1): " << d3->getDetails() << endl;       // deep copy?
+     cout << "d2 (assignment to d1): " << d2->getDetails() << endl; // now a deep copy! OK
+     cout << "d3 (copy of d1): " << d3->getDetails() << endl;       // deep copy? OK
 
      cout << endl
           << endl;
@@ -258,6 +258,10 @@ void testOrdersA2()
      //        Testing getters and setters      //
      // ***************************************** //
      cout << "Testing getters and setters. Current d1, d2, d3:" << endl;
+     // Originally passed player p1 and territory england
+     cout << "*p1: " << &(*p1) << endl;
+     cout << "*t1: " << &(*t1) << endl;
+     cout << "*europeTerritories.at(0):  " << &(*europeTerritories.at(0)) << endl;
      cout << "d1 details: " << d1->getDetails() << endl;
      cout << "d1_0 details: " << d1_0->getDetails() << endl; // should contain same Player* as d1
      cout << "d2 details: " << d2->getDetails() << endl;
@@ -280,7 +284,7 @@ void testOrdersA2()
      d1->setPlayer(p2);
      cout << "d1 player: " << d1->getPlayer() << endl;
      cout << "d1_0 player: " << d1_0->getPlayer() << endl; // not a shallow copy of d1! is its unique order now
-     cout << "d2 player: " << d2->getPlayer() << endl;     // shallow copy of d1,
+     cout << "d2 player: " << d2->getPlayer() << endl;     // now a deep copy!
      cout << "d3 player: " << d3->getPlayer() << endl;
 
      cout << endl;
@@ -311,7 +315,7 @@ void testAssignmentOperator()
      //   Initialize parameters for the orders to test...
      // ************************************************** //
      int army = 4;
-     // Player *p1 = new Player("Hoax", vector<Territory *>(), nullptr, nullptr);
+     // DO NOT create players like that: Player *p1 = new Player("Hoax", vector<Territory *>(), nullptr, nullptr);
      Player *p1 = new Player("Hoax");
 
      MapLoader *mapLoader = new MapLoader();
@@ -330,9 +334,9 @@ void testAssignmentOperator()
      // ************************* //
      //   Assignment operator     //
      // ************************* //
-     Deploy *d2 = new Deploy; 
-          // The pointer d2 needs to be init with new, else we cannot use the assignment operator!
-          // operator= works only on initialized object
+     Deploy *d2 = new Deploy;
+     // The pointer d2 needs to be init with new, else we cannot use the assignment operator!
+     // operator= works only on initialized object
      *d2 = *d1;
      cout << d2->getDetails();
 
@@ -341,4 +345,51 @@ void testAssignmentOperator()
      // ********** //
      delete d1;
      delete d2;
+}
+
+void testDeployExec()
+{
+     // ************************************************** //
+     //   Initialize parameters for the orders to test...
+     // ************************************************** //
+     int army = 4;
+     Player *p1 = new Player("Hoax");
+
+     MapLoader *mapLoader = new MapLoader();
+     Map x4 = *mapLoader->loadMap("../maps/europe.map");
+     Map *map4 = new Map(x4);
+     map4->validate();
+
+     vector<Territory *> europeTerritories = map4->getTerritories();
+     int numberOfTerritoryInEurope = map4->getTerritorySize();
+     Territory *t1 = europeTerritories.at(0);
+
+     // To create a valid territory, need to specify owner and number of armies (if territory is conquered)
+     t1->setNumberOfArmies(5); 
+     t1->setOwner(p1);
+
+     // ************************* //
+     // Creating a Deploy order   //
+     // ************************* //
+
+     // Creating 2 distinct Deploy objects with same parameters should result in orders that execute on same Player and Territory
+     Deploy *d1 = new Deploy(army, p1, t1);
+     Deploy *d1_0 = new Deploy(army, p1, t1); // Creating two Deploy objects as pointer is OK
+
+     cout << "===================================" << endl;
+     cout << "p1: " << &(*p1) << endl;
+     cout << "t1: " << &(*t1) << endl;
+     cout << "d1: " << d1->getDetails() << endl
+     << "d1.playerDeploying: " << d1->getPlayer() << endl
+     << "d1.territoryTarget: " << d1->getTerritory() << endl;
+
+     cout << "Executing Deploy order d1." << endl;
+     d1->execute();
+     cout << "t1 After d1 execution: " << *t1 << endl;
+
+     cout << "Executing Deploy order d1_0" << endl;
+     d1_0->execute();
+     cout << "t1 After d1_0 execution: " << *t1 << endl;
+
+
 }

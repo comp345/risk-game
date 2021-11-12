@@ -60,22 +60,21 @@ private:
 
 public:
     Deploy();
-    Deploy(std::string details);
+    Deploy(std::string details); // don't use
     Deploy(int armies, Player *player, Territory *territory);
-    // Deep copy. Use for value semantics (pass/return by value). Don't use to create orders to execute
-    Deploy(const Deploy &d); 
+    Deploy(const Deploy &d); // Deep copy. Use for value semantics (pass/return by value). Don't use to create orders to execute
     ~Deploy();
     // Shallow copy. Reference semantics
-    Deploy& operator=(const Deploy& d);
-    
+    Deploy &operator=(const Deploy &d);
+
     // friend std::ostream& operator<<(std::ostream& out, const Deploy& d);
 
     int getArmies() const;
-    Player* getPlayer() const;
-    Territory* getTerritory() const;
+    Player *getPlayer() const;
+    Territory *getTerritory() const;
     void setArmies(int armies);
-    void setPlayer(Player* p);
-    void setTerritory(Territory* t);
+    void setPlayer(Player *p);
+    void setTerritory(Territory *t);
 
     bool validate();
     bool execute();
@@ -84,10 +83,25 @@ public:
 
 class Advance : public Order
 {
+private:
+    int armiesToMove;
+    Player* playerAdvancing;
+    Territory* territorySource;
+    Territory* territoryTarget;
 public:
     Advance();
-    Advance(std::string details);
+    Advance(std::string details); // don't use
+    Advance(int armies, Player* player, Territory* src, Territory* target);
     Advance(const Advance &a);
+
+    int getArmies() const;
+    Player *getPlayer() const;
+    Territory *getTerritorySource() const;
+    Territory *getTerritoryTarget() const;
+    void setArmies(int armies);
+    void setPlayer(Player *p);
+    void setTerritorySource(Territory *t);
+    void setTerritoryTarget(Territory *t);
 
     bool validate();
     bool execute();
@@ -184,3 +198,5 @@ void testOrdersDriver();
 void testOrdersA2();
 
 void testAssignmentOperator();
+
+void testDeployExec();

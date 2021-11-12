@@ -20,7 +20,6 @@ Order::Order(const Order &o)
 }
 Order &Order::operator=(const Order &o)
 {
-    cout << "Entering Order::operator=" << endl;
     // self-assignment guard
     if (this == &o)
         return *this;
@@ -123,13 +122,16 @@ void Order::setDetails(std::string orderDetails)
     details = orderDetails;
 }
 
-Deploy::Deploy() : Order("Deploy type", ""), armiesToMove(0), playerDeploying(new Player), territoryTarget(new Territory)
+Deploy::Deploy() : Order("Deploy type", ""), armiesToMove(0), 
+playerDeploying(new Player), territoryTarget(new Territory)
 {
 }
 // Do not use (A1 legacy)
 Deploy::Deploy(string orderdetails) : Order("Deploy type", orderdetails)
 {
 }
+// The pointer fields Player* and Territory* are passed by reference (no deep copy)
+// Note: Player* and Territory* passed as param should be ptr to dymically allocated objects
 Deploy::Deploy(int armies, Player *player, Territory *territory)
 {
     armiesToMove = armies;
@@ -141,44 +143,86 @@ Deploy::Deploy(int armies, Player *player, Territory *territory)
     string desc = _command + " = {" + _details + "}";
     setDetails(desc);
 }
-// Deep copy. Value semantics -> cannot be used to execute duplicate orders?
+
+/** 
+ * Deploy Copy constructor 1 => can be used to create duplicate Deploy orders whose execution will be the same as the Original Deploy
+ * Deep copy, with pointers of copy Deploy pointing to the same pointers (Player, Territory) as original
+ * Is this desirable?
+*/
+// Deploy::Deploy(const Deploy &d) : Order(d.getCommand(), d.getDetails()), 
+// armiesToMove(d.getArmies()), playerDeploying(d.getPlayer()), territoryTarget(d.getTerritory())
+// {
+// }
+
+
+/** Deploy Copy constructor 2 => cannot be used to create executable Deploy order with same behavior as original
+ * True deep copy: Player* and Territory* of copy Deploy are not pointing to the same object as original
+ */ 
 Deploy::Deploy(const Deploy &d) : Order(d.getCommand(), d.getDetails()), 
-armiesToMove(d.getArmies()), playerDeploying(d.getPlayer()), territoryTarget(d.getTerritory())
+armiesToMove(d.getArmies()), playerDeploying(new Player(*d.getPlayer())), 
+territoryTarget(new Territory(*d.getTerritory()))
 {
 }
+
 Deploy::~Deploy()
 {
     delete playerDeploying;
     delete territoryTarget;
 }
 
-// Shallow copy. Reference semantic -> use to create duplicate orders that are executable
+// Deep copy -> duplicate copy Deploy cannot be executed and produce the same behavior as the original Deploy
 Deploy &Deploy::operator=(const Deploy &d)
 {
-    cout << "Entering Deploy::operator=" << endl;
-
     Order::operator=(d); // self-assign guard + assign base fields
-    cout << "Processing Deploy::operator=" << endl;
     this->armiesToMove = d.getArmies();
     if (playerDeploying) delete playerDeploying;
     if (territoryTarget) delete territoryTarget;
     
-    this->playerDeploying = new Player(*d.getPlayer()); // Causes segmentation error
+    this->playerDeploying = new Player(*d.getPlayer()); 
     this->territoryTarget = new Territory(*d.getTerritory());
-    cout << "Exiting Deploy::operator=" <<endl;
     return *this;
 }
 // ostream& Deploy::operator<<(std::ostream& out, const Deploy& d) {}
 
-// Fake validate and execute methods to implement later
+
+/**
+ * Run down of creation and exec of Deploy order:
+ * - Inside Part 3: issueOrdersPhase() { 
+ *      determine which order to create depending on toDefend/toAttack territory, 
+ *      create new <OrderSubType> (numberOfArmies, playerDeploying=engine.players[i], territoryTarget=toDefend().popFirst(), 
+ *      then engine.players[i].orderList->add(o)
+ *      }
+ * - Inside Part 3: execOrdersPhase() { 
+ *      // round robin loop: while orderList != empty for every players; for i in range(num of players))
+ *      engine.players[i].orderList.at(0)->execute();
+ *      // after executing the order, pop the order and finish iteration
+ *      engine.players[i].orderList->remove(0);
+ *      }
+ */
+
 bool Deploy::validate()
 {
-    cout << "Validate Deploy order.";
+    cout << "Validate Deploy order." << endl;
+    // cout << "this->getTerritory()->getOwner(): " << this->getTerritory()->getOwner() << endl
+    // << "playerDeploying: " << playerDeploying << endl;
+    if (this->getTerritory()->getOwner() != playerDeploying)
+        return false;
     return true;
 }
 bool Deploy::execute()
 {
-    cout << "Execute Deploy order.";
+    if (!validate()) // if invalid order
+    {
+        cout << "Invalide Deploy order. Exit of Deploy::execute" << endl;
+        // Note about the Logger: do we notify if the order is invalid?
+        return false;
+    }
+    
+    cout << "Execute Deploy order." << endl;
+    territoryTarget->setNumberOfArmies(this->getArmies() + territoryTarget->getNumberOfArmies()); 
+
+    // End of exec order : orderList->remove(0);
+    
     notify(this);
     return true;
 }
@@ -194,12 +238,18 @@ string Deploy::stringToLog()
     return "TODO";
 }
 
-Advance::Advance() : Order("Advance type", "")
+Advance::Advance() : Order("Advance type", ""), armiesToMove(0),
+playerAdvancing(new Player), territorySource(new Territory), territoryTarget(new Territory)
 {
 }
-Advance::Advance(string orderdetails) : Order("Advance type", orderdetails)
+Advance::Advance(string orderdetails) : Order("Advance type", orderdetails) // don't use
 {
 }
+Advance::Advance(int armies, Player* player, Territory* src, Territory* target)
+{
+
+}
+
 Advance::Advance(const Advance &a)
 {
     Advance cpyAdvance = a;
@@ -351,11 +401,12 @@ OrderList::OrderList()
 // Copy constructor of OrderList
 OrderList::OrderList(const OrderList &ol)
 {
-    // list = vector<Order *>(ol.list);
     list = ol.list;
 }
 OrderList::~OrderList()
 {
+    for (auto p : list)
+        delete p;
     list.clear();
 }
 
