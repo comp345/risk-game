@@ -267,7 +267,9 @@ void GameEngine::issueOrdersPhase()
 {}
 void GameEngine::executeOrdersPhase()
 {}
-
+void GameEngine::getNumOfPlayers() {
+    return numberOfPlayers;
+}
 //helper method for loading list of maps from the directory in an ordered list
 void GameEngine::getMapList(){
     int i=0;
@@ -296,6 +298,7 @@ void GameEngine::startupPhase()
     MapLoader *mapLoader= new MapLoader();
         cout <<"Initiating map loading stage: \n"<<endl;
         getMapList();
+
         while(true){
             cout<<"\n Enter the number of the desired map: \n"<<endl;
             //cin>>mapNum;
@@ -312,21 +315,25 @@ void GameEngine::startupPhase()
                 Map x1 = *mapLoader->loadMap(fpath);
                 Map *map1= new Map(x1);
                 map1->validate();// validates map
-
             break;
         }
-
-
     // addplayer loop
         //if(command==addplayer)-> do this
-        /*
-        string playerNumInput;
-        string playerNameInput;
-        cout<<"Enter player name: \n"<<endl;
-        cin>>playerNameInput;
-        cout<<"Enter the number of players: \n" <<endl;
-        cin >>playerNumInput;
-         */
+        while(true) {
+            string playerNameInput;
+            cout << "Enter player name: \n" << endl;
+            cin >> playerNameInput;
+            cout << "Enter the number of players (between 2-5): \n" << endl;
+            cin >> numberOfPlayers;
+            if (numberOfPlayers < 2 || numberOfPlayers > 5) {
+                cin.clear();
+                cin.ignore(1000, '\n');
+                std::cout << "Invalid number of players. Please enter between 2-5 players. \n" << endl;
+            } else{
+                break;
+            }
+        }
+
         //create a vector of players and assign the playernumInput as the vector size
 
     // gamestart ->

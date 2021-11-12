@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "LoggingObserver.h"
+#include "Player.h"
 /* The states and transitions are stored in a linked list like structure */
 
 // States are Nodes in the game flow
@@ -76,10 +77,12 @@ namespace A2
         friend class Transition;
 
     private:
+        int numberOfPlayers;
         State *currentState; 
         std::vector<State *> states; // GameEngine maintains collection of all states
         std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
         std::vector<std::string> listOfFile;
+        std::vector<Player*> plVec;
 
     public:
         GameEngine();
@@ -105,6 +108,7 @@ namespace A2
     /* A2 */
 
         // A2 Part 2
+        void getNumOfPlayers();
         void getMapList();
         void startupPhase();
 
