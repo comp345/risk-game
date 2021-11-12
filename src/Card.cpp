@@ -382,6 +382,7 @@ Hand::Hand(const Hand& other)
 
 Hand::~Hand()
 {
+    for (auto p : m_cards) delete p;
     m_cards.clear();
 }
 
