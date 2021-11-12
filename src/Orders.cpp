@@ -347,10 +347,23 @@ bool Advance::execute()
     }
     else
     {
-        // if target belong to enemy, attack
-        simulateAttack();
-    }
+        // if target belong to enemy...
 
+        if (getArmies() <= getTerritorySource()->getNumberOfArmies())
+        {
+            // Decrease armies from source territory
+            getTerritorySource()->setNumberOfArmies(
+                getTerritorySource()->getNumberOfArmies() - getArmies());
+            // Attack enemy
+            simulateAttack();
+        }
+        else
+        {
+            cout << "Debug: Invalid number of army units to advance (greater than the number of units available on territory source." << endl;
+            return false;
+        }
+    }
+    updateDetails();
     notify(this);
     return true;
 }
@@ -362,42 +375,53 @@ void Advance::simulateAttack()
      * Attacking army -> Defending army: each unit has 60% chance to kill
      * Defending army -> Attacking army: each unit has 70% chance to kill
      */
-    // 
-    int attackUnit = 0, defendUnit = 0; // Number of attacker and defender units killed
+    //
+    int attackUnit = getArmies(), defendUnit = territoryTarget->getNumberOfArmies(); // Number of attacker and defender units alive
+    int deadAttacker = 0, deadDefender = 0;                                          // body count
     bool isAttackingTurn = true;
-    
-    while (attackUnit <= getArmies() || defendUnit <= territoryTarget->getNumberOfArmies())
+
+    while (attackUnit > 0 && defendUnit > 0) // as long as player or enemy's armies are not decimated, continue battle
     {
         if (isAttackingTurn)
         {
-            // cout << "Debug: Attacking army turn " << attackUnit << " ." << "rand(): " << rand() % 10 << endl; 
+            // cout << "Debug: Attacking army turn " << attackUnit << " ." << "rand(): " << rand() % 10 << endl;
             int resultAttack = rand() % 10;
             if (resultAttack <= 5) // Advancing player kills one defending army
             {
-                territoryTarget->setNumberOfArmies(territoryTarget->getNumberOfArmies()-1);
-                cout << "Debug: Attacker kills Defender #" << to_string(defendUnit+1) << endl;
-                ++defendUnit; // 1 defender killed
+                territoryTarget->setNumberOfArmies(territoryTarget->getNumberOfArmies() - 1);
+                cout << "Debug: Attacker kills Defender #" << to_string(++deadDefender) << endl;
+                --defendUnit; // 1 defender killed
             }
-
-            
-        } else 
+        }
+        else
         {
-            // cout << "Debug: Defending army turn " << defendUnit << " ." << "rand(): " << rand() % 10 << endl; 
+            // cout << "Debug: Defending army turn " << defendUnit << " ." << "rand(): " << rand() % 10 << endl;
             int resultAttack = rand() % 10;
             if (resultAttack <= 6) // Defending player kills one attacking army
             {
-                this->setArmies(this->getArmies()-1);
-                cout << "Debug: Defender kills Attacker #" << to_string(attackUnit+1) << endl;
-                ++attackUnit; // 1 attacker killed
+                this->setArmies(this->getArmies() - 1);
+                cout << "Debug: Defender kills Attacker #" << to_string(++deadAttacker) << endl;
+                --attackUnit; // 1 attacker killed
             }
-           
         }
 
         isAttackingTurn = !(isAttackingTurn); // switch turn
 
     } // Outcome: Either all defenders are dead, or all attackers are dead
-    cout << "Result of battle: Attacker armies=" << this->getArmies() << " Defender armies=" << territoryTarget->getNumberOfArmies() <<  endl;
-    // If attack wins, change ownership of territory
+    cout << "Result of battle: "
+         << "Attacker armies=" << this->getArmies()
+         << " Defender armies=" << territoryTarget->getNumberOfArmies() << endl;
+    // If attack wins
+    bool win = (this->getArmies() > 0) ? true : false;
+    if (win)
+    {
+        // set target armies number as remaining attacking armies
+        territoryTarget->setNumberOfArmies(this->getArmies());
+        // change ownership of territory
+        territoryTarget->setOwner(this->getPlayer());
+    }
+
+    updateDetails();
 }
 
 int Advance::getArmies() const { return armiesToMove; }
