@@ -19,6 +19,7 @@ Player::Player(string n)
 }
 
 //parametrized constructor
+// Noah note for A2: should not init Hand* and OrderList* to NULL (see default constructor)
 Player::Player(string n, vector<Territory*> t, Hand* h, OrderList* o)
 {
     this->name = n;
@@ -27,16 +28,15 @@ Player::Player(string n, vector<Territory*> t, Hand* h, OrderList* o)
     this->orderList = o;
 }
 
-//copy constructor
-// Noah note for A2: Need to correct player constructor, causes segmentation error in Deploy operator=
-Player::Player(const Player& p) // : name(p.name), territories(p.territories),hand(p.hand), orderList(p.orderList)
+//copy constructor: Deep copy, cannot be used for reference semantic or to 
+Player::Player(const Player& p) 
 {
-    cout << "Entering Player::Player(const Player& p)" <<endl;
+    // cout << "Entering Player::Player(const Player& p)" <<endl;
     this->name = p.name;
     this->territories = p.territories;
     this->hand = new Hand(*p.hand); 
     this->orderList = new OrderList(*p.orderList); 
-    cout << "Exiting Player::Player(const Player& p)" <<endl;
+    // cout << "Exiting Player::Player(const Player& p)" <<endl;
 }
 
 //destructor
@@ -56,11 +56,14 @@ Player::~Player()
 
 //operator overloading
 //assignment operator overloading
+// Noah note for A2: Deep copy
 Player& Player::operator=(const Player& p) {
     if (this == &p)
         return *this;
 
     territories = p.territories;
+    if (hand) delete hand;
+    if (orderList) delete orderList;
     hand = new Hand(*(p.hand));
     orderList = new OrderList(*(p.orderList));
     return *this;
