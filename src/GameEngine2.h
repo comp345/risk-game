@@ -8,81 +8,18 @@
 /* The states and transitions are stored in a linked list like structure */
 
 // States are Nodes in the game flow
-namespace A2
-{
-    class Transition;
-    class GameEngine;
-    class State
-    {
-        friend class GameEngine;
-        friend class Transition;
-
-    private:
-        std::string nameState;
-        std::vector<Transition *> transitions;
-
-    public:
-        State();
-        State(std::string name);
-        State(std::string name, std::vector<Transition *> trans);
-        State(const State &s);
-        ~State();
-        void addTransition(Transition *t);
-
-        State &operator=(const State &o);
-        friend std::ostream &operator<<(std::ostream &out, const State &s)
-        {
-            std::string name = s.nameState;
-            out << name;
-            return out;
-        }
-        friend std::ostream &operator<<(std::ostream &out, const Transition &trans);
-    };
-
-    // Transitions are the command that allow to change states in the game flow
-    class Transition
-    {
-        friend class GameEngine;
-        friend class State;
-
-    private:
-        std::string nameTransition;
-        State *nextState;
-
-    public:
-        Transition();
-        Transition(std::string name);
-        Transition(std::string name, State *s);
-        Transition(const Transition &t);
-        ~Transition();
-        Transition &operator=(const Transition &t);
-        friend std::ostream &operator<<(std::ostream &out, const Transition &trans)
-        {
-            std::string nextStateString;
-            if (trans.nextState == NULL)
-                nextStateString = "";
-            else
-                nextStateString = trans.nextState->nameState;
-
-            out << "{" << trans.nameTransition << ", "
-                << trans.nextState << "=" << trans.nextState->nameState << "}";
-            return out;
-        }
-        friend std::ostream &operator<<(std::ostream &out, const State &s);
-    };
 
     class GameEngine : public ILoggable, public Subject
     {
         friend class State;
         friend class Transition;
-        friend class CommandProcessor;
 
     private:
         State *currentState; 
+        State stateTracker;
         std::vector<State *> states; // GameEngine maintains collection of all states
         std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
-        CommandProcessor* commandProcessor;
-
+        CommandProcessor *commandProcessor;
     public:
         GameEngine();
 
@@ -101,7 +38,7 @@ namespace A2
         // check if command is valid. no update.
         bool validateCommand(std::string command);
         
-        static void testGameEngine();
+        void testGameEngine();
         string stringToLog() override;
 
     /* A2 */
@@ -117,4 +54,3 @@ namespace A2
 
     };
 
-}

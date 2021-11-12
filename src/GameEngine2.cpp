@@ -5,83 +5,12 @@
 
 using namespace std;
 
-using namespace A2;
-
-State::State()
-{
-    nameState = "";
-}
-State::State(string name)
-{
-    nameState = name;
-}
-State::State(string name, vector<Transition *> t)
-{
-    nameState = name;
-    transitions = t;
-}
-State::State(const State &s)
-{
-    nameState = s.nameState;
-    transitions = vector<Transition *>(s.transitions); // Using vector copy constructor! Works, demonstration in testGameEngine
-}
-State::~State()
-{
-    transitions.clear();
-}
-State &State::operator=(const State &c)
-{
-    if (this == &c)
-        return *this;
-    this->nameState = c.nameState;
-    this->transitions = c.transitions; // Using the vector assignment operator
-    return *this;
-}
-void State::addTransition(Transition *t)
-{
-    transitions.push_back(t);
-}
-
-Transition::Transition()
-{
-    nameTransition = "";
-    nextState = nullptr;
-}
-Transition::Transition(string name)
-{
-    nameTransition = name;
-    nextState = nullptr;
-}
-Transition::Transition(string name, State *s)
-{
-    nameTransition = name;
-    nextState = s;
-}
-Transition::Transition(const Transition &t)
-{
-    nameTransition = t.nameTransition;
-    nextState = new State(*(t.nextState));
-}
-Transition::~Transition()
-{
-    delete nextState;
-}
-Transition &Transition::operator=(const Transition &t)
-{
-    if (this == &t)
-        return *this;
-    this->nameTransition = t.nameTransition;
-    this->nextState = new State(*(t.nextState));
-    return *this;
-}
-
 // Creates the finite state machine that contains states and transitions
 // The GameEngine object has access to the current state with getCurrentState(), as well
 // as the valid transitions from that state with getCurrentPossibleTransitions()
 GameEngine::GameEngine()
 {
     // Create the states and add to states collection
-
     State *startState = new State("start");
     State *maploadedState = new State("maploaded");
     State *mapvalidatedState = new State("mapvalidated");
@@ -106,6 +35,7 @@ GameEngine::GameEngine()
 
     // Setting current state to the start state
     currentState = startState;
+//    stateTracker = &startState;
 
     // Create the transitions
     Transition *loadmapTransition = new Transition("loadmap", maploadedState);
@@ -125,7 +55,7 @@ GameEngine::GameEngine()
     transitions.push_back(loadmapTransition);
     transitions.push_back(validatemapTransition);
     transitions.push_back(addplayerTransition);
-    transitions.push_back(assigncountriesTransition);
+    transitions.push_back(gamestart);
     transitions.push_back(issueorderTransition);
     transitions.push_back(endissueordersTransition);
     transitions.push_back(execorderTransition);
@@ -140,7 +70,7 @@ GameEngine::GameEngine()
     maploadedState->addTransition(validatemapTransition);
     mapvalidatedState->addTransition(addplayerTransition);
     playersaddedState->addTransition(addplayerTransition);
-    playersaddedState->addTransition(assigncountriesTransition);
+    playersaddedState->addTransition(gamestart);
     assignreinforcementState->addTransition(issueorderTransition);
     issueordersState->addTransition(issueorderTransition);
     issueordersState->addTransition(endissueordersTransition);
@@ -149,6 +79,8 @@ GameEngine::GameEngine()
     executeordersState->addTransition(winTransition);
     winState->addTransition(playTransition);
     winState->addTransition(endTransition);
+
+    commandProcessor = new CommandProcessor();
 }
 
 string GameEngine::getCurrentStateName()
@@ -178,7 +110,7 @@ string GameEngine::getNextStateName(string command)
     return ""; //TODO: throw exception
 }
 
-// Only check if command is valid. Does NOT act upon the command, even if it is valid.
+//Only check if command is valid. Does NOT act upon the command, even if it is valid.
 bool GameEngine::validateCommand(string command)
 {
     for (int i = 0; i < currentState->transitions.size(); ++i)
@@ -213,35 +145,10 @@ void GameEngine::testGameEngine()
     GameEngine engine;
     cout << "Welcome to WarZone!" << endl;
 
-    while (true)
+    while(true)
     {
-        string keyinput;
-
-        cout << "Enter a valid command to progress in the game."
-             << "(Enter x to quit or press any key when at final State)" << endl;
-
-        cin >> keyinput;
-        if (keyinput == "x" or engine.getCurrentStateName() == "final")
-            break;
-        else
-        {
-            cout << "\n***\n"
-                 << endl;
-
-            // Acting on the command. The function doTransition internally validates the command.
-            // Returns true if command was valid, in order to display correct message.
-            // TODO: switch statement to have different message for each state
-            bool isCommandValid = engine.doTransition(keyinput);
-
-            if (isCommandValid)
-            {
-                cout << "Valid command. Current state is: " << engine.getCurrentStateName() << endl;
-            }
-            else
-            {
-                cout << "Invalid command. Replay current state: " << engine.getCurrentStateName() << endl;
-            }
-        }
+        string output = commandProcessor->getCommand(&currentState[0]);
+        cout << "return output: " << output << std::endl;
     }
 }
 
