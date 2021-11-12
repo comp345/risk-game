@@ -42,7 +42,42 @@ void testMap()
     map8->validate();
 }
 
-// int main()
-// {
-//     testMap();
-// }
+void testA2Map()
+{
+
+    // ********************************** //
+    //   Init parameters for testing      //
+    // ********************************** //
+    int army = 4;
+
+    MapLoader *mapLoader = new MapLoader();
+    Map x4 = *mapLoader->loadMap("../maps/europe.map");
+    Map *map0 = new Map(x4);
+    map0->validate();
+
+    vector<Territory *> europeTerritories = map0->getTerritories();
+    int numberOfTerritoryInEurope = map0->getTerritorySize();
+
+    Player *p1 = new Player("Hoax");
+    Player *p2 = new Player("Toast");
+
+    // ********************************** //
+    //   Test Territory Copy Constructor  //
+    // ********************************** //
+    Territory* englandPtr = new Territory(*europeTerritories.at(0));
+    Territory* t0 = new Territory(*englandPtr);
+    Territory* t1 = new Territory(*englandPtr);
+    // Result: These are all deep copy of the pointer to europeTerritories.at(0)
+    cout << "address of the territory pointed at by englantPtr: " << &(*englandPtr) << ". *englandPtr: " << *englandPtr << endl; // Address 1, point to
+    cout << "address of the territory pointed at by t0: " << &(*t0) << ". *t0: " << *t0 << endl; // Address 1, point to
+    cout << "address of the territory pointed at by t1: " << &(*t1) << ". *t1: " << *t1 << endl;
+
+    // Check if, as t0 and t1 point to the same territory: Change ownership.
+    t0->setName("Not england"); // Desired result: *t0 and *t1 will be named "Not england"
+    cout << "Chanding Name of England:" << endl;
+    cout << "address of the territory pointed at by t0: " << &(*t0) << ". *t0: " << *t0 << endl; // Address 1, point to
+    cout << "address of the territory pointed at by t1: " << &(*t1) << ". *t1: " << *t1 << endl;
+
+    cout << endl
+         << endl;
+}
