@@ -1,4 +1,7 @@
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h> // need for rand() function
 #include "GameEngine2.h"
 #include "Orders.h"
 
@@ -7,6 +10,7 @@ using namespace A2;
 
 int main(int, char **)
 {
+    srand(time(NULL));
     /* A1 : GameEngine */
     // GameEngine engine;
     // engine.testGameEngine();
@@ -21,6 +25,9 @@ int main(int, char **)
     // testA2Map();
 
     /* A2 : Testing Deploy exec */
-    testDeployExec();
+    // testDeployExec();
+
+    /* A2 : Testing Advance exec */
+    testAdvanceExec();
     return 0;
 }

@@ -75,6 +75,7 @@ public:
     void setArmies(int armies);
     void setPlayer(Player *p);
     void setTerritory(Territory *t);
+    void updateDetails();
 
     bool validate();
     bool execute();
@@ -93,6 +94,9 @@ public:
     Advance(std::string details); // don't use
     Advance(int armies, Player* player, Territory* src, Territory* target);
     Advance(const Advance &a);
+    ~Advance();
+
+    Advance& operator=(const Advance& a);
 
     int getArmies() const;
     Player *getPlayer() const;
@@ -102,9 +106,11 @@ public:
     void setPlayer(Player *p);
     void setTerritorySource(Territory *t);
     void setTerritoryTarget(Territory *t);
+    void updateDetails();
 
     bool validate();
     bool execute();
+    void simulateAttack();
     string stringToLog() override;
 };
 
@@ -200,3 +206,5 @@ void testOrdersA2();
 void testAssignmentOperator();
 
 void testDeployExec();
+
+void testAdvanceExec();

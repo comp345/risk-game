@@ -122,8 +122,8 @@ void Order::setDetails(std::string orderDetails)
     details = orderDetails;
 }
 
-Deploy::Deploy() : Order("Deploy type", ""), armiesToMove(0), 
-playerDeploying(new Player), territoryTarget(new Territory)
+Deploy::Deploy() : Order("Deploy type", ""), armiesToMove(0),
+                   playerDeploying(new Player), territoryTarget(new Territory)
 {
 }
 // Do not use (A1 legacy)
@@ -138,10 +138,8 @@ Deploy::Deploy(int armies, Player *player, Territory *territory)
     playerDeploying = player;
     territoryTarget = territory;
     string _command = "Deploy type";
-    string _details = "Player " + player->getName() + " deploys " + to_string(armies) 
-        + " army units to " + territory->getName();
-    string desc = _command + " = {" + _details + "}";
-    setDetails(desc);
+    setCommand(_command);
+    updateDetails();
 }
 
 /** 
@@ -149,18 +147,17 @@ Deploy::Deploy(int armies, Player *player, Territory *territory)
  * Deep copy, with pointers of copy Deploy pointing to the same pointers (Player, Territory) as original
  * Is this desirable?
 */
-// Deploy::Deploy(const Deploy &d) : Order(d.getCommand(), d.getDetails()), 
+// Deploy::Deploy(const Deploy &d) : Order(d.getCommand(), d.getDetails()),
 // armiesToMove(d.getArmies()), playerDeploying(d.getPlayer()), territoryTarget(d.getTerritory())
 // {
 // }
 
-
 /** Deploy Copy constructor 2 => cannot be used to create executable Deploy order with same behavior as original
  * True deep copy: Player* and Territory* of copy Deploy are not pointing to the same object as original
- */ 
-Deploy::Deploy(const Deploy &d) : Order(d.getCommand(), d.getDetails()), 
-armiesToMove(d.getArmies()), playerDeploying(new Player(*d.getPlayer())), 
-territoryTarget(new Territory(*d.getTerritory()))
+ */
+Deploy::Deploy(const Deploy &d) : Order(d.getCommand(), d.getDetails()),
+                                  armiesToMove(d.getArmies()), playerDeploying(new Player(*d.getPlayer())),
+                                  territoryTarget(new Territory(*d.getTerritory()))
 {
 }
 
@@ -175,15 +172,16 @@ Deploy &Deploy::operator=(const Deploy &d)
 {
     Order::operator=(d); // self-assign guard + assign base fields
     this->armiesToMove = d.getArmies();
-    if (playerDeploying) delete playerDeploying;
-    if (territoryTarget) delete territoryTarget;
-    
-    this->playerDeploying = new Player(*d.getPlayer()); 
+    if (playerDeploying)
+        delete playerDeploying;
+    if (territoryTarget)
+        delete territoryTarget;
+
+    this->playerDeploying = new Player(*d.getPlayer());
     this->territoryTarget = new Territory(*d.getTerritory());
     return *this;
 }
 // ostream& Deploy::operator<<(std::ostream& out, const Deploy& d) {}
-
 
 /**
  * Run down of creation and exec of Deploy order:
@@ -217,21 +215,46 @@ bool Deploy::execute()
         // Note about the Logger: do we notify if the order is invalid?
         return false;
     }
-    
+
     cout << "Execute Deploy order." << endl;
-    territoryTarget->setNumberOfArmies(this->getArmies() + territoryTarget->getNumberOfArmies()); 
+    /** TODO: Check num of armies to deploy and Remove army units from reinforcement pool
+     *      if (getPlayer()->getReinforcementPool() < getArmies()) { cout <<  << endl ;return false; }
+     *      getPlayer()->setReinforcementPool(getPlayer()->getReinforcementPool() - getArmies());
+     */
+
+    // Add army units to target
+    territoryTarget->setNumberOfArmies(
+        getArmies() + territoryTarget->getNumberOfArmies());
 
     // End of exec order : orderList->remove(0);
-    
+
     notify(this);
     return true;
 }
 int Deploy::getArmies() const { return armiesToMove; }
-Player* Deploy::getPlayer() const { return playerDeploying; }
-Territory* Deploy::getTerritory() const { return territoryTarget; }
-void Deploy::setArmies(int armies) { armiesToMove = armies; }
-void Deploy::setPlayer(Player* p) { playerDeploying = p; }
-void Deploy::setTerritory(Territory* t) { territoryTarget = t; }
+Player *Deploy::getPlayer() const { return playerDeploying; }
+Territory *Deploy::getTerritory() const { return territoryTarget; }
+void Deploy::setArmies(int armies)
+{
+    armiesToMove = armies;
+    updateDetails();
+}
+void Deploy::setPlayer(Player *p)
+{
+    playerDeploying = p;
+    updateDetails();
+}
+void Deploy::setTerritory(Territory *t)
+{
+    territoryTarget = t;
+    updateDetails();
+}
+void Deploy::updateDetails()
+{
+    string _details = "Player " + playerDeploying->getName() + " deploys " + to_string(getArmies()) + " army units to " + territoryTarget->getName();
+    string desc = getCommand() + " = {" + _details + "}";
+    setDetails(desc);
+}
 
 string Deploy::stringToLog()
 {
@@ -239,34 +262,173 @@ string Deploy::stringToLog()
 }
 
 Advance::Advance() : Order("Advance type", ""), armiesToMove(0),
-playerAdvancing(new Player), territorySource(new Territory), territoryTarget(new Territory)
+                     playerAdvancing(new Player), territorySource(new Territory), territoryTarget(new Territory)
 {
 }
+// Do not use (A1 legacy)
 Advance::Advance(string orderdetails) : Order("Advance type", orderdetails) // don't use
 {
 }
-Advance::Advance(int armies, Player* player, Territory* src, Territory* target)
+Advance::Advance(int armies, Player *player, Territory *src, Territory *target)
 {
+    armiesToMove = armies;
+    playerAdvancing = player;
+    territorySource = src;
+    territoryTarget = target;
+    string _command = "Advance type";
+    setCommand(_command);
+    updateDetails();
+}
+Advance::Advance(const Advance &a) : Order(a.getCommand(), a.getDetails()),
+                                     armiesToMove(a.getArmies()), playerAdvancing(new Player(*a.getPlayer())),
+                                     territorySource(new Territory(*a.getTerritorySource())), territoryTarget(new Territory(*a.getTerritoryTarget()))
+{
+}
+Advance::~Advance()
+{
+    delete playerAdvancing;
+    delete territorySource;
+    delete territoryTarget;
+}
+Advance &Advance::operator=(const Advance &a)
+{
+    Order::operator=(a);
+    this->armiesToMove = a.getArmies();
+    if (playerAdvancing)
+        delete playerAdvancing;
+    if (territorySource)
+        delete territorySource;
+    if (territoryTarget)
+        delete territoryTarget;
 
+    this->playerAdvancing = new Player(*a.getPlayer());
+    this->territorySource = new Territory(*a.getTerritorySource());
+    this->territoryTarget = new Territory(*a.getTerritoryTarget());
+
+    return *this;
 }
 
-Advance::Advance(const Advance &a)
-{
-    Advance cpyAdvance = a;
-    setCommand(cpyAdvance.getCommand());
-    setDetails(cpyAdvance.getDetails());
-}
-// Fake validate and execute methods to implement later
 bool Advance::validate()
 {
-    cout << "Validate Advance order.";
+    cout << "Debug: Validate Advance order." << endl;
+    if (this->getTerritorySource()->getOwner() != playerAdvancing)
+        return false;
+    /** to add: check adjacency of territorytarget to territorysource, else return false
+     * 
+     */
     return true;
 }
 bool Advance::execute()
 {
-    cout << "Execute Advance order.";
+    if (!validate())
+    {
+        cout << "Debug: Invalid Advance order." << endl;
+        return false;
+    }
+    cout << "Debug: Execute Advance order.";
+    if (getTerritoryTarget()->getOwner() == playerAdvancing)
+    {
+        // if target belong to player, basically deploy src -> target
+
+        /** TODO: check that num of armies ordered to advance is not greater than armies on territory source
+         */
+        if (getArmies() <= getTerritorySource()->getNumberOfArmies())
+        {
+            getTerritorySource()->setNumberOfArmies(
+                getTerritorySource()->getNumberOfArmies() - getArmies());
+            getTerritoryTarget()->setNumberOfArmies(
+                getTerritoryTarget()->getNumberOfArmies() + getArmies());
+        }
+        else
+        {
+            cout << "Debug: Invalid number of army units to advance (greater than the number of units available on territory source." << endl;
+            return false;
+        }
+    }
+    else
+    {
+        // if target belong to enemy, attack
+        simulateAttack();
+    }
+
     notify(this);
     return true;
+}
+void Advance::simulateAttack()
+{
+    cout << "Attacking enemy!" << endl;
+    /** TODO: Implement randomized battle result
+     * Attacking army and Defending alternate their attack on each other
+     * Attacking army -> Defending army: each unit has 60% chance to kill
+     * Defending army -> Attacking army: each unit has 70% chance to kill
+     */
+    // 
+    int attackUnit = 0, defendUnit = 0; // Number of attacker and defender units killed
+    bool isAttackingTurn = true;
+    
+    while (attackUnit <= getArmies() || defendUnit <= territoryTarget->getNumberOfArmies())
+    {
+        if (isAttackingTurn)
+        {
+            // cout << "Debug: Attacking army turn " << attackUnit << " ." << "rand(): " << rand() % 10 << endl; 
+            int resultAttack = rand() % 10;
+            if (resultAttack <= 5) // Advancing player kills one defending army
+            {
+                territoryTarget->setNumberOfArmies(territoryTarget->getNumberOfArmies()-1);
+                cout << "Debug: Attacker kills Defender #" << to_string(defendUnit+1) << endl;
+                ++defendUnit; // 1 defender killed
+            }
+
+            
+        } else 
+        {
+            // cout << "Debug: Defending army turn " << defendUnit << " ." << "rand(): " << rand() % 10 << endl; 
+            int resultAttack = rand() % 10;
+            if (resultAttack <= 6) // Defending player kills one attacking army
+            {
+                this->setArmies(this->getArmies()-1);
+                cout << "Debug: Defender kills Attacker #" << to_string(attackUnit+1) << endl;
+                ++attackUnit; // 1 attacker killed
+            }
+           
+        }
+
+        isAttackingTurn = !(isAttackingTurn); // switch turn
+
+    } // Outcome: Either all defenders are dead, or all attackers are dead
+    cout << "Result of battle: Attacker armies=" << this->getArmies() << " Defender armies=" << territoryTarget->getNumberOfArmies() <<  endl;
+    // If attack wins, change ownership of territory
+}
+
+int Advance::getArmies() const { return armiesToMove; }
+Player *Advance::getPlayer() const { return playerAdvancing; }
+Territory *Advance::getTerritorySource() const { return territorySource; }
+Territory *Advance::getTerritoryTarget() const { return territoryTarget; }
+void Advance::setArmies(int armies)
+{
+    armiesToMove = armies;
+    updateDetails();
+}
+void Advance::setPlayer(Player *p)
+{
+    playerAdvancing = p;
+    updateDetails();
+}
+void Advance::setTerritorySource(Territory *t)
+{
+    territorySource = t;
+    updateDetails();
+}
+void Advance::setTerritoryTarget(Territory *t)
+{
+    territoryTarget = t;
+    updateDetails();
+}
+void Advance::updateDetails()
+{
+    string _desc = getCommand() + " = {" + getPlayer()->getName() + " advances " +
+                   to_string(getArmies()) + " army units from " + getTerritorySource()->getName() + " to " + getTerritoryTarget()->getName() + "}.";
+    setDetails(_desc);
 }
 
 string Advance::stringToLog()

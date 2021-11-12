@@ -365,7 +365,7 @@ void testDeployExec()
      Territory *t1 = europeTerritories.at(0);
 
      // To create a valid territory, need to specify owner and number of armies (if territory is conquered)
-     t1->setNumberOfArmies(5); 
+     t1->setNumberOfArmies(5);
      t1->setOwner(p1);
 
      // ************************* //
@@ -380,8 +380,8 @@ void testDeployExec()
      cout << "p1: " << &(*p1) << endl;
      cout << "t1: " << &(*t1) << endl;
      cout << "d1: " << d1->getDetails() << endl
-     << "d1.playerDeploying: " << d1->getPlayer() << endl
-     << "d1.territoryTarget: " << d1->getTerritory() << endl;
+          << "d1.playerDeploying: " << d1->getPlayer() << endl
+          << "d1.territoryTarget: " << d1->getTerritory() << endl;
 
      cout << "Executing Deploy order d1." << endl;
      d1->execute();
@@ -390,6 +390,132 @@ void testDeployExec()
      cout << "Executing Deploy order d1_0" << endl;
      d1_0->execute();
      cout << "t1 After d1_0 execution: " << *t1 << endl;
+}
 
+void testAdvanceExec()
+{
+     // ************************************************** //
+     //   Initialize parameters for the orders to test...
+     // ************************************************** //
+     Player *p1 = new Player("Hoax");
+     Player *p2 = new Player("Toast");
+
+     MapLoader *mapLoader = new MapLoader();
+     Map x4 = *mapLoader->loadMap("../maps/europe.map");
+     Map *map4 = new Map(x4);
+     map4->validate();
+
+     vector<Territory *> europeTerritories = map4->getTerritories();
+     int numberOfTerritoryInEurope = map4->getTerritorySize();
+     Territory *t1 = europeTerritories.at(0);
+     Territory *t2 = europeTerritories.at(1);
+     Territory *t3 = europeTerritories.at(2);
+     Territory *t4 = europeTerritories.at(3);
+
+     // To create a valid territory, need to specify owner and number of armies (if territory is conquered)
+     t1->setNumberOfArmies(5);
+     t1->setOwner(p1);
+     t2->setNumberOfArmies(9);
+     t2->setOwner(p1);
+     t3->setNumberOfArmies(11);
+     t3->setOwner(p2);
+     t4->setNumberOfArmies(3);
+     t4->setOwner(p2);
+
+     // Player Hoax owns England, which has 5 armies
+     // Player Hoax owns Scotland, which has 9 armies
+     // Player Toast owns Ireland (?), which has 11 armies
+
+     cout << "===================================" << endl
+          << endl;
+
+     cout << "Displaying players and territories from the tests:" << endl
+          << endl;
+     cout << "p1: " << p1->getName() << endl;
+     cout << "p2: " << p2->getName() << endl;
+     cout << "t1: " << t1->getName() << " owned by " << t1->getOwner()->getName() << endl;
+     cout << "t2: " << t2->getName() << " owned by " << t2->getOwner()->getName() << endl;
+     cout << "t3: " << t3->getName() << " owned by " << t3->getOwner()->getName() << endl;
+     cout << "t4: " << t4->getName() << " owned by " << t4->getOwner()->getName() << endl;
+     cout << endl << endl;
+
+     cout << "Creating Valid Advance Orders" << endl << endl;
+     // ******************************* //
+     // Creating Valid Advance orders   //
+     // ******************************* //
+
+     // p1 advance to his own territory (similar to deployment)
+     Advance *a1 = new Advance(4, p1, t1, t2);
+     cout << "a1: " << a1->getDetails() << endl;
+
+     // p1 advance in enemy territory
+     Advance *a1_0 = new Advance(12, p1, t2, t3);
+     cout << "a1_0: " << a1_0->getDetails() << endl;
+
+     // ********************************************************************************* //
+     // Executing Valid Advance order: player source territory to player target territory   //
+     // ********************************************************************************* //
+     cout << endl << endl;
+     cout << "Testing valid execution of a1: " << a1->getDetails() << endl;
+     cout << "t1 before a1: " << t1->getName() << ", owned by " << t1->getOwner()->getName() 
+          << " has " << t1->getNumberOfArmies() << " armies." << endl;
+     cout << "t2 before a1: " << t2->getName() << ", owned by " << t2->getOwner()->getName() 
+          << " has " << t2->getNumberOfArmies() << " armies." << endl;
+     cout << "********* Executing a1 ********* " << endl;
+     a1->execute();
+     cout << "t1 after a1: " << t1->getName() << ", owned by " << t1->getOwner()->getName() 
+          << " has " << t1->getNumberOfArmies() << " armies." << endl;
+     cout << "t2 after a1: " << t2->getName() << ", owned by " << t2->getOwner()->getName() 
+          << " has " << t2->getNumberOfArmies() << " armies." << endl;
+     // ********************************************************************** //
+     //   Executing Invalid Advance orders: insufficient source army number    //
+     // ********************************************************************** //
+     // This order is not valid: source territory not enough armies to advance!
+     cout << endl << endl;
+     cout << "Testing invalid execution of a1: " << a1->getDetails() << endl;
+     cout << "t1 before a1: " << t1->getName() << ", owned by " << t1->getOwner()->getName() 
+          << " has " << t1->getNumberOfArmies() << " armies." << endl;
+     cout << "t2 before a1: " << t2->getName() << ", owned by " << t2->getOwner()->getName() 
+          << " has " << t2->getNumberOfArmies() << " armies." << endl;
+     cout << "********* Executing a1 ********* " << endl;
+     a1->execute();
+     cout << "t1 after a1: " << t1->getName() << ", owned by " << t1->getOwner()->getName() 
+          << " has " << t1->getNumberOfArmies() << " armies." << endl;
+     cout << "t2 after a1: " << t2->getName() << ", owned by " << t2->getOwner()->getName() 
+          << " has " << t2->getNumberOfArmies() << " armies." << endl;
+
+     // ********************************************************************************* //
+     // Executing Valid Advance order: Player advance on enemy territory         //
+     // ********************************************************************************* //
+     /**
+      * TODO: Implement simulatingAttack()
+      * 
+      */
+     cout << endl << endl;
+     cout << "Testing valid execution of a1_0: " << a1_0->getDetails() << endl;
+     cout << "t2 before a1: " << t2->getName() << ", owned by " << t2->getOwner()->getName() 
+          << " has " << t2->getNumberOfArmies() << " armies." << endl;
+     cout << "t3 before a1: " << t3->getName() << ", owned by " << t3->getOwner()->getName() 
+          << " has " << t3->getNumberOfArmies() << " armies." << endl;
+     cout << "********* Executing a1 ********* " << endl;
+     a1_0->execute();
+     cout << "t1 after a1_0: " << t2->getName() << ", owned by " << t2->getOwner()->getName() 
+          << " has " << t2->getNumberOfArmies() << " armies." << endl;
+     cout << "t2 after a1: " << t3->getName() << ", owned by " << t3->getOwner()->getName() 
+          << " has " << t3->getNumberOfArmies() << " armies." << endl;
+     
+     // ********************************************************************************* //
+     // Creating Invalid Orders: Source Territory does not belong to Player                //
+     // ********************************************************************************* //
+     cout << endl << endl; 
+     cout << "Testing Invalid Order: Source Territory does not belong to Player" << endl;
+     Advance* a2 = new Advance(5, p1, t3, t1);
+     cout << "a2: " << a2->getDetails() << endl;
+     a2->execute();
+
+     /**
+      * TODO: Test invalid Order when TerritoryTarget is not adjacent to TerritorySource 
+      * 
+      */
 
 }
