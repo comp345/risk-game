@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <filesystem>
 #include "GameEngine2.h"
 #include "Map.h"
 
-using namespace std;
-
+namespace fs= filesystem;
 using namespace A2;
 
 State::State()
@@ -268,29 +268,66 @@ void GameEngine::issueOrdersPhase()
 void GameEngine::executeOrdersPhase()
 {}
 
+//helper method for loading list of maps from the directory in an ordered list
+void GameEngine::getMapList(){
+    int i=0;
+    string path= "../maps/";
+    for (const auto& entry : fs::directory_iterator(path)) {
+        if (entry.path().extension() == ".map") {
+            std::cout << i+1  << ": " << entry.path().filename() << endl;
+            listOfFile.push_back(entry.path().filename().string());
+            i++;
+        }
+    }
+
+    }
 // Two main phases
 void GameEngine::startupPhase()
 {
     // loadmap <filename> to select map from list of map loaded
-    GameEngine engine;
-    MapLoader *mapLoader= new MapLoader();
-    //if(engine.getCurrentStateName()=="start" || engine.getCurrentStateName()=="maploaded"){
-        cout <<"Initiating map loading stage: \n"<<endl;
-        cout<<"Type one of the following maps from this list: \n"<<endl;
-        //add methods to iterate through maps directory and show list of maps in the folder
-        string keyIn;
-        cin>>keyIn;
-        if(keyIn=="europe"){
-            Map x4 = *mapLoader->loadMap("../maps/europe.map");
-            Map *map4 = new Map(x4);
-            map4->validate();
-        }
-        //if map is validated, transition to map validated stage
-    //}
 
-    // validate map
+    //if (command=='loadmap') -> do this
+    GameEngine engine;
+    int mapNum;
+    string path="../maps/";
+    string mName;
+    string fpath;
+
+    MapLoader *mapLoader= new MapLoader();
+        cout <<"Initiating map loading stage: \n"<<endl;
+        getMapList();
+        while(true){
+            cout<<"\n Enter the number of the desired map: \n"<<endl;
+            //cin>>mapNum;
+            while(mapNum>listOfFile.size()||!(cin>>mapNum)) {
+                std::cin.clear();
+                std::cin.ignore(1000, '\n');
+                if (!isdigit(mapNum)) {
+                    cout << "Wrong input. Try with a valid number! \n" << endl;
+                    continue;
+                }
+            }
+                mName=listOfFile[mapNum-1];
+                fpath=path.append(mName);
+                Map x1 = *mapLoader->loadMap(fpath);
+                Map *map1= new Map(x1);
+                map1->validate();// validates map
+
+            break;
+        }
+
 
     // addplayer loop
+        //if(command==addplayer)-> do this
+        /*
+        string playerNumInput;
+        string playerNameInput;
+        cout<<"Enter player name: \n"<<endl;
+        cin>>playerNameInput;
+        cout<<"Enter the number of players: \n" <<endl;
+        cin >>playerNumInput;
+         */
+        //create a vector of players and assign the playernumInput as the vector size
 
     // gamestart ->
     /** 
@@ -300,6 +337,7 @@ void GameEngine::startupPhase()
          * - each player draw 2 cards with deck.draw(2)
          * - go to play phase
          */
+
 }
 
 void GameEngine::mainGameLoop()

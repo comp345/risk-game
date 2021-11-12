@@ -79,6 +79,7 @@ namespace A2
         State *currentState; 
         std::vector<State *> states; // GameEngine maintains collection of all states
         std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
+        std::vector<std::string> listOfFile;
 
     public:
         GameEngine();
@@ -104,6 +105,7 @@ namespace A2
     /* A2 */
 
         // A2 Part 2
+        void getMapList();
         void startupPhase();
 
         // A2 Part 3
