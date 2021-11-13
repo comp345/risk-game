@@ -124,3 +124,5 @@ private:
     bool containsHeader(std::fstream& infile, std::string header);
     bool mapStatus = true;
 }; 
+
+void testA2Map();

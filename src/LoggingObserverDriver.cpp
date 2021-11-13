@@ -1,9 +1,13 @@
 #include "LoggingObserver.h"
-#include "GameEngine.h"
-#include "Orders.hpp"
+#include "GameEngine2.h"
+#include "Player.h"
+#include "Map.h"
+#include "Orders.h"
 #include <iostream>
 
 using namespace std;
+
+using namespace A2;
 
 void testLogging()
 {

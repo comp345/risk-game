@@ -1,9 +1,19 @@
 #include<iostream>
 #include<string>
-#include"Card.h"
-#include"Orders.hpp"
-
+#include "Card.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 using namespace std;
+
+// Extra helper functions (Noah)
+void initializedRand() // makes rand() "more" random
+{
+    srand(time(NULL));
+}
 
 
 // **************** //
@@ -239,6 +249,8 @@ void Deck::initialize(int size)
     for(int i=0; i < size; i++)
     {
         int randomNumber = rand() % 5;      //Random number within the type of cards
+        // Notes from Noah: randomNumber is not truly random: https://tinyurl.com/8m37ewu3
+
         Card::Effect* effect = new Card::Effect(static_cast<Card::Effect>(randomNumber));    //Create the card
         switch (*effect)
         {
@@ -319,6 +331,7 @@ void Deck::showDeck()
 void Deck::draw(Player& player)
 {
     // Fetches the players hand and the card that will be drawn
+
     Hand* playerHand = player.getHand();
     Card* toDraw = m_cards.back();
     playerHand->drawCard(toDraw);
@@ -369,6 +382,7 @@ Hand::Hand(const Hand& other)
 
 Hand::~Hand()
 {
+    for (auto p : m_cards) delete p;
     m_cards.clear();
 }
 
@@ -401,6 +415,8 @@ Card* Hand::useLast()
     m_cards.pop_back();
     return toUse;
 }
+// Note from Noah TODO: Add a way to use any card from hand, not just the last one
+
 
 std::ostream& operator<<(std::ostream& lhs, Hand& hand)
 {

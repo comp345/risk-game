@@ -1,3 +1,4 @@
+#include "Player.h"
 #include "Map.h"
 #include <vector>
 #include <iostream>
@@ -18,27 +19,38 @@ using std::distance;
 Territory::Territory() {
     ID = 0;
     numArmies = 0;
+    neighbors = 0;
+    owner = new Player;
     // neighbors = 0;
 }
 
 Territory::Territory(int t_ID) {
     ID = t_ID;
     numArmies = 0;
+    neighbors = 0;
+    owner = new Player;
     // neighbors = 0;
 }
 
+// Noah note for A2: Deep copy, added deep copy owner
 Territory::Territory(const Territory &t1) {
     ID = t1.ID;
     name = t1.name;
-    owner = t1.owner;
+    owner = new Player(*t1.owner);
     numArmies = t1.numArmies;
+
 }
 
 Territory::~Territory() {}
 
+// Noah note for A2: Deep copy, add copy owner (Player type)
 Territory &Territory::operator=(const Territory &t) {
+    if (this == &t)
+        return *this;
     ID = t.ID;
     name = t.name;
+    if (owner) delete owner;
+    owner = new Player(*t.owner); 
     numArmies = t.numArmies;
     return *this;
 }

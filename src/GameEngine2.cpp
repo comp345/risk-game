@@ -4,6 +4,9 @@
 #include <cmath>
 #include <algorithm>
 #include "GameEngine2.h"
+#include "Map.h"
+#include "Player.h"
+#include "Orders.h"
 
 
 using namespace std;
@@ -329,13 +332,47 @@ void GameEngine::testGameEngine()
     }
 }
 
-
-int main()
-{
-    GameEngine::testGameEngine();
-
-    return 0;
+string GameEngine::stringToLog() {
+    return "TODO";
 }
+
+/**
+ * @A2 Part 2 
+ * Commented out: Noah's notes for A2 part 2 and part 3 implementation
+ */
+
+// // Helper functions
+// bool checkWinCondition()
+// {
+//     // Check if there is a player who wons every territory in map
+//     return false;
+// }
+// void GameEngine::reinforcementPhase()
+// {}
+// void GameEngine::issueOrdersPhase()
+// {}
+// void GameEngine::executeOrdersPhase()
+// {}
+
+// // Two main phases
+// void GameEngine::startupPhase()
+// {
+//     // loadmap <filename> to select map from list of map loaded
+
+//     // validate map
+
+//     // addplayer loop
+
+//     // gamestart ->
+//     /** 
+//          * - distribute territories of map between players
+//          * - determine order of play of players
+//          * - initially: give 50 armies to the players (50 between them? or 50 each?)
+//          * - each player draw 2 cards with deck.draw(2)
+//          * - go to play phase
+//          */
+// }
+
 
 void GameEngine::mainGameLoop(){
     if(currentState->nameState == "assignreinforcement")

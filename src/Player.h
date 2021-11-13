@@ -3,12 +3,15 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "Orders.hpp"
-#include "Card.h"
-#include "Map.h"
+// #include "LoggingObserver.h"
+// #include "Orders.h"
+// #include "Card.h"
+// #include "Map.h"
 
 class Territory;
 class Hand;
+class Order;
+class OrderList;
 
 using namespace std;
 
