@@ -60,8 +60,9 @@ private:
 
 public:
     Deploy();
-    Deploy(std::string details); // don't use
-    Deploy(int armies, Player *player, Territory *territory);
+    Deploy(std::string details); // don't use (A1 legacy)
+    Deploy(string orderdetails, Player* p);
+    Deploy(int armies, Player *player, Territory *territory); // Alexander wrote implementation for it
     Deploy(const Deploy &d); // Deep copy. Use for value semantics (pass/return by value). Don't use to create orders to execute
     ~Deploy();
     // Shallow copy. Reference semantics

@@ -28,6 +28,9 @@ int main(int, char **)
     // testDeployExec();
 
     /* A2 : Testing Advance exec */
-    testAdvanceExec();
+    // testAdvanceExec();
+
+    /* A2 : Testing GameLoop */
+    GameEngine::testGameEngine();
     return 0;
 }

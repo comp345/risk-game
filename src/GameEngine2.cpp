@@ -1,7 +1,13 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cmath>
+#include <algorithm>
 #include "GameEngine2.h"
+#include "Map.h"
+#include "Player.h"
+#include "Orders.h"
+
 
 using namespace std;
 
@@ -149,6 +155,9 @@ GameEngine::GameEngine()
     executeordersState->addTransition(winTransition);
     winState->addTransition(playTransition);
     winState->addTransition(endTransition);
+
+    //Initialization
+    currentPlayers = vector<Player*>();
 }
 
 string GameEngine::getCurrentStateName()
@@ -217,7 +226,7 @@ void GameEngine::testGameEngine()
     {
         string keyinput;
 
-        cout << "Enter a valid command to progress in the game."
+        cout << "\nEnter a valid command to progress in the game."
              << "(Enter x to quit or press any key when at final State)" << endl;
 
         cin >> keyinput;
@@ -241,7 +250,81 @@ void GameEngine::testGameEngine()
             {
                 cout << "Invalid command. Replay current state: " << engine.getCurrentStateName() << endl;
             }
+
+            engine.currentState == new State("mapvalidated");
+
+            if(engine.currentState->nameState == "mapvalidated")
+            {
+                MapLoader *mapLoader = new MapLoader();
+                Map x5 = *mapLoader->loadMap("../maps/france.map");
+                Map *map5 = new Map(x5);
+                map5->validate();
+                engine.map = map5;
+            }
+
+            else if(engine.currentState->nameState == "playersadded")
+            {
+                Player *p = new Player("Alexander");
+                p->reinforcementPool = 0;
+
+                //Get the latest continent from the maps
+                Continent* mapsContinent = engine.map->continentList.back();
+                vector<Territory *> p1Territories;
+                for(Territory* t : mapsContinent->territories){
+                    p1Territories.push_back(t);
+                }
+                p->setTerritories(p1Territories);
+
+                //Show what we created
+                cout << "\n\n" << p->getName() << " was created!\n";
+                for(Territory* t : p->getTerritories())
+                    cout << t->getName() << "\n";
+                engine.currentPlayers.push_back(p);
+                cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
+
+
+                //Do the same for another player
+                Player *p2 = new Player("Andrew");
+                p2->reinforcementPool = 0;
+
+                mapsContinent = engine.map->continentList.front();
+                cout << "\n THERE ARE: " << engine.map->getTerritories().size() << " Territories\n";
+
+                vector<Territory*> p2Territories;
+                for(Territory* t : mapsContinent->territories){
+                    p2Territories.push_back(t);
+                }
+                p2->setTerritories(p2Territories);
+
+                cout << "\n\n" << p2->getName() << " was created! \n";
+                for(Territory* t : p2->getTerritories())
+                    cout << t->getName() << "\n";
+                engine.currentPlayers.push_back(p2);
+                cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
+            
+                //Empty player
+                Player *p3 = new Player("noob");
+                p3->reinforcementPool = 0;
+                vector<Territory*> p3Territories = vector<Territory*>();
+                p3->setTerritories(p3Territories);
+                cout << "\nNumber of territories: " << p3->getTerritories().size() << "\n";
+                engine.currentPlayers.push_back(p3);
+
+
+                // Player* winner = new Player("Pro");
+                // vector<Territory*> allTerritories = engine.map->getTerritories();
+                // winner->setTerritories(allTerritories);
+                // engine.currentPlayers.push_back(winner);
+
+            }
+
+
+            
+
         }
+        
+        engine.mainGameLoop();
+            
     }
 }
 
@@ -251,62 +334,175 @@ string GameEngine::stringToLog() {
 
 /**
  * @A2 Part 2 
- * 
+ * Commented out: Noah's notes for A2 part 2 and part 3 implementation
  */
 
-// Helper functions
-bool checkWinCondition()
-{
-    // Check if there is a player who wons every territory in map
-    return false;
+// // Helper functions
+// bool checkWinCondition()
+// {
+//     // Check if there is a player who wons every territory in map
+//     return false;
+// }
+// void GameEngine::reinforcementPhase()
+// {}
+// void GameEngine::issueOrdersPhase()
+// {}
+// void GameEngine::executeOrdersPhase()
+// {}
+
+// // Two main phases
+// void GameEngine::startupPhase()
+// {
+//     // loadmap <filename> to select map from list of map loaded
+
+//     // validate map
+
+//     // addplayer loop
+
+//     // gamestart ->
+//     /** 
+//          * - distribute territories of map between players
+//          * - determine order of play of players
+//          * - initially: give 50 armies to the players (50 between them? or 50 each?)
+//          * - each player draw 2 cards with deck.draw(2)
+//          * - go to play phase
+//          */
+// }
+
+
+void GameEngine::mainGameLoop(){
+    if(currentState->nameState == "assignreinforcement")
+        {
+            for (Player* p : currentPlayers)
+            {
+                reinforcementPhase(p);
+                cout << "\nPlayer: " << p->getName() << " has " << p->reinforcementPool << " in his reinforcement pool.\n";
+            }
+        }
+
+        if(currentState->nameState == "issueorder")
+        {
+            //dummy order
+            Deploy* deployOrder = new Deploy("random order");
+            currentPlayers.front()->getOrderList()->add(deployOrder);
+            issueOrdersPhase();
+        }
+
+        if(currentState->nameState == "executeorders")
+        {
+            executeOrdersPhase();
+        }
+
+        
+
+        // loop shall continue until only one of the players owns all the territories
+        Player* winner = hasWinner();
+        if(winner != NULL){
+            currentState = new State("win");
+            cout << "\nPlayer " << winner->getName() << " won the game!\n";
+
+        }
+
+        // loop to check if a player should be removed from the game
+        auditPlayers();
 }
-void GameEngine::reinforcementPhase()
-{}
-void GameEngine::issueOrdersPhase()
-{}
-void GameEngine::executeOrdersPhase()
-{}
 
-// Two main phases
-void GameEngine::startupPhase()
+void GameEngine::auditPlayers()
 {
-    // loadmap <filename> to select map from list of map loaded
+    for(Player* p : currentPlayers){
+        if(p->getTerritories().size() == 0)
+        {
+            cout << "\nPlayer " << p->getName() << " no longer has any territories left and will be removed from the game \n";
+        
 
-    // validate map
+            currentPlayers.erase(remove(currentPlayers.begin(), currentPlayers.end(), p));
 
-    // addplayer loop
+            delete p;
+            p = NULL;
+        }
 
-    // gamestart ->
-    /** 
-         * - distribute territories of map between players
-         * - determine order of play of players
-         * - initially: give 50 armies to the players (50 between them? or 50 each?)
-         * - each player draw 2 cards with deck.draw(2)
-         * - go to play phase
-         */
-}
-
-void GameEngine::mainGameLoop()
-{
-    //3 phases
-    bool noWin = true;
-
-    // main game loop: 3 phases repeat until game is won by someone
-    while (noWin)
-    {
-        /** Phases are performed in sequence:
-         * 1- Reinforcement phase: 
-         * 2- Issueing Orders phase:
-         * 3- Orders Execution phase:
-         */
-        reinforcementPhase(); // player do nothing: they receive reinforcements, depending on outcome from prev turns
-
-        issueOrdersPhase(); // players issue order and place them in list. This happens in round robin (switch between players)
-        // Using play order determined in startupPhase, switch between player's turn . In actual game, this happens in parallel usign multiprocessing
-
-        executeOrdersPhase(); // After both player have finished
-
-        // win condition: one player own every territory in map
-        noWin = checkWinCondition();
     }
+}
+
+Player* GameEngine::hasWinner()
+{
+    //Get the players territories
+    for(Player* p : currentPlayers)
+    {
+    
+        if(map->getTerritories().size() == p->getTerritories().size()){
+            return p;
+        }
+    }
+
+    return NULL;
+}
+
+void GameEngine::reinforcementPhase(Player* p){
+    //Get players number of territories
+    vector<Territory *> playerT = p->getTerritories();
+
+    int numberOfArmies = floor(playerT.size()/3);
+
+    //Find if the player owns all the territories of an entire contenent:
+    int controlBonus = 0;
+    bool ownsContinent = false;
+
+    //Get all the contenents then their territories:
+    for(Continent* c : map->continentList){
+        int territoryCount = 0;
+        controlBonus = c->controlBonus;
+        vector<Territory*> listOfContentsTerritories = c->territories;
+
+        //Loop through what the player has to check if the owns the full continent
+        for(Territory* t : playerT){
+
+            //Count of how many of the players Territories we find of the continent
+            if(find(listOfContentsTerritories.begin(), listOfContentsTerritories.end(), t) != listOfContentsTerritories.end()){
+                territoryCount++;
+            }
+        }
+
+        //If both are equal sizes, then players owns continent.
+        if(territoryCount == listOfContentsTerritories.size())
+            ownsContinent = true;
+        
+        if(ownsContinent == true){
+            cout << "continent bonus has been applied! adding an addtional " << controlBonus << " units";
+            numberOfArmies += controlBonus;
+            ownsContinent = false;
+        }
+
+    }
+
+    //the minimal number of reinforcement armies per turn for any player is 3
+    if(numberOfArmies < 3)
+        numberOfArmies = 3;
+
+    // placed in the player’s reinforcement pool.
+    p->reinforcementPool += numberOfArmies;
+}
+
+
+void GameEngine::issueOrdersPhase(){
+    for(Player* players : currentPlayers){
+        for(Order* order : players->getOrderList()->getList()){
+            players->issueOrder(order);
+        }
+    }
+}
+
+void GameEngine::executeOrdersPhase(){
+    //players have signified that they are not issuing one more order
+
+    for(Player* players : currentPlayers)
+    {
+        for(Order* order : players->getOrderList()->getList())
+        {
+            order->execute();
+        }
+    }
+
+    //the main game loop goes back to the reinforcement phase
+    currentState = new State("assignreinforcement");
 }

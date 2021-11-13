@@ -1,0 +1,8 @@
+loadmap
+validatemap 
+addplayer 
+assigncountries 
+issueorder
+endissueorders
+execorder
+endexecorders

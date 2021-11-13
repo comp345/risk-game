@@ -129,7 +129,95 @@ void Player::issueOrder(string order, string details)
 //adds order to a player's list of orders
 void Player::issueOrder(Order* o)
 {
+    int counter = 0;
+    cout << "The following is a list of all the territories that can be attacked.\n";
+
+    // decides which neighboring territories are to be attacked
+    for (Territory* toAttack : toAttack())
+    {
+        cout << counter++ << " : " << toAttack->getName() << "\n";
+    }
+
+    cout << "\nEnter the numbers of the territory you wish to attack from highest to lowest priority.\n";
+    vector<Territory*> prioritisedAttack = vector<Territory*>(); 
+    for (int i = 0; i < counter; i++)
+    {
+        cout << "Enter territory number " << i+1 << "\n";
+        int next;
+        cin >> next;
+        while(next >= counter)
+        {
+            cout << "You must enter a number smalller than " << counter << "\n";
+            cin >> next;
+        }
+        prioritisedAttack.push_back(toAttack().at(next));
+    }
+
+    cout << "\nYour specified priority is: \n";
+    for (int i = 0; i < prioritisedAttack.size(); i++)
+    {
+        cout << i << " : " << prioritisedAttack.at(i)->getName() << "\n";
+    }
+    
+
+    counter = 0;
+    cout << "\nThe following is a list of all the territories that can be defended.\n";
+    // decides which neighboring territories are to be defended
+    for (Territory* toDefend : toDefend())
+    {
+        cout << counter++ << " : " << toDefend->getName() << "\n";
+    }
+
+    cout << "\nEnter the numbers of the territory you wish to deffend from highest to lowest priority.\n";
+    vector<Territory*> prioritisedDefend = vector<Territory*>(); 
+    for (int i = 0; i < counter; i++)
+    {
+        cout << "Enter territory number " << i+1 << "\n";
+        int next;
+        cin >> next;
+        while(next >= counter)
+        {
+            cout << "You must enter a number smalller than " << counter << "\n";
+            cin >> next;
+        }
+        prioritisedDefend.push_back(toAttack().at(next));
+    }
+
+    cout << "\nYour specified priority is: \n";
+    for (int i = 0; i < prioritisedDefend.size(); i++)
+    {
+        cout << i << " : " << prioritisedDefend.at(i)->getName() << "\n";
+    }
+
+
+
+
+    // As long as the player has armies still to deploy
+    while(reinforcementPool != 0)
+    {
+        // it will issue a deploy order and no other order.
+        if(o->getCommand() != "deploy"){
+            cout << "Since there are still reinforcements in this players pool, you must places all arimies first.\n"
+            << "There are " << reinforcementPool << " orders remaining \n";
+
+            Deploy* deployOrder = new Deploy("armies",this);
+            orderList->add(deployOrder);
+        }
+    }
+
+
+    // The player issues advance orders
+    if(o->getCommand() == "advance"){
+
+        // move armies from one of its own territory to the other in order to defend them
+
+
+        // move armies from one of its territories to a neighboring enemy territory to attack them 
+    }
+
+
     orderList->add(o);
+    
 }
 
 Hand *Player::getHand() {
