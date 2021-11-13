@@ -21,6 +21,7 @@ Territory::Territory() {
     numArmies = 0;
     neighbors = 0;
     owner = new Player;
+    // neighbors = 0;
 }
 
 Territory::Territory(int t_ID) {
@@ -28,6 +29,7 @@ Territory::Territory(int t_ID) {
     numArmies = 0;
     neighbors = 0;
     owner = new Player;
+    // neighbors = 0;
 }
 
 // Noah note for A2: Deep copy, added deep copy owner
@@ -68,7 +70,7 @@ std::istream &operator>>(std::istream &in, const Territory &t) {
 Territory::Territory(string n) {
     ID = 0;
     numArmies = 0;
-    neighbors = 0;
+    // neighbors = 0;
     name = n;
 }
 
@@ -88,9 +90,9 @@ Player *Territory::getOwner() {
     return owner;
 }
 
-void Territory::setNeighbors(int n) {
-    neighbors = n;
-}
+// void Territory::setNeighbors(int n) {
+//     neighbors = n;
+// }
 
 void Territory::setName(string n) {
     name = n;
@@ -100,8 +102,18 @@ void Territory::setOwner(Player *p) {
     owner = p;
 }
 
+vector<Territory*> Territory::getNeighbors()
+{
+    return neighbors;
+}
+
 void Territory::setNumberOfArmies(int n) {
     numArmies = n;
+}
+
+void Territory::addNeighbor(Territory* t)
+{
+    neighbors.push_back(t);
 }
 
 Continent::Continent() {
@@ -133,6 +145,7 @@ Territory *Map::createTerritoryNode() {
 int Map::initList() {
     for (int i = 0; i < MAX_SIZE; i++) {
         territoryNodeList.push_back(createTerritoryNode());
+        // territoryNodeList.back()->addNeighbor(territoryNodeList.back());
         neighborsList[i].push_back(territoryNodeList.back());
     }
     return 0;
@@ -142,6 +155,7 @@ int Map::initList() {
 //add edge between territories
 void Map::addEdge(Territory *u, Territory *v) {
     neighborsList[u->getID()].push_back(v); //adds new territory V after the territory u in the vector
+    territoryNodeList.at(u->getID())->addNeighbor(v);
 }
 
 //create a continent with name and list of countries
@@ -424,6 +438,7 @@ Map *MapLoader::loadMap(string fileName) {
         for (const string &stringNeighbor: lineVector) {
             int neighbor = stoi(stringNeighbor);
             graph->addEdge(graph->territoryNodeList[countryIndex - 1], graph->territoryNodeList[neighbor - 1]);
+
         }
     }
 

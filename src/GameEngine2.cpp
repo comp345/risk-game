@@ -277,8 +277,10 @@ void GameEngine::testGameEngine()
 
                 //Show what we created
                 cout << "\n\n" << p->getName() << " was created!\n";
-                for(Territory* t : p->getTerritories())
+                for(Territory* t : p->getTerritories()){
                     cout << t->getName() << "\n";
+                    t->setNumberOfArmies(2);
+                }
                 engine.currentPlayers.push_back(p);
                 cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
 
@@ -297,8 +299,10 @@ void GameEngine::testGameEngine()
                 p2->setTerritories(p2Territories);
 
                 cout << "\n\n" << p2->getName() << " was created! \n";
-                for(Territory* t : p2->getTerritories())
+                for(Territory* t : p2->getTerritories()){
                     cout << t->getName() << "\n";
+                    t->setNumberOfArmies(2);
+                }
                 engine.currentPlayers.push_back(p2);
                 cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
             
@@ -385,6 +389,11 @@ void GameEngine::mainGameLoop(){
             //dummy order
             Deploy* deployOrder = new Deploy("random order");
             currentPlayers.front()->getOrderList()->add(deployOrder);
+
+            Territory* currentPlayerTerritory = currentPlayers.front()->getTerritories().front();
+            Advance* advanceOrder = new Advance("");
+            currentPlayers.front()->getOrderList()->add(advanceOrder);
+            
             issueOrdersPhase();
         }
 

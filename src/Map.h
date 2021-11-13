@@ -28,19 +28,20 @@ public:
 
     Player* getOwner();
 
-    int getNeighbors();
+    vector<Territory*> getNeighbors();
 
     string getName();
 
     int getNumberOfArmies();
 
-    void setNeighbors(int n);
+    // void setNeighbors(int n);
 
     void setName(string n);
 
     void setOwner(Player* p);
 
     void setNumberOfArmies(int n);
+    void addNeighbor(Territory* t);
 
     //operators
     Territory &operator=(const Territory &t); //overloaded assignment operator
@@ -53,7 +54,8 @@ private:
     string name;
     Player* owner;
     int numArmies = 0;
-    int neighbors = 0;
+    // int neighbors = 0;
+    vector<Territory*> neighbors;
 };
 
 struct Continent {
