@@ -122,67 +122,26 @@ void Player::issueOrder(string order, string details)
 //adds order to a player's list of orders
 void Player::issueOrder(Order* o)
 {
-    int counter = 0;
-    cout << "The following is a list of all the territories that can be attacked.\n";
+    vector<Territory*> attackableTerritories = vector<Territory*>();
 
-    // decides which neighboring territories are to be attacked
-    for (Territory* toAttack : toAttack())
+    //Get the players territories
+    for (Territory* territory : territories)
     {
-        cout << counter++ << " : " << toAttack->getName() << "\n";
+        //add them to the attackable Territories if they have an army on them
+        if(territory->getNumberOfArmies() > 0)
+            attackableTerritories.push_back(territory);
     }
 
-    cout << "\nEnter the numbers of the territory you wish to attack from highest to lowest priority.\n";
-    vector<Territory*> prioritisedAttack = vector<Territory*>(); 
-    for (int i = 0; i < counter; i++)
+
+    for (Territory* territory : attackableTerritories)
     {
-        cout << "Enter territory number " << i+1 << "\n";
-        int next;
-        cin >> next;
-        while(next >= counter)
+        
+        cout << "the neighbours of " << territory->getName() << " are as follows:\n";
+        for (Territory* neighbour : territory->getNeighbors())
         {
-            cout << "You must enter a number smalller than " << counter << "\n";
-            cin >> next;
+            cout << neighbour->getName() << "\n";
         }
-        prioritisedAttack.push_back(toAttack().at(next));
     }
-
-    cout << "\nYour specified priority is: \n";
-    for (int i = 0; i < prioritisedAttack.size(); i++)
-    {
-        cout << i << " : " << prioritisedAttack.at(i)->getName() << "\n";
-    }
-    
-
-    counter = 0;
-    cout << "\nThe following is a list of all the territories that can be defended.\n";
-    // decides which neighboring territories are to be defended
-    for (Territory* toDefend : toDefend())
-    {
-        cout << counter++ << " : " << toDefend->getName() << "\n";
-    }
-
-    cout << "\nEnter the numbers of the territory you wish to deffend from highest to lowest priority.\n";
-    vector<Territory*> prioritisedDefend = vector<Territory*>(); 
-    for (int i = 0; i < counter; i++)
-    {
-        cout << "Enter territory number " << i+1 << "\n";
-        int next;
-        cin >> next;
-        while(next >= counter)
-        {
-            cout << "You must enter a number smalller than " << counter << "\n";
-            cin >> next;
-        }
-        prioritisedDefend.push_back(toAttack().at(next));
-    }
-
-    cout << "\nYour specified priority is: \n";
-    for (int i = 0; i < prioritisedDefend.size(); i++)
-    {
-        cout << i << " : " << prioritisedDefend.at(i)->getName() << "\n";
-    }
-
-
 
 
     // As long as the player has armies still to deploy
