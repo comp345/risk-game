@@ -318,8 +318,10 @@ bool Advance::validate()
      */
     return true;
 }
+// Returns true if exect
 bool Advance::execute()
 {
+    bool bonus = false; // bonus is true if advance execution leads to enemy territory conquest
     if (!validate())
     {
         cout << "Debug: Invalid Advance order." << endl;
@@ -355,7 +357,7 @@ bool Advance::execute()
             getTerritorySource()->setNumberOfArmies(
                 getTerritorySource()->getNumberOfArmies() - getArmies());
             // Attack enemy
-            simulateAttack();
+            bonus = simulateAttack();
         }
         else
         {
@@ -365,9 +367,10 @@ bool Advance::execute()
     }
     updateDetails();
     notify(this);
-    return true;
+    return bonus;
 }
-void Advance::simulateAttack()
+// Return true if win
+bool Advance::simulateAttack()
 {
     cout << "Attacking enemy!" << endl;
     /** TODO: Implement randomized battle result
@@ -375,7 +378,6 @@ void Advance::simulateAttack()
      * Attacking army -> Defending army: each unit has 60% chance to kill
      * Defending army -> Attacking army: each unit has 70% chance to kill
      */
-    //
     int attackUnit = getArmies(), defendUnit = territoryTarget->getNumberOfArmies(); // Number of attacker and defender units alive
     int deadAttacker = 0, deadDefender = 0;                                          // body count
     bool isAttackingTurn = true;
@@ -422,6 +424,7 @@ void Advance::simulateAttack()
     }
 
     updateDetails();
+    return win;
 }
 
 int Advance::getArmies() const { return armiesToMove; }

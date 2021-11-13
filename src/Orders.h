@@ -109,8 +109,10 @@ public:
     void updateDetails();
 
     bool validate();
-    bool execute();
-    void simulateAttack();
+    // return true if there is a bonus
+    bool execute(); 
+    // return true if win
+    bool simulateAttack(); 
     string stringToLog() override;
 };
 
