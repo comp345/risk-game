@@ -594,8 +594,10 @@ OrderList::OrderList()
     // list = vector<Order *>();
 }
 // Copy constructor of OrderList
+// To Review (deep copy, see getList)
 OrderList::OrderList(const OrderList &ol)
 {
+    list = vector<Order*>();
     list = ol.list;
 }
 OrderList::~OrderList()
