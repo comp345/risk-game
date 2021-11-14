@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <iostream>
+#include <fstream>
 #include <vector>
 #include "CommandProcessor.h"
 
@@ -89,24 +91,27 @@ string Command::saveEffect(string command)
     }
     else
     {
-        effect = "Command was shitty";
+        effect = "Invalid comment was entered - " + command;
         cout << "The effect - " << effect << std::endl; 
     }
     command = "";
-    cout << "The command - before exiting: " << command << std::endl;
+    //cout << "The command - before exiting: " << command << std::endl;
 
   //  cout << "The effect - " << effect << std::endl;
     return effect;
 }
+
+// ------------------------------------------------------------------------------------------------------------------------------------------------
 
 CommandProcessor::CommandProcessor()
 {
     fileName = "";
 }
 
-CommandProcessor::CommandProcessor(std::string fileInput)
+CommandProcessor::CommandProcessor(std::string fileInput, State* setState)
 {
     this->fileName = fileInput;
+    this->currentState = setState;
 }
 
 CommandProcessor::~CommandProcessor()
@@ -120,7 +125,7 @@ bool CommandProcessor::validateCommand(State* currentState, string command)
     {
         if (currentState->transitions.at(i)->nameTransition == command)
         {
-            cout << "Curent state: " << currentState->nameState << endl;
+            cout << "Current state: " << currentState->nameState << endl;
             //*currentState->nameState;
             return true;
         }
@@ -151,7 +156,7 @@ std::string CommandProcessor::readCommand(State* currentState)
             // Acting on the command. The function doTransition internally validates the command.
             // Returns true if command was valid, in order to display correct message.
             // TODO: switch statement to have different message for each state
-            bool isCommandValid = this->doTransition(&currentState[0], keyinput);
+            bool isCommandValid = this->validateCommand(&currentState[0], keyinput);
 
             if (isCommandValid)
             {
@@ -161,7 +166,7 @@ std::string CommandProcessor::readCommand(State* currentState)
             else
             {
                 cout << "Invalid command. Replay current state: " << this->getCurrentStateName(currentState) << endl;
-                return "invalid";
+                return keyinput;
             }
         
     }
@@ -173,7 +178,7 @@ void CommandProcessor::saveCommand(Command* c)
     commands.push_back(c);
 } 
 
-string CommandProcessor::getCommand(State* currentState)
+Command* CommandProcessor::getCommand(State* currentState)
 {
     Command* newCommand = new Command();
     string newCommandName = readCommand(&currentState[0]);
@@ -181,7 +186,7 @@ string CommandProcessor::getCommand(State* currentState)
     newCommand->setCommandName(newCommandName);
     newCommand->saveEffect(newCommandName);
     saveCommand(newCommand);
-    return newCommandName;
+    return newCommand;
 }
 
 bool CommandProcessor::doTransition(State* currentState, string command)
@@ -198,70 +203,96 @@ bool CommandProcessor::doTransition(State* currentState, string command)
     return false;
 }
 
-State::State()
+//------------------------------------------------------------------------------------------------------------------------
+
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(std::string newFile)
 {
-    nameState = "";
+    reader = new FileLineReader(newFile);
 }
-State::State(string name)
+std::string FileCommandProcessorAdapter::readCommand(std::string fileName, State* currentState)
 {
-    nameState = name;
-}
-State::State(string name, vector<Transition *> t)
-{
-    nameState = name;
-    transitions = t;
-}
-State::State(const State &s)
-{
-    nameState = s.nameState;
-    transitions = vector<Transition *>(s.transitions); // Using vector copy constructor! Works, demonstration in testGameEngine
-}
-State::~State()
-{
-    transitions.clear();
-}
-State &State::operator=(const State &c)
-{
-    if (this == &c)
-        return *this;
-    this->nameState = c.nameState;
-    this->transitions = c.transitions; // Using the vector assignment operator
-    return *this;
-}
-void State::addTransition(Transition *t)
-{
-    transitions.push_back(t);
+    listOfCommands = reader->readLineFromFile(fileName);
+    std::string validatedCommand = this->validateCommand(&currentState[0], listOfCommands);
+
+    if (!validatedCommand.empty())
+    {
+        cout << "Valid command. Current state is: " << this->getCurrentStateName(currentState) << endl;
+        return getCurrentStateName(currentState);
+    }
+    else
+    {
+        cout << "Invalid command. Replay current state: " << this->getCurrentStateName(currentState) << endl;
+        return validatedCommand;
+    }
 }
 
-Transition::Transition()
+Command* FileCommandProcessorAdapter::getCommand(State* currentState)
 {
-    nameTransition = "";
-    nextState = nullptr;
+    Command* newCommand = new Command();
+    string newCommandName = readCommand(fileName, currentState);
+    cout << "INSIDE GET COMMAND: " << newCommandName << endl;
+    newCommand->setCommandName(newCommandName);
+    newCommand->saveEffect(newCommandName);
+    saveCommand(newCommand);
+    return newCommand;
 }
-Transition::Transition(string name)
+
+std::string FileCommandProcessorAdapter::validateCommand(State* currentState, std::vector<std::string> &commands)
 {
-    nameTransition = name;
-    nextState = nullptr;
+    //cout << "below is the command INSIDE NEW VALIDATE:: "  << "\n" << endl;
+    for (int i = 0; i < currentState->transitions.size(); ++i)
+    {
+        if (currentState->transitions.at(i)->nameTransition == commands[0])
+        {
+            cout << "Current state inside new validate: " << commands[0] << endl;
+            //*currentState->nameState;
+            commands.erase(commands.begin());
+            return currentState->transitions.at(i)->nameTransition;
+        }
+    }
+    return "";
 }
-Transition::Transition(string name, State *s)
+// ------------------------------------------------------------------------------------------------------------------------
+
+FileLineReader::FileLineReader(std::string newFile)
 {
-    nameTransition = name;
-    nextState = s;
+    fileName = newFile;
+    //listOfCommands = null;
 }
-Transition::Transition(const Transition &t)
+
+FileLineReader::~FileLineReader()
 {
-    nameTransition = t.nameTransition;
-    nextState = new State(*(t.nextState));
+    //listOfCommands = 0;
 }
-Transition::~Transition()
+    
+// int FileLineReader::getLineNumber()
+// {
+//     return lineNumber;
+// }
+
+    
+std::vector<std::string> FileLineReader::readLineFromFile(string passedFile) 
 {
-    delete nextState;
+    std::vector<std::string> commands;
+    int lineNumber = 0;
+    string line;
+
+    ifstream input_file(fileName);
+    if (!input_file.is_open()) {
+        cerr << "Could not open the file - '"
+             << passedFile << "'" << endl;
+        cout << "Exiting program.... Check this file again...! - " + passedFile;
+        exit(0);
+    }
+    // Track line number while reading to check against current state
+    while (getline(input_file, line))
+    {
+        cout << "This is each line printed: " + line + ". This is the line Number: "<< lineNumber << endl;
+        commands.push_back(line);
+        lineNumber++;
+    }
+
+    input_file.close();
+    return commands;
 }
-Transition &Transition::operator=(const Transition &t)
-{
-    if (this == &t)
-        return *this;
-    this->nameTransition = t.nameTransition;
-    this->nextState = new State(*(t.nextState));
-    return *this;
-}
+

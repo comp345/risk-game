@@ -17,11 +17,15 @@
     private:
         State *currentState; 
         State stateTracker;
+        bool isFile;
         std::vector<State *> states; // GameEngine maintains collection of all states
         std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
         CommandProcessor *commandProcessor;
+        FileCommandProcessorAdapter *fileAdapter;
     public:
         GameEngine();
+
+        GameEngine(std::string fileName);
 
         // return name of current state
         std::string getCurrentStateName(); 
