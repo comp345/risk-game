@@ -48,12 +48,13 @@ public:
     friend std::ostream &operator<<(std::ostream &out, const Territory &t); //overloaded stream insertion operator
     friend std::istream &operator>>(std::istream &in, const Territory &t); //overloaded stream extraction operator
 
-
+    bool operator<(const Territory& rhs); 
+int numArmies = 0;
 private:
     int ID;
     string name;
     Player* owner;
-    int numArmies = 0;
+    
     // int neighbors = 0;
     vector<Territory*> neighbors;
 };

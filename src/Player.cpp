@@ -1,6 +1,8 @@
 #include "Player.h"
 #include "Card.h"
 #include <iostream>
+#include <queue>
+#include <algorithm>
 
 using namespace std;
 
@@ -108,8 +110,35 @@ istream& operator>>(istream& in, Player& p) {
 //returns a list of territories to attack
 vector<Territory *> Player::toAttack()
 {
-    return territories;
+    vector<Territory*> attackableTerritories = vector<Territory*>();
 
+    //Get the players territories
+    for (Territory* territory : territories)
+    {
+        //add them to the attackable Territories if they have an army on them
+        if(territory->getNumberOfArmies() > 0)
+            attackableTerritories.push_back(territory);
+    }
+
+    vector<Territory*> neighbourTerritories = vector<Territory*>();
+    for (Territory* territory : attackableTerritories)
+    {
+        
+        // cout << "the neighbours of " << territory->getName() << " are as follows:\n";
+        for (Territory* neighbour : territory->getNeighbors())
+        {
+            // cout << neighbour->getName() << ", owned by " << neighbour->getOwner()->getName() <<"\n";
+
+            // If we haven't already seen the territory, add it to the list.
+            if(!count(neighbourTerritories.begin(), neighbourTerritories.end(), neighbour))
+                
+                // If it already belongs to us then we dont have to attack it.
+                if(neighbour->getOwner() != this)
+                    neighbourTerritories.push_back(neighbour);
+        }
+    }
+
+    return neighbourTerritories;
 }
 
 //returns a list of territories to defend
@@ -126,42 +155,85 @@ void Player::issueOrder(string order, string details)
 //    orderList->add(o);
 }
 
+// struct compareArmySize {
+//     bool operator()(Territory const& t1, Territory const& t2)
+//     {
+//         // return "true" if "p1" is ordered
+//         // before "p2", for example:
+//         return t1.numArmies < t2.numArmies;
+//     }
+// };
+
+bool Territory::operator<(const Territory& rhs)
+{
+  return (this->numArmies <= rhs.numArmies);
+}
+
 //adds order to a player's list of orders
 void Player::issueOrder(Order* o)
 {
-    vector<Territory*> attackableTerritories = vector<Territory*>();
 
-    //Get the players territories
-    for (Territory* territory : territories)
+    // ************************** //
+    // prioritization functions:  //
+    // ************************** //
+    
+    // territories are to be attacked in priority
+    priority_queue<Territory*, vector<Territory*>, less<Territory*>> priorityAttacking = priority_queue<Territory*, vector<Territory*>, less<Territory*>>();
+    for (Territory* toAttack : toAttack()){
+        priorityAttacking.push(toAttack);
+    }
+
+    //Doesn't actually sort for some reason.
+
+    // cout << "\nThe following is the prioritized attacking list:\n";
+    priority_queue<Territory*, vector<Territory*>, less<Territory*>> priorityAttackingCopy = priorityAttacking;
+    while (!priorityAttackingCopy.empty())
     {
-        //add them to the attackable Territories if they have an army on them
-        if(territory->getNumberOfArmies() > 0)
-            attackableTerritories.push_back(territory);
+        Territory* t = priorityAttackingCopy.top();
+        priorityAttackingCopy.pop();
+        // cout << t->getName() << " currently has " << t->getNumberOfArmies() << " armies." << endl;
     }
 
 
-    for (Territory* territory : attackableTerritories)
+    // territories are to be defended in priority
+    priority_queue<Territory*, vector<Territory*>, less<Territory*>> priorityDefending = priority_queue<Territory*, vector<Territory*>, less<Territory*>>();
+    for (Territory* toDefend : toDefend()){
+        priorityDefending.push(toDefend);
+    }
+
+    //Doesn't actually sort for some reason.
+
+    // cout << "\nThe following is the prioritized defending list:\n";
+    priority_queue<Territory*, vector<Territory*>, less<Territory*>> priorityDefendingCopy = priorityDefending;
+    while (!priorityDefendingCopy.empty())
     {
-        
-        cout << "the neighbours of " << territory->getName() << " are as follows:\n";
-        for (Territory* neighbour : territory->getNeighbors())
-        {
-            cout << neighbour->getName() << "\n";
-        }
+        Territory* t = priorityDefendingCopy.top();
+        priorityDefendingCopy.pop();
+        // cout << t->getName() << " currently has " << t->getNumberOfArmies() << " armies." << endl;
     }
 
 
+
+    // ****************** //
+    // order processing:  //
+    // ****************** //
+
+    
+    if(o->getCommand() != "deploy"){
     // As long as the player has armies still to deploy
-    while(reinforcementPool != 0)
+    if(reinforcementPool != 0)
     {
-        // it will issue a deploy order and no other order.
-        if(o->getCommand() != "deploy"){
-            cout << "Since there are still reinforcements in this players pool, you must places all arimies first.\n"
-            << "There are " << reinforcementPool << " orders remaining \n";
+        cout << o->getCommand() << " has been postponed. " << name << " has reinforcements in their pool that must be deployed.\nEnqueueing an additional deploy order for " << name << "\n";
+        Territory* location = priorityDefending.top();
 
-            Deploy* deployOrder = new Deploy("armies",this);
-            orderList->add(deployOrder);
-        }
+        Deploy* deployOrder = new Deploy(1, this, location);
+        orderList->add(deployOrder);
+        // issueOrder(deployOrder);
+    }
+    }
+    if(o->getCommand() == "deploy"){
+        Deploy* deployOrder = dynamic_cast<Deploy*>(o);
+        cout << name << " deployed " << deployOrder->getArmies() << " armies to " << deployOrder->getTerritory();
     }
 
 
@@ -169,14 +241,31 @@ void Player::issueOrder(Order* o)
     if(o->getCommand() == "advance"){
 
         // move armies from one of its own territory to the other in order to defend them
+        Advance* advanceOrder = dynamic_cast<Advance*>(o);
+        if(advanceOrder->getTerritoryTarget()->getOwner() == this){
+            Territory* location = priorityDefending.top();
 
+            advanceOrder->setArmies(1);
+            advanceOrder->setPlayer(this);
+            advanceOrder->setTerritorySource(advanceOrder->getPlayer()->getTerritories().front());
+            advanceOrder->setTerritoryTarget(location);
+        }
 
         // move armies from one of its territories to a neighboring enemy territory to attack them 
-    }
+        else
+        {
 
+        }
+
+
+        
+    }
 
     orderList->add(o);
     
+    //All players are done issuing orders past this point
+    if(reinforcementPool == 0)
+    doneIssuing = true;
 }
 
 Hand *Player::getHand() {

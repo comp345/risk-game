@@ -114,14 +114,14 @@ GameEngine::GameEngine()
     currentState = startState;
 
     // Create the transitions
-    Transition *loadmapTransition = new Transition("loadmap", maploadedState);
-    Transition *validatemapTransition = new Transition("validatemap", mapvalidatedState);
-    Transition *addplayerTransition = new Transition("addplayer", playersaddedState);
-    Transition *assigncountriesTransition = new Transition("assigncountries", assignreinforcementState);
-    Transition *issueorderTransition = new Transition("issueorder", issueordersState);
-    Transition *endissueordersTransition = new Transition("endissueorders", executeordersState);
-    Transition *execorderTransition = new Transition("execorder", executeordersState);
-    Transition *endexecordersTransition = new Transition("endexecorders", assignreinforcementState);
+    Transition *loadmapTransition = new Transition("1", maploadedState);
+    Transition *validatemapTransition = new Transition("2", mapvalidatedState);
+    Transition *addplayerTransition = new Transition("3", playersaddedState);
+    Transition *assigncountriesTransition = new Transition("4", assignreinforcementState);
+    Transition *issueorderTransition = new Transition("5", issueordersState);
+    Transition *endissueordersTransition = new Transition("6", executeordersState);
+    Transition *execorderTransition = new Transition("7", executeordersState);
+    Transition *endexecordersTransition = new Transition("8", assignreinforcementState);
     Transition *winTransition = new Transition("win", winState);
     Transition *playTransition = new Transition("play", startState);
     Transition *endTransition = new Transition("end", finalState);
@@ -268,7 +268,7 @@ void GameEngine::testGameEngine()
                 p->reinforcementPool = 0;
 
                 //Get the latest continent from the maps
-                Continent* mapsContinent = engine.map->continentList.back();
+                Continent* mapsContinent = engine.map->continentList.at(0);
                 vector<Territory *> p1Territories;
                 for(Territory* t : mapsContinent->territories){
                     p1Territories.push_back(t);
@@ -280,7 +280,9 @@ void GameEngine::testGameEngine()
                 for(Territory* t : p->getTerritories()){
                     cout << t->getName() << "\n";
                     t->setNumberOfArmies(2);
+                    t->setOwner(p);
                 }
+                p->getTerritories().front()->setNumberOfArmies(4); //Offset to see if soarting is working.
                 engine.currentPlayers.push_back(p);
                 cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
 
@@ -289,9 +291,7 @@ void GameEngine::testGameEngine()
                 Player *p2 = new Player("Andrew");
                 p2->reinforcementPool = 0;
 
-                mapsContinent = engine.map->continentList.front();
-                cout << "\n THERE ARE: " << engine.map->getTerritories().size() << " Territories\n";
-
+                mapsContinent = engine.map->continentList.at(1);
                 vector<Territory*> p2Territories;
                 for(Territory* t : mapsContinent->territories){
                     p2Territories.push_back(t);
@@ -301,7 +301,8 @@ void GameEngine::testGameEngine()
                 cout << "\n\n" << p2->getName() << " was created! \n";
                 for(Territory* t : p2->getTerritories()){
                     cout << t->getName() << "\n";
-                    t->setNumberOfArmies(2);
+                    t->setNumberOfArmies(5);
+                    t->setOwner(p2);
                 }
                 engine.currentPlayers.push_back(p2);
                 cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
@@ -313,6 +314,15 @@ void GameEngine::testGameEngine()
                 p3->setTerritories(p3Territories);
                 cout << "\nNumber of territories: " << p3->getTerritories().size() << "\n";
                 engine.currentPlayers.push_back(p3);
+
+                //Add a unit in a neighbouring territory to see if priortiy works
+                // for(Territory* t : engine.map->getTerritories())
+                // {
+                //     if(t->getName() == "Cher"){
+                //         t->setNumberOfArmies(10);
+                //         t->setOwner(p3);    //P3 is the noob player, he isnt supposed to have territories
+                //     }
+                // }
 
 
                 // Player* winner = new Player("Pro");
@@ -352,12 +362,17 @@ void GameEngine::mainGameLoop(){
         {
             //dummy order
             Deploy* deployOrder = new Deploy("random order");
-            currentPlayers.front()->getOrderList()->add(deployOrder);
+            currentPlayers.at(0)->getOrderList()->add(deployOrder);
+            currentPlayers.at(0)->getOrderList()->add(deployOrder);
+            currentPlayers.at(1)->getOrderList()->add(deployOrder);
+            currentPlayers.at(1)->getOrderList()->add(deployOrder);
+
 
             Territory* currentPlayerTerritory = currentPlayers.front()->getTerritories().front();
-            Advance* advanceOrder = new Advance("");
+            Advance* advanceOrder = new Advance(1, currentPlayers.front(), currentPlayers.front()->getTerritories().front(), currentPlayers.front()->getTerritories().back());
             currentPlayers.front()->getOrderList()->add(advanceOrder);
             
+
             issueOrdersPhase();
         }
 
@@ -421,7 +436,7 @@ void GameEngine::reinforcementPhase(Player* p){
     int controlBonus = 0;
     bool ownsContinent = false;
 
-    //Get all the contenents then their territories:
+    //Get all the continents then their territories:
     for(Continent* c : map->continentList){
         int territoryCount = 0;
         controlBonus = c->controlBonus;
@@ -441,7 +456,7 @@ void GameEngine::reinforcementPhase(Player* p){
             ownsContinent = true;
         
         if(ownsContinent == true){
-            cout << "continent bonus has been applied! adding an addtional " << controlBonus << " units";
+            cout << "continent bonus has been applied! adding an additional " << controlBonus << " units";
             numberOfArmies += controlBonus;
             ownsContinent = false;
         }
@@ -456,25 +471,122 @@ void GameEngine::reinforcementPhase(Player* p){
     p->reinforcementPool += numberOfArmies;
 }
 
+bool allPlayersDone(vector<Player*> players){
+    for(Player * p: players)
+    {
+        if(p->doneIssuing == false)
+            return false;
+    }
+
+    return true;
+}
 
 void GameEngine::issueOrdersPhase(){
-    for(Player* players : currentPlayers){
-        for(Order* order : players->getOrderList()->getList()){
-            players->issueOrder(order);
+    while (!allPlayersDone(currentPlayers))
+    {
+        for(int i = 0; i < currentPlayers.size(); i++)
+        {
+            bool played = false;
+            Player* currentPlayer = currentPlayers.at(i);
+            cout << "\nGameEngine:: Player: " << currentPlayer->getName() << " is currently in the issue order phase.\n"; 
+
+            for(Order* order : currentPlayer->getOrderList()->getList())
+            {
+                if(!played)
+                {
+                    cout << "\nGameEngine:: Player: " << currentPlayer->getName() << " issued the order " << order->getCommand() << "\n";
+                    currentPlayer->issueOrder(order);
+                    played = true;
+                }
+                else{
+                    break;
+                }
+            }
         }
     }
 }
 
+bool hasOrders(vector<Player*> currentPlayers)
+{
+    for(Player* player : currentPlayers){
+        if(player->getOrderList()->getList().size() != 0)
+            return false;
+    }
+    return true;
+}
+
 void GameEngine::executeOrdersPhase(){
     //players have signified that they are not issuing one more order
+    bool hasDeploy = false;
 
-    for(Player* players : currentPlayers)
+    while (!hasOrders(currentPlayers))
     {
-        for(Order* order : players->getOrderList()->getList())
+    //Iterate over each player
+    for(int i = 0; i < currentPlayers.size(); i++){
+        Player* currentPlayer = currentPlayers.at(i);
+        bool played = false;
+
+        cout << "GameEngine:: Player: " << currentPlayer->getName() << " is currently in the execute order phase.\n";
+        //Check to see if that player has a deploy order
+        for(Order* order : currentPlayer->getOrderList()->getList())
         {
-            order->execute();
+            // cout << order->getCommand() << "\n";
+            if(order->getCommand() == "Deploy type")
+            {
+                hasDeploy = true;
+                break;
+            }
         }
+
+        if(hasDeploy = true)
+        {
+            //Go through all the order
+            for(Order* order : currentPlayers.at(i)->getOrderList()->getList())
+            {
+                //Play the deploy order first
+                if(order->getCommand() == "Deploy type"){
+                    cout << "GameEngine:: Player: " << currentPlayer->getName() << " is issuing a deploy order.\n";
+                    order->execute();
+                    played = true;
+                    break;
+                }
+            }
+            
+            // continue to let other players deploy their armies after 1 occurrence
+            // if(played == true)
+            //     continue;
+        }
+
+        else
+        {
+            //Go through all the order
+            for(Order* order : currentPlayers.at(i)->getOrderList()->getList())
+            {
+                //Play the other orders
+                cout << "GameEngine:: Player: " << currentPlayer->getName() << " is issuing a "<< order->getCommand() <<" order.\n";
+                order->execute();
+                played = true;
+                break;
+            }
+            // continue to let other players execute orders before continuing.
+            // if(played == true)
+            //     continue;
+        }
+
+        //Remove it from the list of orders
+        if(currentPlayers.at(i)->getOrderList()->getList().size() != 0)
+        currentPlayers.at(i)->getOrderList()->remove(0);
     }
+    }
+
+
+    // for(Player* players : currentPlayers)
+    // {
+    //     for(Order* order : players->getOrderList()->getList())
+    //     {
+    //         order->execute();
+    //     }
+    // }
 
     //the main game loop goes back to the reinforcement phase
     currentState = new State("assignreinforcement");

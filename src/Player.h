@@ -56,11 +56,12 @@ public:
     
     
     int reinforcementPool;
-    
+    bool doneIssuing = false;
 private:
     string name;
     vector<Territory *> territories;
     Hand *hand;
     OrderList *orderList;
+    
     
 };
