@@ -16,6 +16,8 @@ public:
     ~Command();
     std::string getNameCommand();
     void setNameCommand(std::string name);
+    void saveEffect();
+    string stringToLog() override;
 };
 
 class CommandProcessor  : public ILoggable, public Subject
@@ -26,8 +28,8 @@ private:
     void saveCommand(Command c); // save Command in commands
 public:
     Command *getCommand();
-    void saveEffect(Command c); // storing string (command effect) after command is executed in GameEngine::doTransition()
     bool validate(Command c);
+    string stringToLog() override;
 };
 
 class FileCommandProcessorAdapter
