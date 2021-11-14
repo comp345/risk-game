@@ -2,8 +2,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "LoggingObserver.h"
 
-class Command
+class Command  : public ILoggable, public Subject
 {
 private:
     std::string nameCommand;
@@ -17,7 +18,7 @@ public:
     void setNameCommand(std::string name);
 };
 
-class CommandProcessor
+class CommandProcessor  : public ILoggable, public Subject
 {
 private:
     std::vector<Command *> commands;
