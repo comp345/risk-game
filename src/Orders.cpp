@@ -122,6 +122,10 @@ void Order::setDetails(std::string orderDetails)
     details = orderDetails;
 }
 
+string Order::stringToLog() {
+    return "Order was executed: " + this->getDetails();
+}
+
 Deploy::Deploy() : Order("Deploy type", ""), armiesToMove(0),
                    playerDeploying(new Player), territoryTarget(new Territory)
 {
@@ -261,11 +265,6 @@ void Deploy::updateDetails()
     string _details = "Player " + playerDeploying->getName() + " deploys " + to_string(getArmies()) + " army units to " + territoryTarget->getName();
     string desc = getCommand() + " = {" + _details + "}";
     setDetails(desc);
-}
-
-string Deploy::stringToLog()
-{
-    return "TODO";
 }
 
 Advance::Advance() : Order("Advance type", ""), armiesToMove(0),
@@ -470,11 +469,6 @@ void Advance::updateDetails()
     setDetails(_desc);
 }
 
-string Advance::stringToLog()
-{
-    return "TODO";
-}
-
 Bomb::Bomb() : Order("Bomb type", ""), playerBombing(new Player), territoryTarget(new Territory)
 {
 }
@@ -558,11 +552,6 @@ void Bomb::updateDetails()
     setDetails(_desc);
 }
 
-string Bomb::stringToLog()
-{
-    return "TODO";
-}
-
 Blockade::Blockade() : Order("Blockade type", "")
 {
 }
@@ -586,11 +575,6 @@ bool Blockade::execute()
     cout << "Execute Blockade order.";
     notify(this);
     return true;
-}
-
-string Blockade::stringToLog()
-{
-    return "TODO";
 }
 
 AirLift::AirLift() : Order("Airlift type", ""), armiesToMove(0),
@@ -706,11 +690,6 @@ void AirLift::updateDetails()
     setDetails(_desc);
 }
 
-string AirLift::stringToLog()
-{
-    return "TODO";
-}
-
 Negotiate::Negotiate() : Order("Negotiate type", "")
 {
 }
@@ -733,12 +712,6 @@ bool Negotiate::execute()
     cout << "Execute Negotiate order.";
     notify(this);
     return true;
-}
-
-//when an order is executed, output the effect of the order to the log file
-string Negotiate::stringToLog()
-{
-    return "TODO";
 }
 
 // Implementation of OrderList

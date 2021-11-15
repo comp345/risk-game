@@ -1,1 +1,3 @@
-Order was added to the OrderList of a player. Order: Advance type
+GameEngine transitioned to a new state: maploaded
+Order was added to the OrderList of a player. Order: Deploy type
+Order was executed: Deploy type = {Player Laila deploys 4 army units to England}

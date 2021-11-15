@@ -335,7 +335,7 @@ void GameEngine::testGameEngine()
 }
 
 string GameEngine::stringToLog() {
-    return "GameEngine transitioned to a new state:" + currentState->nameState;
+    return "GameEngine transitioned to a new state: " + currentState->nameState;
 }
 
 
