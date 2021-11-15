@@ -203,7 +203,7 @@ std::string FileCommandProcessorAdapter::readCommand(std::string fileName, State
 
     if (!validatedCommand.empty())
     {
-        cout << "Valid command. Current state is: " << this->getCurrentStateName(currentState) <<  << endl;
+        cout << "Valid command. Current state is: " << this->getCurrentStateName(currentState) << endl;
     }
     else
     {
