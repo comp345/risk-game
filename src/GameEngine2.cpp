@@ -35,7 +35,6 @@ GameEngine::GameEngine()
 
     // Setting current state to the start state
     currentState = startState;
-//    stateTracker = &startState;
 
     // Create the transitions
     Transition *loadmapTransition = new Transition("loadmap", maploadedState);
@@ -91,7 +90,7 @@ GameEngine::GameEngine(std::string newFile)
     State *maploadedState = new State("maploaded");
     State *mapvalidatedState = new State("mapvalidated");
     State *playersaddedState = new State("playersadded");
-    State *assignreinforcementState = new State("assignreinfgamorcement");
+    State *assignreinforcementState = new State("assignreinforcement");
     State *issueordersState = new State("issueorder");
     State *executeordersState = new State("executeorders");
     State *winState = new State("win");
@@ -161,10 +160,6 @@ GameEngine::GameEngine(std::string newFile)
     isFile = true;
 }
 
-State* GameEngine::setupCommandProcessorStates()
-{
-    
-}
 
 string GameEngine::getCurrentStateName()
 {
@@ -200,16 +195,9 @@ bool GameEngine::doTransition(string command)
     // cout << "Ending up gettin gin the gameengine transtion " << std::endl;
     for (int i = 0; i < currentState->transitions.size(); ++i)
     {
-        //cout << "AM I GETTIN GIN HTERE -  " << *currentState << std::endl;
-        cout << "AM I GETTIN GIN HTERE2222 -  " << (currentState->transitions.at(i)->nameTransition) << std::endl;
-        cout << "AM I GETTIN GIN HTERE2222 -  " << (command) << std::endl;
         if (currentState->transitions.at(i)->nameTransition == command)
         {
-            cout << "BEFORE Ending up gettin inside the ENGINE TRANSITION -  " << *currentState << std::endl;
-
             *currentState = *currentState->transitions.at(i)->nextState;
-            cout << "AFTER Ending up gettin inside the ENGINE TRANSITION -  " << *currentState << std::endl;
-
             return true;
         }
     }
@@ -229,9 +217,21 @@ void GameEngine::testGameEngine()
     {
         while(true)
         {
+            //To handle replay case, getCommand has to be called at a later execution
             output = commandProcessor->getCommand(currentState);
-            cout << "return output from processor: " << output->getCommandName() << std::endl;
-            doTransition(output->getCommandName());            
+            doTransition(output->getCommandName());    
+            if(output->getCommandName() == "gamestart")
+            {
+                //Start the gameloop
+                break;
+            }
+            else if(output->getCommandName() == "replay")
+            {
+                //Call me later   
+                cout << "\n";
+            }
+            else if(output->getCommandName() == "quit")
+                exit(0);        
             cout << "\n";
         
         }
@@ -241,18 +241,15 @@ void GameEngine::testGameEngine()
         while(true)
         {
             output = fileAdapter->getCommand(currentState);
-            cout << "return output from file: " << output->getCommandName() << std::endl;
-            cout << "This is the current state: " << getCurrentStateName() << std::endl;
-            //cout << "Boolean: " << (output->getCommandName() == getCurrentStateName()) << std::endl;
             doTransition(output->getCommandName());
-            //break;
             if(output->getCommandName() == "gamestart")
             {
                 //Start the gameloop
-                
+                break;
             }
             else if(output->getCommandName() == "quit")
-                exit(0);
+               exit(0);
+            cout << "\n";
         }
 }
 

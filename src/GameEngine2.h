@@ -16,7 +16,7 @@
 
     private:
         State *currentState; 
-        State *processorStates;
+        State stateTracker;
         bool isFile;
         std::string fileName;
         std::vector<State *> states; // GameEngine maintains collection of all states
@@ -41,10 +41,7 @@
 
         // check if command is valid. no update.
         bool validateCommand(std::string command);
-
-        // setup command processor responsibility transitions
-        State* setupCommandProcessorStates();
-        
+    
         void testGameEngine();
         string stringToLog() override;
 

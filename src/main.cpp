@@ -15,12 +15,12 @@ std::string checkCliArgs(int argNumber,char *argv[])
     
     for (int i = 0; i < argNumber; ++i) 
     {
+        // Not that nice but assumes argv[2] is a file 
         if(argv[1] && (strcmp(argv[i],"-f")) && argv[2])
         {
             fileName = argv[2]; 
         }
     }
-    //cout <<"argv -> "<<fileName << "\n";
     return fileName;
 }
 

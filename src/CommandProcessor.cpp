@@ -43,61 +43,54 @@ void Command::setCommandName(string name)
 
 string Command::getEffectName()
 {
-    return commandEffect;
+    return this->commandEffect;
 }
 
-// Getting effect of each command - returns effect string
-string Command::saveEffect(string command)
-{
-    std::string effect = "";
-    cout << "Command::saveEffect - Command Variable: " << command << std::endl;
-    
+// Saving effect of each command
+void Command::saveEffect(string command)
+{    
     if(command == "loadmap")
     {
-        effect = "Map has been loaded!";
-        cout << "The effect - " << effect << std::endl; 
+        commandEffect = "Map has been loaded!";
+        //cout << "The effect - " << commandEffect << std::endl; 
 
     }
     else if(command == "validatemap")
     {
-        effect = "Map has been validated!";
-        cout << "The effect - " << effect << std::endl; 
+        commandEffect = "Map has been validated!";
+        //cout << "The effect - " << commandEffect << std::endl; 
 
     }
     else if (command == "addplayer")
     {
-        effect = "Player added!";
-        cout << "The effect - " << effect << std::endl; 
+        commandEffect = "Player added!";
+        //cout << "The effect - " << commandEffect << std::endl; 
 
     }
     else if (command == "gamestart")
     {
-        effect = "Game Engine Started!";
-        cout << "The effect - " << effect << std::endl; 
+        commandEffect = "Game Engine Started!";
+       // cout << "The effect - " << commandEffect << std::endl; 
 
     }
     else if (command == "replay")
     {
-        effect = "Starting over";
-        cout << "The effect - " << effect << std::endl; 
+        commandEffect = "Starting over";
+        //cout << "The effect - " << commandEffect << std::endl; 
 
     }
     else if (command == "exit")
     {
-        effect = "Exiting...!";
-        cout << "The effect - " << effect << std::endl; 
+        commandEffect = "Exiting...!";
+        //cout << "The effect - " << commandEffect << std::endl; 
 
     }
     else
     {
-        effect = "Invalid command was entered - " + command;
-        cout << "The effect - " << effect << std::endl; 
+        commandEffect = "Invalid command was entered - " + command;
+        //cout << "No effect - " << commandEffect << std::endl; 
     }
-    command = "";
-    return effect;
 }
-
-// ------------------------------------------------------------------------------------------------------------------------------------------------
 
 CommandProcessor::CommandProcessor()
 {
@@ -121,7 +114,6 @@ bool CommandProcessor::validateCommand(State*& currentState, string command)
     {
         if (currentState->transitions.at(i)->nameTransition == command)
         {
-            cout << "Current state: " << currentState->nameState << endl;
             return true;
         }
     }
@@ -133,37 +125,36 @@ std::string CommandProcessor::getCurrentStateName(State*& currentState)
     return currentState->nameState;
 }
 
-// read string from console to create Command
+// Reads string from console. Validates then returns input
 std::string CommandProcessor::readCommand(State*& currentState)
 {
-        string keyinput;
+    string keyinput;
 
-        cout << "Enter a valid command to progress in the game."
-             << "(Enter x to quit or press any key when at final State)" << endl;
+    cout << "Enter a valid command to progress in the game."
+         << "(Enter x to quit or press any key when at final State)" << endl;
 
-        cin >> keyinput;
-        if (keyinput == "x" or this->getCurrentStateName(currentState) == "final")
-            std::exit(0);
+    cin >> keyinput;
+    if (keyinput == "x" or this->getCurrentStateName(currentState) == "final")
+        std::exit(0);
+    else
+    {
+        cout << "\n***\n" << endl;
+        // Validates the command.
+        // Returns true if command was valid, in order to display correct message.
+        bool isCommandValid = this->validateCommand(currentState, keyinput);
+
+        if (isCommandValid)
+        {
+            cout << "Valid command. Current state is: " << this->getCurrentStateName(currentState) << endl;
+        }
         else
         {
-            cout << "\n***\n"
-                 << endl;
-            // Validates the command.
-            // Returns true if command was valid, in order to display correct message.
-            bool isCommandValid = this->validateCommand(currentState, keyinput);
-
-            if (isCommandValid)
-            {
-                cout << "Valid command. Current state is: " << this->getCurrentStateName(currentState) << endl;
-            }
-            else
-            {
-                cout << "Invalid command. Replay current state: " << this->getCurrentStateName(currentState) << endl;
-            }
-            return keyinput;        
+            cout << "Invalid command. Replay current state: " << this->getCurrentStateName(currentState) << endl;
+        }
+        return keyinput;        
     }
-
 } 
+
 // save Command in commands vector
 void CommandProcessor::saveCommand(Command* c)
 {
@@ -174,15 +165,23 @@ Command* CommandProcessor::getCommand(State*& currentState)
 {
     Command* newCommand = new Command();
     string newCommandName = readCommand(currentState);
-    cout << "CommandProcessor::getCommand - newCommandName: " << newCommandName << endl;
     newCommand->setCommandName(newCommandName);
     newCommand->saveEffect(newCommandName);
     saveCommand(newCommand);
     return newCommand;
 }
 
-//------------------------------------------------------------------------------------------------------------------------
+// Prob going to be useful later
+void CommandProcessor::printCommands()
+{
+    for(Command *i : commands) 
+    {
+        cout << "Command name: " << i->getCommandName() << endl;
+        cout << "Command effect: " << i->getEffectName() << endl;
+    }
+}
 
+//Adapter to handle reading from file. Takes a new file input and creates reader obj
 FileCommandProcessorAdapter::FileCommandProcessorAdapter(std::string newFile)
 {
     //Set initial variable to has not read
@@ -190,62 +189,53 @@ FileCommandProcessorAdapter::FileCommandProcessorAdapter(std::string newFile)
     listOfCommands = {""};
     reader = new FileLineReader(newFile);
 }
+
+//Read from file then validates. Returns whatever user input after validation
 std::string FileCommandProcessorAdapter::readCommand(std::string fileName, State*& currentState)
 {
-
-        //cout << "Value of readFile: " << readFile << endl;
-        //cout << "CHECKING SIZE OF MY VECTOR: " << listOfCommands.size() << endl;
-    
-        if(!readFile)
-        {
-            listOfCommands = reader->readLineFromFile(fileName);
-            readFile = true;
-        }
+    if(!readFile)
+    {
+        listOfCommands = reader->readLineFromFile(fileName);
+        readFile = true;
+    }
         
-        std::string validatedCommand = this->validateCommand(currentState, listOfCommands);
+    std::string validatedCommand = this->validateCommand(currentState, listOfCommands);
 
-        if (!validatedCommand.empty())
-        {
-            cout << "Valid command. Current state is: " << this->getCurrentStateName(currentState) << endl;
-        }
-        else
-        {
-            cout << "Invalid command. Replay current state: " << this->getCurrentStateName(currentState) << endl;
-        }
-        return validatedCommand;
-    
+    if (!validatedCommand.empty())
+    {
+        cout << "Valid command. Current state is: " << this->getCurrentStateName(currentState) <<  << endl;
+    }
+    else
+    {
+        cout << "Invalid command. Must check transition for current state: " << this->getCurrentStateName(currentState) << endl;
+    }
+return validatedCommand;
 }
 
 Command* FileCommandProcessorAdapter::getCommand(State*& currentState)
 {
     Command* newCommand = new Command();
     string newCommandName = readCommand(fileName, currentState);
-    cout << "Inside FileCommandProcessorAdapter::getCommand - CommandName: " << newCommandName << endl;
     newCommand->setCommandName(newCommandName);
     newCommand->saveEffect(newCommandName);
     saveCommand(newCommand);
+    //cout << "Inside FileCommandProcessorAdapter::getCommand - CommandName: " << newCommandName << endl; - left if needed to debug later
     return newCommand;
 }
 
+// Overloaded validate method to handle a passed vector. Returns a valid transition if true
 std::string FileCommandProcessorAdapter::validateCommand(State*& currentState, std::vector<std::string> &commands)
 {
-    //cout << "below is the command INSIDE NEW VALIDATE:: "  << "\n" << endl;
     for (int i = 0; i < currentState->transitions.size(); ++i)
     {
-        cout << "Inside - FileCommandProcessorAdapter::validateCommand - Passed Commands : " << commands[0] << endl;
-        cout << "Current size of the commands vector: " << commands.size() << std::endl;
+        //cout << "Inside - FileCommandProcessorAdapter::validateCommand - Passed Commands : " << commands[0] << endl; - left if needed to debug later
         if(commands.size() == 0)
         {
-            cout << "I hit the last element in the file: " << commands.size() << std::endl;
             return currentState->transitions.at(i)->nameTransition;
         }
         if (currentState->transitions.at(i)->nameTransition == commands[0])
         {
-            cout << "Current state inside new validate: " << commands[i] << endl;
-            
-            //*currentState->nameState;
             commands.erase(commands.begin());
-            //cout << "This is the name transition inside - validateCommandProcessor - " << currentState->transitions.at(i)->nameTransition << endl;
             return currentState->transitions.at(i)->nameTransition;
         }
     }
@@ -253,30 +243,23 @@ std::string FileCommandProcessorAdapter::validateCommand(State*& currentState, s
     return "";
 }
 
-// ------------------------------------------------------------------------------------------------------------------------
-
+//FileLineReader used to read file commands
 FileLineReader::FileLineReader(std::string newFile)
 {
     fileName = newFile;
-    //listOfCommands = null;
+    listOfCommands = {};
 }
 
 FileLineReader::~FileLineReader()
 {
-    //listOfCommands = 0;
+    fileName = "";
+    listOfCommands = {};
 }
     
-// int FileLineReader::getLineNumber()
-// {
-//     return lineNumber;
-// }
-
-    
+// Handles actually reading from the file - returns each lines stacked into a string vector
 std::vector<std::string> &FileLineReader::readLineFromFile(string passedFile) 
 {
-    int lineNumber = 0;
     string line;
-
     ifstream input_file(fileName);
     if (!input_file.is_open()) {
         cerr << "Could not open the file - '"
@@ -287,10 +270,10 @@ std::vector<std::string> &FileLineReader::readLineFromFile(string passedFile)
     // Track line number while reading to check against current state
     while (getline(input_file, line))
     {
-        cout << "This is each line printed: " + line + ". This is the line Number: "<< lineNumber << endl;
+        cout << "Reading.... " + line << endl;
         listOfCommands.push_back(line);
-        lineNumber++;
     }
+    cout << "\n";
     input_file.close();
     return listOfCommands;
 }
