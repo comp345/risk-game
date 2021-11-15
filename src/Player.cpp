@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Card.h"
 #include <iostream>
 
 using namespace std;
@@ -18,6 +19,7 @@ Player::Player(string n)
 }
 
 //parametrized constructor
+// Noah note for A2: should not init Hand* and OrderList* to NULL (see default constructor)
 Player::Player(string n, vector<Territory*> t, Hand* h, OrderList* o)
 {
     this->name = n;
@@ -26,13 +28,15 @@ Player::Player(string n, vector<Territory*> t, Hand* h, OrderList* o)
     this->orderList = o;
 }
 
-//copy constructor
-Player::Player(const Player& p)
+//copy constructor: Deep copy, cannot be used for reference semantic or to 
+Player::Player(const Player& p) 
 {
+    // cout << "Entering Player::Player(const Player& p)" <<endl;
     this->name = p.name;
     this->territories = p.territories;
-    this->hand = p.hand;
-    this->orderList = p.orderList;
+    this->hand = new Hand(*p.hand); 
+    this->orderList = new OrderList(*p.orderList); 
+    // cout << "Exiting Player::Player(const Player& p)" <<endl;
 }
 
 //destructor
@@ -52,11 +56,14 @@ Player::~Player()
 
 //operator overloading
 //assignment operator overloading
+// Noah note for A2: Deep copy
 Player& Player::operator=(const Player& p) {
     if (this == &p)
         return *this;
 
     territories = p.territories;
+    if (hand) delete hand;
+    if (orderList) delete orderList;
     hand = new Hand(*(p.hand));
     orderList = new OrderList(*(p.orderList));
     return *this;
@@ -122,7 +129,54 @@ void Player::issueOrder(string order, string details)
 //adds order to a player's list of orders
 void Player::issueOrder(Order* o)
 {
+    vector<Territory*> attackableTerritories = vector<Territory*>();
+
+    //Get the players territories
+    for (Territory* territory : territories)
+    {
+        //add them to the attackable Territories if they have an army on them
+        if(territory->getNumberOfArmies() > 0)
+            attackableTerritories.push_back(territory);
+    }
+
+
+    for (Territory* territory : attackableTerritories)
+    {
+        
+        cout << "the neighbours of " << territory->getName() << " are as follows:\n";
+        for (Territory* neighbour : territory->getNeighbors())
+        {
+            cout << neighbour->getName() << "\n";
+        }
+    }
+
+
+    // As long as the player has armies still to deploy
+    while(reinforcementPool != 0)
+    {
+        // it will issue a deploy order and no other order.
+        if(o->getCommand() != "deploy"){
+            cout << "Since there are still reinforcements in this players pool, you must places all arimies first.\n"
+            << "There are " << reinforcementPool << " orders remaining \n";
+
+            Deploy* deployOrder = new Deploy("armies",this);
+            orderList->add(deployOrder);
+        }
+    }
+
+
+    // The player issues advance orders
+    if(o->getCommand() == "advance"){
+
+        // move armies from one of its own territory to the other in order to defend them
+
+
+        // move armies from one of its territories to a neighboring enemy territory to attack them 
+    }
+
+
     orderList->add(o);
+    
 }
 
 Hand *Player::getHand() {

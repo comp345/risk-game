@@ -4,7 +4,7 @@
 #include <vector>
 #include "LoggingObserver.h"
 
-class Command  : public ILoggable, public Subject
+class Command : public ILoggable, public Subject
 {
 private:
     std::string nameCommand;
@@ -17,10 +17,10 @@ public:
     std::string getNameCommand();
     void setNameCommand(std::string name);
     void saveEffect();
-    string stringToLog() override;
+    string stringToLog();
 };
 
-class CommandProcessor  : public ILoggable, public Subject
+class CommandProcessor : public ILoggable, public Subject
 {
 private:
     std::vector<Command *> commands;
@@ -29,7 +29,7 @@ private:
 public:
     Command *getCommand();
     bool validate(Command c);
-    string stringToLog() override;
+    string stringToLog();
 };
 
 class FileCommandProcessorAdapter

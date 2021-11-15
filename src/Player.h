@@ -3,12 +3,11 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "Orders.hpp"
-#include "Card.h"
-#include "Map.h"
 
 class Territory;
 class Hand;
+class Order;
+class OrderList;
 
 using namespace std;
 
@@ -50,10 +49,14 @@ public:
     //stream insertion operator overloading
     friend ostream& operator<<(ostream& out, const Player& p);
     friend istream& operator>>(istream& in, Player& p);
-
+    
+    
+    int reinforcementPool;
+    
 private:
     string name;
     vector<Territory *> territories;
     Hand *hand;
     OrderList *orderList;
+    
 };

@@ -10,5 +10,6 @@ string Command::stringToLog() {
 }
 
 string CommandProcessor::stringToLog() {
-    return "New command saved: " + commands.back()->getNameCommand();
+    // return "New command saved: " + commands.back()->getNameCommand();
+    return "New command saved: TODO";
 }

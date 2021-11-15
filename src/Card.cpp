@@ -1,7 +1,6 @@
 #include<iostream>
 #include<string>
-#include"Card.h"
-#include"Orders.hpp"
+#include "Card.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -383,6 +382,7 @@ Hand::Hand(const Hand& other)
 
 Hand::~Hand()
 {
+    for (auto p : m_cards) delete p;
     m_cards.clear();
 }
 
