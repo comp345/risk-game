@@ -5,8 +5,6 @@
 #include <map>
 #include "States.h"
 
-
-
 class Command;
 class CommandProcessor;
 class FileCommandProcessorAdapter;
@@ -32,20 +30,21 @@ class CommandProcessor
 {
     friend class GameEngine;
 protected:
-    virtual std::string readCommand(State* currentState); // read string from console to create Command
-    virtual Command* getCommand(State* currentState); // storing string (command effect) after command is executed
+    virtual std::string readCommand(State*& currentState); // read string from console to create Command
     void saveCommand(Command* c); // save Command in commands
-    bool validateCommand(State* currentState, std::string command);
 private:
     std::vector<Command *> commands;
     State *currentState; 
 public:
     std::string fileName;
     CommandProcessor();
-    CommandProcessor(std::string fileInput, State* setState);
+    CommandProcessor(std::string fileInput, State*& setState);
     ~CommandProcessor();
-    std::string getCurrentStateName(State* currentState);
-    bool doTransition(State* currentState, std::string command);
+    bool validateCommand(State*& currentState, std::string command);
+    virtual Command* getCommand(State*& currentState); // storing string (command effect) after command is executed
+    std::string getCurrentStateName(State*& currentState);
+    std::string getCurrentTransition(State*& currentState);
+    bool doTransition(State*& currentState, std::string command);
    // virtual Command* getCommand(State* currentState); // storing string (command effect) after command is executed in GameEngine::doTransition()
 };
 
@@ -56,13 +55,14 @@ class FileCommandProcessorAdapter: CommandProcessor
 private:
     FileLineReader* reader;
     std::string fileName;
+    bool readFile;
     std::vector<std::string> listOfCommands;
-    std::string readCommand(std::string fileName, State* currentState); // read string from file to create Command
+    std::string readCommand(std::string fileName, State*& currentState); // read string from file to create Command
 public:
     FileCommandProcessorAdapter(std::string newFile);
-    Command* getCommand(State* currentState);
+    Command* getCommand(State*& currentState);
    // bool checkCurrentState(std::vector<std::string> commands, State* currentState);
-    std::string validateCommand(State* currentState, std::vector<std::string> &commands);
+    std::string validateCommand(State*& currentState, std::vector<std::string> &commands);
 
 };
  
@@ -75,5 +75,5 @@ public:
     FileLineReader(std::string newFile);
     ~FileLineReader();
     std::vector<std::string> listOfCommands;
-    std::vector<std::string> readLineFromFile(std::string fileName);
+    std::vector<std::string> &readLineFromFile(std::string fileName);
 };

@@ -16,15 +16,15 @@
 
     private:
         State *currentState; 
-        State stateTracker;
+        State *processorStates;
         bool isFile;
+        std::string fileName;
         std::vector<State *> states; // GameEngine maintains collection of all states
         std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
         CommandProcessor *commandProcessor;
         FileCommandProcessorAdapter *fileAdapter;
     public:
         GameEngine();
-
         GameEngine(std::string fileName);
 
         // return name of current state
@@ -41,6 +41,9 @@
 
         // check if command is valid. no update.
         bool validateCommand(std::string command);
+
+        // setup command processor responsibility transitions
+        State* setupCommandProcessorStates();
         
         void testGameEngine();
         string stringToLog() override;

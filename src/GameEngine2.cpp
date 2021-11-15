@@ -15,7 +15,7 @@ GameEngine::GameEngine()
     State *maploadedState = new State("maploaded");
     State *mapvalidatedState = new State("mapvalidated");
     State *playersaddedState = new State("playersadded");
-    State *assignreinforcementState = new State("assignreinfgamorcement");
+    State *assignreinforcementState = new State("assignreinforcement");
     State *issueordersState = new State("issueorder");
     State *executeordersState = new State("executeorders");
     State *winState = new State("win");
@@ -81,11 +81,10 @@ GameEngine::GameEngine()
     winState->addTransition(endTransition);
 
     commandProcessor = new CommandProcessor();
-    cout << "Hit the 1st one" << endl;
     isFile = false;
 }
 
-GameEngine::GameEngine(std::string fileName)
+GameEngine::GameEngine(std::string newFile)
 {
     // Create the states and add to states collection
     State *startState = new State("start");
@@ -112,7 +111,6 @@ GameEngine::GameEngine(std::string fileName)
 
     // Setting current state to the start state
     currentState = startState;
-//    stateTracker = &startState;
 
     // Create the transitions
     Transition *loadmapTransition = new Transition("loadmap", maploadedState);
@@ -158,15 +156,20 @@ GameEngine::GameEngine(std::string fileName)
     winState->addTransition(endTransition);
 
     // Create Adapter and pass file
-    fileAdapter = new FileCommandProcessorAdapter(fileName);
+    fileName = newFile;
+    fileAdapter = new FileCommandProcessorAdapter(newFile);
     isFile = true;
-    cout << "Hit the 2nd one" << endl;
 }
 
-// string GameEngine::getCurrentStateName()
-// {
-//     return currentState->nameState;
-// }
+State* GameEngine::setupCommandProcessorStates()
+{
+    
+}
+
+string GameEngine::getCurrentStateName()
+{
+    return currentState->nameState;
+}
 
 vector<string> GameEngine::getNextTransitions()
 {
@@ -190,28 +193,23 @@ string GameEngine::getNextStateName(string command)
     return ""; //TODO: throw exception
 }
 
-//Only check if command is valid. Does NOT act upon the command, even if it is valid.
-// bool GameEngine::validateCommand(string command)
-// {
-//     for (int i = 0; i < currentState->transitions.size(); ++i)
-//     {
-//         if (currentState->transitions.at(i)->nameTransition == command)
-//         {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-
 // Check if command is valid. If it is, updates the state. Return true if command was valid, false if else.
 // The success and error messages are not implemented, to allow flexible implementation in differents parts of A2.
 bool GameEngine::doTransition(string command)
 {
+    // cout << "Ending up gettin gin the gameengine transtion " << std::endl;
     for (int i = 0; i < currentState->transitions.size(); ++i)
     {
+        //cout << "AM I GETTIN GIN HTERE -  " << *currentState << std::endl;
+        cout << "AM I GETTIN GIN HTERE2222 -  " << (currentState->transitions.at(i)->nameTransition) << std::endl;
+        cout << "AM I GETTIN GIN HTERE2222 -  " << (command) << std::endl;
         if (currentState->transitions.at(i)->nameTransition == command)
         {
-            currentState = currentState->transitions.at(i)->nextState;
+            cout << "BEFORE Ending up gettin inside the ENGINE TRANSITION -  " << *currentState << std::endl;
+
+            *currentState = *currentState->transitions.at(i)->nextState;
+            cout << "AFTER Ending up gettin inside the ENGINE TRANSITION -  " << *currentState << std::endl;
+
             return true;
         }
     }
@@ -222,26 +220,39 @@ bool GameEngine::doTransition(string command)
 // TODO: Will need to divide game flow into StartUpPhase(), GameLoopPhase(), etc. for A2
 void GameEngine::testGameEngine()
 {
-    //GameEngine engine;
+    //GameEngine engine{fileName};
     Command* output;
     cout << "Welcome to WarZone!" << endl;
-   // cout << "IS this thing true: " << isFile << endl;
-   
+
    //Different execution depending if -f arg is passed
     if(!isFile)
     {
         while(true)
         {
-            output = commandProcessor->getCommand(&currentState[0]);
-            cout << "return output: " << output->getCommandName() << std::endl;
+            output = commandProcessor->getCommand(currentState);
+            cout << "return output from processor: " << output->getCommandName() << std::endl;
+            doTransition(output->getCommandName());            
+            cout << "\n";
+        
         }
 
     }
     else
         while(true)
         {
-            output = fileAdapter->getCommand(&currentState[0]);
-            cout << "return output: " << output->getCommandName() << std::endl;
+            output = fileAdapter->getCommand(currentState);
+            cout << "return output from file: " << output->getCommandName() << std::endl;
+            cout << "This is the current state: " << getCurrentStateName() << std::endl;
+            //cout << "Boolean: " << (output->getCommandName() == getCurrentStateName()) << std::endl;
+            doTransition(output->getCommandName());
+            //break;
+            if(output->getCommandName() == "gamestart")
+            {
+                //Start the gameloop
+                
+            }
+            else if(output->getCommandName() == "quit")
+                exit(0);
         }
 }
 
