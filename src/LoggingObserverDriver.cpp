@@ -28,7 +28,6 @@ void testLogging()
 
     delete engine;
     delete observer;
-    delete ol;
     delete deployOrder;
 }
 

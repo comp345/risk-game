@@ -1,12 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
-// #include "Player.h"
-#include "LoggingObserver.h"
 #include "Orders.h"
-
-
-
 
 class Deck;
 class Hand;
@@ -51,9 +46,6 @@ public:
     friend std::ostream &operator<<(std::ostream &lhs, Effect *e);
 
     Card &operator=(const Card &rhs);
-
-    string stringToLog();
-    // string stringToLog() override; // TO OVERRIDE later
 
 
 protected:
