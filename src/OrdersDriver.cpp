@@ -6,10 +6,6 @@
 
 using namespace std;
 
-void testOrdersLink()
-{
-     cout << "Successfully linked orders.cpp and orders.hpp to main\n";
-}
 
 void testOrdersDriver()
 {

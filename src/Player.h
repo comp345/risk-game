@@ -3,10 +3,6 @@
 #include <string>
 #include <vector>
 #include <iostream>
-// #include "LoggingObserver.h"
-// #include "Orders.h"
-// #include "Card.h"
-// #include "Map.h"
 
 class Territory;
 class Hand;

@@ -101,6 +101,7 @@ namespace A2
         // check if command is valid and updates current state accordingly
         bool doTransition(std::string command);
 
+
         // check if command is valid. no update.
         bool validateCommand(std::string command);
 

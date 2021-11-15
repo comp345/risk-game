@@ -3,11 +3,11 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
-#include "GameEngine2.h"
 #include "Map.h"
 #include "Player.h"
 #include "Orders.h"
 
+#include "GameEngine.h"
 
 using namespace std;
 
@@ -209,6 +209,7 @@ bool GameEngine::doTransition(string command)
         if (currentState->transitions.at(i)->nameTransition == command)
         {
             currentState = currentState->transitions.at(i)->nextState;
+            notify(this);
             return true;
         }
     }
@@ -334,7 +335,7 @@ void GameEngine::testGameEngine()
 }
 
 string GameEngine::stringToLog() {
-    return "TODO";
+    return "GameEngine transitioned to a new state:" + currentState->nameState;
 }
 
 
