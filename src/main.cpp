@@ -30,7 +30,10 @@ int main(int, char **)
     /* A2 : Testing Advance exec */
     // testAdvanceExec();
 
+    /* A2 : Testing AirLift exec */
+    // testAirliftExec();
+
     /* A2 : Testing GameLoop */
-    GameEngine::testGameEngine();
+    // GameEngine::testGameEngine();
     return 0;
 }
