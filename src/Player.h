@@ -18,7 +18,7 @@ public:
 
     Player(const Player &); //copy constructor
     Player(string);
-    Player(string, vector<Territory *>, Hand *, OrderList *);
+    Player(int,string, vector<Territory *>, Hand *, OrderList *);
 
     ~Player(); //destructor
     vector<Territory *> toAttack();
@@ -43,6 +43,8 @@ public:
     void setTerritories(vector<Territory *> vector1);
 
     void setCards(Hand *pHand);
+    int getPlArmies();
+    void setPlArmies(int armies);
 
     //operator overloading
     //assignment operator overloading
@@ -56,4 +58,5 @@ private:
     vector<Territory *> territories;
     Hand *hand;
     OrderList *orderList;
+    int plArmies;
 };

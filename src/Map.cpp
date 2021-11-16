@@ -261,6 +261,20 @@ bool Map::validate() {
     cout << "\n";
     return true;
 }
+void Map::showLoadedMap() {
+    Continent continent;
+    //cout<<"Showing content of "<<continent.name <<" and its territories: \n"<<endl;
+
+    for(int i=0; i<continentList.size();i++){
+        cout<<"Showing "<<continentList[i]->name<<" and its adjacents:\n \t"<<endl;
+        for(int j=0;j<continentList[i]->territories.size();j++){
+            cout<<"-> "<<continentList[i]->territories[j]->getID()<<endl;
+        }
+        //cout<<"\n"<<endl;
+    }
+    cout<<"\n \n"<<endl;
+
+}
 
 // ********************** //
 // Map Loader functions:  //
@@ -350,7 +364,7 @@ istream &operator>>(std::istream &in, MapLoader &ml) {
 
 //Method to load map from a .map file
 Map *MapLoader::loadMap(string fileName) {
-    cout << "\n -----------------------------" << endl;
+    cout << "\n-----------------------------" << endl;
     cout << "\nLoading map from file..... " << fileName << endl;
     fstream infile;
     infile.open(fileName);

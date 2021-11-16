@@ -96,6 +96,7 @@ public:
     bool containsDuplicateTerritories();
 
     std::vector<Territory *> getTerritories();
+    void showLoadedMap();
 
 private:
     int counter;

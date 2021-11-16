@@ -267,11 +267,18 @@ void GameEngine::issueOrdersPhase()
 {}
 void GameEngine::executeOrdersPhase()
 {}
-void GameEngine::getNumOfPlayers() {
+
+//helper methods
+Map* GameEngine::getMap(){
+    return map;
+}
+int GameEngine::getNumOfPlayers() {
     return numberOfPlayers;
 }
-//helper method for loading list of maps from the directory in an ordered list
-void GameEngine::getMapList(){
+vector<Player*> GameEngine::getPlayersVect() {
+    return plVec; //returns the vector containing player objects
+}
+void GameEngine::getMapList(){//helper method for loading list of maps from the directory in an ordered list
     int i=0;
     string path= "../maps/";
     for (const auto& entry : fs::directory_iterator(path)) {
@@ -281,10 +288,9 @@ void GameEngine::getMapList(){
             i++;
         }
     }
-
-    }
+}
 // Two main phases
-void GameEngine::startupPhase()
+void GameEngine::preStartup()
 {
     // loadmap <filename> to select map from list of map loaded
 
@@ -298,31 +304,32 @@ void GameEngine::startupPhase()
     MapLoader *mapLoader= new MapLoader();
         cout <<"Initiating map loading stage: \n"<<endl;
         getMapList();
-
         while(true){
             cout<<"\n Enter the number of the desired map: \n"<<endl;
-            //cin>>mapNum;
-            while(mapNum>listOfFile.size()||!(cin>>mapNum)) {
-                std::cin.clear();
-                std::cin.ignore(1000, '\n');
+            cin>>mapNum;
+           while (mapNum > listOfFile.size()||!(cin>>mapNum)) {
+                cin.clear();
+                cin.ignore(1000, '\n');
                 if (!isdigit(mapNum)) {
                     cout << "Wrong input. Try with a valid number! \n" << endl;
-                    continue;
-                }
+                    continue;//breaking here if we input wrong number on the first try, doesnt work as intended even when entering correct number on 2nd try
+                }else
+                    break;
             }
-                mName=listOfFile[mapNum-1];
-                fpath=path.append(mName);
-                Map x1 = *mapLoader->loadMap(fpath);
-                Map *map1= new Map(x1);
-                map1->validate();// validates map
+            mName=listOfFile[mapNum-1];
+            fpath=path.append(mName);
+            Map x1 = *mapLoader->loadMap(fpath);
+            Map *map1= new Map(x1);
+            map1->validate();// validates map
+            map1->showLoadedMap();
             break;
         }
     // addplayer loop
         //if(command==addplayer)-> do this
         while(true) {
-            string playerNameInput;
-            cout << "Enter player name: \n" << endl;
-            cin >> playerNameInput;
+//            string playerNameInput;
+//            cout << "Enter player name: \n" << endl;
+//            cin >> playerNameInput;
             cout << "Enter the number of players (between 2-5): \n" << endl;
             cin >> numberOfPlayers;
             if (numberOfPlayers < 2 || numberOfPlayers > 5) {
@@ -330,12 +337,23 @@ void GameEngine::startupPhase()
                 cin.ignore(1000, '\n');
                 std::cout << "Invalid number of players. Please enter between 2-5 players. \n" << endl;
             } else{
+                cout<<"you have entered: "<<numberOfPlayers<<" players. Proceeding to next step....\n"<<endl;
                 break;
             }
         }
-
-        //create a vector of players and assign the playernumInput as the vector size
-
+        //creating players based on given input (assigns army, hand, etc) and pushes the info into the player vector
+        for(int i=0; i<numberOfPlayers; i++){
+            Player *p= new Player();
+            Deck* cardDeck= new Deck();
+            Hand* plCard= new Hand(cardDeck);
+            p->setCards(plCard);
+            p->setPlArmies(50);
+            cout<<*p<<"Number of Armies: "<<p->getPlArmies()<<endl;
+            cout<<"Cards in players hand: "<<p->getHand()<<endl;
+            plVec.push_back(p);
+            cout<<"-------------------"<<endl;
+        }
+        cout<<"Thats all?"<<endl;
     // gamestart ->
     /** 
          * - distribute territories of map between players
@@ -346,6 +364,42 @@ void GameEngine::startupPhase()
          */
 
 }
+//startupPhase methods
+StartupPhase::StartupPhase() {
+    eng= new GameEngine();
+}
+StartupPhase::StartupPhase(const StartupPhase &sp) {
+    this->eng=sp.eng;
+}
+StartupPhase::~StartupPhase() {
+
+}
+void StartupPhase::operator=(const StartupPhase& sp) {
+    eng = sp.eng;
+}
+ostream& operator<<(ostream& out, const StartupPhase& sp) {
+   // out << "\nGame Engine: " << sp.eng<< endl;//to fix
+    return out;
+}
+istream& operator>>(istream& in, const StartupPhase& sp) {
+    return in;
+}
+void StartupPhase::setGameEng(GameEngine *en) {
+    eng=en;
+}
+//void StartupPhase::startup() {
+//    vector<Player*> p1= eng->getPlayersVect();
+//
+//    //step1: territory assignment
+//    cout<<"Distributing territories to the players: \n"<<endl;
+//    Map* map= eng->getMap();
+//
+//    if(map->territoryNodeList.empty()){
+//        vector<Player*> p= eng->getPlayersVect()
+//    }
+//}
+
+
 
 void GameEngine::mainGameLoop()
 {

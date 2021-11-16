@@ -12,6 +12,6 @@ int main(int, char **)
 {
     GameEngine engine;
     //engine.testGameEngine();
-    engine.startupPhase();
+    engine.preStartup();
     return 0;
 }

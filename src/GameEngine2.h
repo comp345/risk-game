@@ -83,6 +83,7 @@ namespace A2
         std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
         std::vector<std::string> listOfFile;
         std::vector<Player*> plVec;
+        Map* map;
 
     public:
         GameEngine();
@@ -108,9 +109,11 @@ namespace A2
     /* A2 */
 
         // A2 Part 2
-        void getNumOfPlayers();
+        int getNumOfPlayers();
+        std::vector<Player*> getPlayersVect();
         void getMapList();
-        void startupPhase();
+        void preStartup();
+        Map* getMap();
 
         // A2 Part 3
         void mainGameLoop();
@@ -118,6 +121,20 @@ namespace A2
         void issueOrdersPhase();
         void executeOrdersPhase();
 
+    };
+    class StartupPhase{
+    private:
+        GameEngine* eng;
+    public:
+        StartupPhase();
+        StartupPhase(const StartupPhase& sp);
+        ~StartupPhase();
+
+        void startup();
+        void setGameEng(GameEngine* en);
+        void operator=(const StartupPhase& sp);
+        friend ostream& operator<<(ostream& out, const StartupPhase& sp);
+        friend istream& operator>>(istream& in, const StartupPhase& sp);
     };
 
 }

@@ -239,6 +239,12 @@ std::ostream& Diplomacy::write(std::ostream &os) const
 // **************** //
 // Deck functions:  //
 // **************** //
+
+Deck::Deck() {//default
+    m_cards= vector<Card*>();
+    //srand(time(0));
+}
+
 Deck::Deck(int size)
 {
     initialize(size);
@@ -348,6 +354,9 @@ void Deck::returnCard(Card* card)
 {
     m_cards.insert(m_cards.begin(), card);
 }
+vector<Card*> Deck::getDeckCards() {
+    return m_cards;
+}
 
 std::ostream& operator<<(std::ostream& lhs, Deck& deck)
 {
@@ -374,6 +383,9 @@ Deck& Deck::operator=(const Deck& rhs)
 // **************** //
 Hand::Hand()
 {
+}
+Hand::Hand(Deck* hDeck) {
+    m_cards=hDeck->getDeckCards();
 }
 
 Hand::Hand(const Hand& other)

@@ -5,8 +5,9 @@ using namespace std;
 
 Player::Player()
 {
+    plArmies=0;
     territories = vector<Territory *>();
-    hand = new Hand();
+    hand = new Hand();//cards in players hand
     orderList = new OrderList();
 }
 
@@ -18,8 +19,9 @@ Player::Player(string n)
 }
 
 //parametrized constructor
-Player::Player(string n, vector<Territory*> t, Hand* h, OrderList* o)
+Player::Player(int armies, string n, vector<Territory*> t, Hand* h, OrderList* o)
 {
+    this->plArmies=armies;
     this->name = n;
     this->territories = t;
     this->hand = h;
@@ -64,7 +66,7 @@ Player& Player::operator=(const Player& p) {
 
 //stream insertion operator overloading
 ostream& operator<<(ostream& out, const Player& p) {
-    out << "Territories: " << endl;
+    out << "Territories: (should print if assigned!)" << endl;
     for (Territory* t : p.territories) {
         out << *t << endl;
     }
@@ -73,7 +75,7 @@ ostream& operator<<(ostream& out, const Player& p) {
         for (Order* o : p.orderList->getList()) {
             out << "Orders: " << *o << endl;
         }
-        out << "Orders should be printing here\n";
+        out << "Orders should be printing here (for debugging)\n";
     }
 
     else {
@@ -157,4 +159,10 @@ void Player::printOrders()
     {
         cout << *o << "\n";
     }
+}
+int Player::getPlArmies() {
+    return plArmies;
+}
+void Player::setPlArmies(int armies) {
+    plArmies=armies;
 }

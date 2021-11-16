@@ -118,6 +118,8 @@ private:
 
 public:
     //Constructors
+    Deck();
+
     Deck(int size);
 
     Deck(const Deck &other);
@@ -135,6 +137,8 @@ public:
 
     void returnCard(Card *card);
 
+    vector<Card*> getDeckCards();
+
     // Operator functions
     friend std::ostream &operator<<(std::ostream &lhs, Deck &d);
 
@@ -150,6 +154,8 @@ private:
 public:
     //Constructors
     Hand();
+
+    Hand(Deck*);
 
     Hand(const Hand &other);
 
