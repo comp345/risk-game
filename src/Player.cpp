@@ -257,8 +257,8 @@ void Player::issueOrder(Order *o)
         orderList->add(o);
 
         //All players are done issuing orders past this point
-        if (reinforcementPool == 0)
-            doneIssuing = true;
+        // if (reinforcementPool == 0)
+        //     doneIssuing = true;
 }
 
 Hand *Player::getHand()
@@ -356,4 +356,11 @@ int Player::getReinforcementPool()
 void Player::setReinforcementPool(int val)
 {
     reinforcementPool = val;
+}
+
+Territory* Player::popPriorityDefend()
+{
+    Territory* p = priorityDefending.top();
+    priorityDefending.pop();
+    return p;
 }

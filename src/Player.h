@@ -70,6 +70,7 @@ public:
 
     void addToPriorityAttack(Territory *toAdd);
     void addToPriorityDefend(Territory *toAdd);
+    Territory* popPriorityDefend();
 
     priority_queue<Territory *, vector<Territory *>, compareArmySize> getPriorityAttacking();
     priority_queue<Territory *, vector<Territory *>, compareArmySize> getPriorityDefending();

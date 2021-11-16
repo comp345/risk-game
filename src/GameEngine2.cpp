@@ -545,7 +545,7 @@ void GameEngine::issueOrdersPhase()
     // empty
     while (!allPlayersDone())
     {
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < currentPlayers.size(); i++)
         {
             cout << "\nGameEngine:: Player: " << currentPlayers.at(i)->getName() << " is currently in the issue order phase.\n";
 
@@ -555,16 +555,13 @@ void GameEngine::issueOrdersPhase()
             // (1) Deploy: until reinforc pool == 0
             if (currentPlayers.at(i)->getReinforcementPool() > 0)
             {
-                Player *currentPlayer = currentPlayers.at(i);
-                cout << " DEBUT " << (currentPlayers.at(i)->getPriorityDefending());
-                // Territory *territoryTarget = currentPlayer->getPriorityDefending().top();
-                // // Create Deploy -> decrease reinforcement)
-                // Deploy *deploy = new Deploy(1, currentPlayer, territoryTarget);
-                // cout << "Issueing! " << deploy->getDetails() << endl;
-                // currentPlayer->issueOrder(deploy);
-                // // Pop territory from queue
-                // currentPlayer->getPriorityDefending().pop();
-                // cout << "POP DEBUG " << currentPlayer->getPriorityDefending().top() << endl;
+                Territory *territoryTarget = currentPlayers.at(i)->getPriorityDefending().top();
+                // Create Deploy -> decrease reinforcement)
+                Deploy *deploy = new Deploy(1, currentPlayers.at(i), territoryTarget);
+                cout << "Issueing: " << deploy->getDetails() << endl;
+                currentPlayers.at(i)->issueOrder(deploy);
+                // Pop territory from queue
+                currentPlayers.at(i)->popPriorityDefend();
             }
             else if (currentPlayers.at(i)->getPriorityDefending().size() > 0)
             {
@@ -584,11 +581,9 @@ void GameEngine::issueOrdersPhase()
             {
                 // (2) Card
             }
-            cout << "DEBUG: " << currentPlayers.at(i)->getPriorityDefending().top()->getName() << " "
-                << currentPlayers.at(i)->getReinforcementPool() << endl;
 
             // After a player issue one order, check if reinforcementPool 0 or queues empty
-            if (currentPlayers.at(i)->getPriorityDefending().size() == 0) //currentPlayers.at(i)->getPriorityAttacking().size() == 0 && 
+            if (currentPlayers.at(i)->getPriorityDefending().size() == 0) //currentPlayers.at(i)->getPriorityAttacking().size() == 0 &&
                 currentPlayers.at(i)->toggleDoneIssuing();
         }
     }
