@@ -5,14 +5,15 @@
 #include "LoggingObserver.h"
 #include "Map.h"
 #include "Player.h"
+#include "Card.h"
 
-/* The states and transitions are stored in a linked list like structure */
+class Deck;
 
-// States are Nodes in the game flow
 namespace A2
 {
     class Transition;
     class GameEngine;
+    
     // class Player;
     // class Map;
 
@@ -120,11 +121,14 @@ namespace A2
         void issueOrdersPhase();
         void executeOrdersPhase();
 
+        // Noah: Data members should be private and only accessed with public methods
         vector<Player *> currentPlayers;
         Map *map;
-
+        Deck* deck;
+        bool allPlayersDone();
         Player *hasWinner();
         void auditPlayers();
+        Order* createOrderFromCard(Card* card);
     };
 
 }

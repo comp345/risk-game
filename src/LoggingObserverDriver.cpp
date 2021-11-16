@@ -15,7 +15,7 @@ void testLogging()
     engine->attach(observer); 
     
     // transition engine to next state
-    engine.toTransition("loadmap"); // current state is "start". valid transition is "loadmap"
+    // engine->toTransition("loadmap"); // current state is "start". valid transition is "loadmap"
 
 
 
@@ -30,7 +30,7 @@ void testLogging()
     string effect = advance1->getDetails();
 }
 
-int main()
-{
-    testLogging();
-}
+// int main()
+// {
+//     testLogging();
+// }

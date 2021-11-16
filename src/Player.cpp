@@ -1,14 +1,27 @@
 #include "Player.h"
 #include "Card.h"
 #include <iostream>
+#include <queue>
+#include <algorithm>
 
 using namespace std;
+
+bool compareArmySize::operator()(Territory const *t1, Territory const *t2)
+{
+    // return "true" if "p1" is ordered
+    // before "p2", for example:
+    return t1->numArmies > t2->numArmies;
+}
 
 Player::Player()
 {
     territories = vector<Territory *>();
     hand = new Hand();
     orderList = new OrderList();
+    this->prevTerritorySize = 0;
+    this->doneIssuing = false;
+    priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
+    priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
 }
 
 Player::Player(string n)
@@ -16,26 +29,41 @@ Player::Player(string n)
     this->name = n;
     this->hand = new Hand();
     this->orderList = new OrderList();
+    this->doneIssuing = false;
+    this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
+    this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
 }
 
 //parametrized constructor
 // Noah note for A2: should not init Hand* and OrderList* to NULL (see default constructor)
-Player::Player(string n, vector<Territory*> t, Hand* h, OrderList* o)
+Player::Player(string n, vector<Territory *> t, Hand *h, OrderList *o)
 {
     this->name = n;
     this->territories = t;
     this->hand = h;
     this->orderList = o;
+    this->doneIssuing = false;
+    this->prevTerritorySize = territories.size();
+    this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
+    this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
 }
 
-//copy constructor: Deep copy, cannot be used for reference semantic or to 
-Player::Player(const Player& p) 
+bool Territory::operator<(const Territory &rhs)
+{
+    return (this->numArmies <= rhs.numArmies);
+}
+
+//copy constructor: Deep copy, cannot be used for reference semantic or to
+Player::Player(const Player &p)
 {
     // cout << "Entering Player::Player(const Player& p)" <<endl;
     this->name = p.name;
     this->territories = p.territories;
-    this->hand = new Hand(*p.hand); 
-    this->orderList = new OrderList(*p.orderList); 
+    this->hand = new Hand(*p.hand);
+    this->doneIssuing = p.doneIssuing;
+    this->orderList = new OrderList(*p.orderList);
+    this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
+    this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     // cout << "Exiting Player::Player(const Player& p)" <<endl;
 }
 
@@ -48,7 +76,8 @@ Player::~Player()
     delete hand;
     hand = nullptr;
 
-    for (Territory* t : territories) {
+    for (Territory *t : territories)
+    {
         delete t;
         t = nullptr;
     }
@@ -57,50 +86,62 @@ Player::~Player()
 //operator overloading
 //assignment operator overloading
 // Noah note for A2: Deep copy
-Player& Player::operator=(const Player& p) {
+Player &Player::operator=(const Player &p)
+{
     if (this == &p)
         return *this;
 
     territories = p.territories;
-    if (hand) delete hand;
-    if (orderList) delete orderList;
+    if (hand)
+        delete hand;
+    if (orderList)
+        delete orderList;
     hand = new Hand(*(p.hand));
     orderList = new OrderList(*(p.orderList));
     return *this;
 }
 
 //stream insertion operator overloading
-ostream& operator<<(ostream& out, const Player& p) {
+ostream &operator<<(ostream &out, const Player &p)
+{
     out << "Territories: " << endl;
-    for (Territory* t : p.territories) {
+    for (Territory *t : p.territories)
+    {
         out << *t << endl;
     }
 
-    if (p.orderList != nullptr) {
-        for (Order* o : p.orderList->getList()) {
+    if (p.orderList != nullptr)
+    {
+        for (Order *o : p.orderList->getList())
+        {
             out << "Orders: " << *o << endl;
         }
         out << "Orders should be printing here\n";
     }
 
-    else {
+    else
+    {
         out << "\nOrders not initialized";
     }
 
-    if (p.hand != nullptr) {
-        for (Card* c : p.hand->getCards()) {
+    if (p.hand != nullptr)
+    {
+        for (Card *c : p.hand->getCards())
+        {
             out << "\nCard: " << c << endl;
         }
     }
 
-    else {
+    else
+    {
         out << "\nHand not initialized";
     }
 
     return out;
 }
 
-istream& operator>>(istream& in, Player& p) {
+istream &operator>>(istream &in, Player &p)
+{
     in >> p.name;
     return in;
 }
@@ -108,8 +149,35 @@ istream& operator>>(istream& in, Player& p) {
 //returns a list of territories to attack
 vector<Territory *> Player::toAttack()
 {
-    return territories;
+    vector<Territory *> attackableTerritories = vector<Territory *>();
 
+    //Get the players territories
+    for (Territory *territory : territories)
+    {
+        //add them to the attackable Territories if they have an army on them
+        if (territory->getNumberOfArmies() > 0)
+            attackableTerritories.push_back(territory);
+    }
+
+    vector<Territory *> neighbourTerritories = vector<Territory *>();
+    for (Territory *territory : attackableTerritories)
+    {
+
+        // cout << "the neighbours of " << territory->getName() << " are as follows:\n";
+        for (Territory *neighbour : territory->getNeighbors())
+        {
+            // cout << neighbour->getName() << ", owned by " << neighbour->getOwner()->getName() <<"\n";
+
+            // If we haven't already seen the territory, add it to the list.
+            if (!count(neighbourTerritories.begin(), neighbourTerritories.end(), neighbour))
+
+                // If it already belongs to us then we dont have to attack it.
+                if (neighbour->getOwner() != this)
+                    neighbourTerritories.push_back(neighbour);
+        }
+    }
+
+    return neighbourTerritories;
 }
 
 //returns a list of territories to defend
@@ -122,84 +190,44 @@ vector<Territory *> Player::toDefend()
 void Player::issueOrder(string order, string details)
 {
     //TODO: delete?
-//    Order* o = new Order(order, details);
-//    orderList->add(o);
+    //    Order* o = new Order(order, details);
+    //    orderList->add(o);
 }
 
 //adds order to a player's list of orders
-void Player::issueOrder(Order* o)
+void Player::issueOrder(Order *o)
 {
-    vector<Territory*> attackableTerritories = vector<Territory*>();
-
-    //Get the players territories
-    for (Territory* territory : territories)
-    {
-        //add them to the attackable Territories if they have an army on them
-        if(territory->getNumberOfArmies() > 0)
-            attackableTerritories.push_back(territory);
-    }
-
-
-    for (Territory* territory : attackableTerritories)
-    {
-        
-        cout << "the neighbours of " << territory->getName() << " are as follows:\n";
-        for (Territory* neighbour : territory->getNeighbors())
-        {
-            cout << neighbour->getName() << "\n";
-        }
-    }
-
-
-    // As long as the player has armies still to deploy
-    while(reinforcementPool != 0)
-    {
-        // it will issue a deploy order and no other order.
-        if(o->getCommand() != "deploy"){
-            cout << "Since there are still reinforcements in this players pool, you must places all arimies first.\n"
-            << "There are " << reinforcementPool << " orders remaining \n";
-
-            Deploy* deployOrder = new Deploy("armies",this);
-            orderList->add(deployOrder);
-        }
-    }
-
-
-    // The player issues advance orders
-    if(o->getCommand() == "advance"){
-
-        // move armies from one of its own territory to the other in order to defend them
-
-
-        // move armies from one of its territories to a neighboring enemy territory to attack them 
-    }
-
-
     orderList->add(o);
-    
 }
 
-Hand *Player::getHand() {
+Hand *Player::getHand()
+{
     return hand;
 }
 
-vector<Territory *> Player::getTerritories() {
+vector<Territory *> Player::getTerritories()
+{
     return territories;
 }
 
-string Player::getName() {
+string Player::getName()
+{
     return name;
 }
 
-OrderList *Player::getOrderList() {
+OrderList *Player::getOrderList()
+{
     return orderList;
 }
 
-void Player::setTerritories(vector<Territory *> terr) {
+void Player::setTerritories(vector<Territory *> terr)
+{
     territories = terr;
+    prevTerritorySize = territories.size();
 }
 
-void Player::setCards(Hand *pHand) {
+void Player::setCards(Hand *pHand)
+{
     hand = pHand;
 }
 
@@ -207,8 +235,77 @@ void Player::setCards(Hand *pHand) {
 void Player::printOrders()
 {
     cout << "\nPlayer: " << name << " Has the following ordered queued\n";
-    for(Order* o : orderList->getList())
+    for (Order *o : orderList->getList())
     {
         cout << *o << "\n";
     }
+}
+
+int Player::getTerritorySize()
+{
+    return this->getTerritories().size();
+}
+
+int Player::getPrevTerritorySize()
+{
+    return prevTerritorySize;
+}
+
+void Player::setPrevTerritorySize()
+{
+    prevTerritorySize = territories.size();
+}
+
+void Player::addToPriorityAttack(Territory *toAdd)
+{
+    priorityAttacking.push(toAdd);
+}
+
+void Player::addToPriorityDefend(Territory *toAdd)
+{
+    priorityDefending.push(toAdd);
+}
+
+priority_queue<Territory *, vector<Territory *>, compareArmySize> Player::getPriorityAttacking()
+{
+    return priorityAttacking;
+}
+priority_queue<Territory *, vector<Territory *>, compareArmySize> Player::getPriorityDefending()
+{
+    return priorityDefending;
+}
+
+bool Player::isDoneIssuing()
+{
+    return doneIssuing;
+}
+void Player::toggleDoneIssuing()
+{
+    if (doneIssuing == true)
+        doneIssuing = false;
+    else
+        doneIssuing = true;
+}
+
+int Player::getReinforcementPool()
+{
+    return reinforcementPool;
+}
+
+void Player::setReinforcementPool(int val)
+{
+    reinforcementPool = val;
+}
+
+Territory *Player::popPriorityDefend()
+{
+    Territory *p = priorityDefending.top();
+    priorityDefending.pop();
+    return p;
+}
+Territory *Player::popPriorityAttack()
+{
+    Territory *p = priorityAttacking.top();
+    priorityAttacking.pop();
+    return p;
 }

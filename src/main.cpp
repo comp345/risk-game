@@ -2,18 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h> // need for rand() function
-#include "Orders.h"
+#include "GameEngine.h" // NEEDED
+#include "Orders.h" // NEEDED
 #include "Player.h"
 #include "Map.h"
 #include "Orders.h"
 #include "Card.h"
-#include "GameEngine.h"
 
 using namespace std;
 using namespace A2;
 
-// int main(int, char **)
-// {
+int main(int, char **)
+{
 //     srand(time(NULL));
 //     /* A1 : GameEngine */
 //     // GameEngine engine;
@@ -37,7 +37,8 @@ using namespace A2;
 //     /* A2 : Testing AirLift exec */
 //     // testAirliftExec();
 
-//     /* A2 : Testing GameLoop */
-//     // GameEngine::testGameEngine();
-//     return 0;
-// }
+    // /* A2 : Testing GameLoop */
+    GameEngine::testGameEngine();
+
+    return 0;
+}
