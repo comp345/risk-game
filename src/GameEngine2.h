@@ -4,15 +4,13 @@
 #include <string>
 #include <vector>
 #include "LoggingObserver.h"
-#include "CommandProcessor.h"
-
 #include "Player.h"
+#include "CommandProcessor.h"
 /* The states and transitions are stored in a linked list like structure */
 
 // States are Nodes in the game flow
 
 class Transition;
-
 class GameEngine;
 
 class CommandProcessor;

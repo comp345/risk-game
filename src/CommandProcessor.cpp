@@ -1,12 +1,11 @@
 #include <iostream>
 #include <string>
-#include <iostream>
 #include <fstream>
 #include <vector>
-#include "CommandProcessor.h"
+#include "GameEngine2.h"
 
 using namespace std;
-
+class State;
 
 Command::Command()
 {
