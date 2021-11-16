@@ -2,6 +2,7 @@
 #include "GameEngine.h"
 #include "Orders.h"
 #include <iostream>
+#include "CommandProcessor.h"
 #include <string.h>
 
 using namespace std;
@@ -16,14 +17,22 @@ void testLogging()
 
     // transition engine to next state
     engine->doTransition("loadmap"); // current state is "start". valid transition is "loadmap"
-
+    //------------------
     OrderList* ol = new OrderList();
     Deploy* deployOrder = createDeployOrder();
     ol->attach(observer);
     ol->add(deployOrder);
-
+    //------------------
     deployOrder->attach(observer);
     deployOrder->execute();
+    //------------------
+    Command* command = new Command("loadmap", "map is loaded");
+    command->attach(observer);
+    command->saveEffect("loadmap");
+    //------------------
+    CommandProcessor* cp = new CommandProcessor();
+    cp->attach(observer);
+    cp->saveCommand(command);
 
     delete engine;
     delete observer;
@@ -40,7 +49,6 @@ Deploy * createDeployOrder() {
     map4->validate();
 
     vector<Territory *> europeTerritories = map4->getTerritories();
-    int numberOfTerritoryInEurope = map4->getTerritorySize();
     Territory *t1 = europeTerritories.at(0);
 
     // To create a valid territory, need to specify owner and number of armies (if territory is conquered)
@@ -51,36 +59,6 @@ Deploy * createDeployOrder() {
     Deploy *d1 = new Deploy(army, p1, t1);
     return d1;
 }
-
-//std::string checkCliArgs(int argNumber,char *argv[])
-//{
-//    string fileName = "";
-//
-//    for (int i = 0; i < argNumber; ++i)
-//    {
-//        // Not that nice but assumes argv[2] is a file
-//        if(argv[1] && (strcmp(argv[i],"-f")) && argv[2])
-//        {
-//            fileName = argv[2];
-//        }
-//    }
-//    return fileName;
-//}
-//
-//void testCommandProcessor(int argc, char *argv[])
-//{
-//    string fileName = checkCliArgs(argc, argv);
-//    if(fileName.empty())
-//    {
-//        GameEngine engine;
-//        engine.testGameEngine();
-//    }
-//    else
-//    {
-//        GameEngine engine{fileName};
-//        engine.testGameEngine();
-//    }
-//}
 
 int main()
 {

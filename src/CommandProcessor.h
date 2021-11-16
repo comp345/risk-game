@@ -33,7 +33,6 @@ class CommandProcessor : public ILoggable, public Subject
 protected:
     std::vector<Command *> commands;
     virtual std::string readCommand(State*& currentState); //Get console arg
-    void saveCommand(Command* c); // save Command in commands
 private:
     State *currentState;
 public:
@@ -46,6 +45,7 @@ public:
     virtual Command* getCommand(State*& currentState); // Class driver, runs everything - input is a ref to currentState pointer
     std::string getCurrentStateName(State*& currentState);
     string stringToLog();
+    void saveCommand(Command* c); // save Command in commands
 };
 
 class FileCommandProcessorAdapter: virtual public CommandProcessor
