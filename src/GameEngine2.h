@@ -16,7 +16,6 @@
 
     private:
         State *currentState; 
-        State stateTracker;
         bool isFile;
         std::string fileName;
         std::vector<State *> states; // GameEngine maintains collection of all states
