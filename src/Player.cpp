@@ -364,3 +364,9 @@ Territory* Player::popPriorityDefend()
     priorityDefending.pop();
     return p;
 }
+Territory* Player::popPriorityAttack()
+{
+    Territory* p = priorityAttacking.top();
+    priorityAttacking.pop();
+    return p;
+}

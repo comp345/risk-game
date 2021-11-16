@@ -560,22 +560,21 @@ void GameEngine::issueOrdersPhase()
                 Deploy *deploy = new Deploy(1, currentPlayers.at(i), territoryTarget);
                 cout << "Issueing: " << deploy->getDetails() << endl;
                 currentPlayers.at(i)->issueOrder(deploy);
-                // Pop territory from queue
+                /* To do for A3: Able to use same territory in deploy order for advance (add stack to store popped defending territory?) */
                 currentPlayers.at(i)->popPriorityDefend();
             }
-            else if (currentPlayers.at(i)->getPriorityDefending().size() > 0)
+            else
+            if (currentPlayers.at(i)->getPriorityDefending().size() > 0 and currentPlayers.at(i)->getPriorityAttacking().size() > 0)
             {
                 // (3) Advance
-                // Player *currentPlayer = currentPlayers.at(i);
-                // Territory * territorySource = currentPlayer->getPriorityDefending().top();
-                // Territory *territoryTarget = currentPlayer->getPriorityAttacking().top();
-                // Advance* advance = new Advance(1, currentPlayer, territorySource, territoryTarget);
-                // cout << "Issueing! " << advance->getDetails() << endl;
-                // currentPlayer->issueOrder(advance);
-
-                // // Pop territory from queue
-                // currentPlayer->getPriorityDefending().pop();
-                // currentPlayer->getPriorityAttacking().pop();
+                Player *currentPlayer = currentPlayers.at(i);
+                Territory *territorySource = currentPlayer->getPriorityDefending().top();
+                Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
+                Advance *advance = new Advance(1, currentPlayer, territorySource, territoryTarget);
+                cout << "Issueing! " << advance->getDetails() << endl;
+                currentPlayer->issueOrder(advance);
+                currentPlayer->popPriorityAttack();
+                currentPlayer->popPriorityDefend();
             }
             else
             {
@@ -583,7 +582,7 @@ void GameEngine::issueOrdersPhase()
             }
 
             // After a player issue one order, check if reinforcementPool 0 or queues empty
-            if (currentPlayers.at(i)->getPriorityDefending().size() == 0) //currentPlayers.at(i)->getPriorityAttacking().size() == 0 &&
+            if (currentPlayers.at(i)->getPriorityDefending().size() == 0 or currentPlayers.at(i)->getPriorityAttacking().size() == 0)
                 currentPlayers.at(i)->toggleDoneIssuing();
         }
     }
