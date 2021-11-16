@@ -3,11 +3,12 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
-#include "GameEngine2.h"
 #include "Map.h"
 #include "Player.h"
 #include "Orders.h"
 #include "Card.h"
+
+#include "GameEngine.h"
 
 using namespace std;
 
@@ -210,9 +211,16 @@ bool GameEngine::doTransition(string command)
         if (currentState->transitions.at(i)->nameTransition == command)
         {
             currentState = currentState->transitions.at(i)->nextState;
+            notify(this);
             return true;
         }
     }
+    // cout << "DEBUG: Current State " << getCurrentStateName() << endl;
+    // for (vector<std::string>::iterator it = getNextTransitions().begin();
+    //      it != getNextTransitions().end(); ++it)
+    // {
+    //     cout << " Transition " << (*it) << endl;
+    // }
     return false;
 }
 
@@ -348,9 +356,8 @@ void GameEngine::testGameEngine()
     }
 }
 
-string GameEngine::stringToLog()
-{
-    return "TODO";
+string GameEngine::stringToLog() {
+    return "GameEngine transitioned to a new state:" + currentState->nameState;
 }
 
 void GameEngine::mainGameLoop()
@@ -567,7 +574,7 @@ void GameEngine::issueOrdersPhase()
                 // For A3? Add ability to play cards altho we can see create advance orders
                 // (2) Card
                 Player *currentPlayer = currentPlayers.at(i);
-
+                
 
             }
 

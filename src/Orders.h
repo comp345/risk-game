@@ -61,11 +61,10 @@ private:
 public:
     Deploy();
     Deploy(std::string details); // don't use (A1 legacy)
-    Deploy(string orderdetails, Player* p);
+    Deploy(string orderdetails, Player *p);
     Deploy(int armies, Player *player, Territory *territory); // Alexander wrote implementation for it
-    Deploy(const Deploy &d); // Deep copy. Use for value semantics (pass/return by value). Don't use to create orders to execute
+    Deploy(const Deploy &d);                                  // Deep copy. Use for value semantics (pass/return by value). Don't use to create orders to execute
     ~Deploy();
-    // Shallow copy. Reference semantics
     Deploy &operator=(const Deploy &d);
 
     // friend std::ostream& operator<<(std::ostream& out, const Deploy& d);
@@ -87,17 +86,19 @@ class Advance : public Order
 {
 private:
     int armiesToMove;
-    Player* playerAdvancing;
-    Territory* territorySource;
-    Territory* territoryTarget;
+    Player *playerAdvancing;
+    Territory *territorySource;
+    Territory *territoryTarget;
+
 public:
     Advance();
-    Advance(std::string details); // don't use
-    Advance(int armies, Player* player, Territory* src, Territory* target);
+    // DO NOT USE
+    Advance(std::string details);
+    Advance(int armies, Player *player, Territory *src, Territory *target);
     Advance(const Advance &a);
     ~Advance();
 
-    Advance& operator=(const Advance& a);
+    Advance &operator=(const Advance &a);
 
     int getArmies() const;
     Player *getPlayer() const;
@@ -110,20 +111,33 @@ public:
     void updateDetails();
 
     bool validate();
-    // return true if there is a bonus
-    bool execute(); 
+    // return true if there is a bonusF
+    bool execute();
     // return true if win
-    bool simulateAttack(); 
+    bool simulateAttack();
     string stringToLog() override;
 };
 
 class Bomb : public Order
 {
+private:
+    Player *playerBombing;
+    Territory *territoryTarget;
+
 public:
     Bomb();
+    // DO NOT USE (A1 legacy)
     Bomb(std::string details);
-    // Copu constructor to-do
+    Bomb(Player *player, Territory *territory);
     Bomb(const Bomb &b);
+    ~Bomb();
+    Bomb &operator=(const Bomb &b);
+
+    Player *getPlayer() const;
+    Territory *getTerritory() const;
+    void setPlayer(Player *p);
+    void setTerritory(Territory *t);
+    void updateDetails();
 
     bool validate();
     bool execute();
@@ -141,12 +155,34 @@ public:
     bool execute();
     string stringToLog() override;
 };
+/** TODO:  In issueOrderPhase, AirLift only created when AIRLIFT Card is played */
 class AirLift : public Order
 {
+private:
+    int armiesToMove;
+    Player *playerAirlifting;
+    Territory *territorySource;
+    Territory *territoryTarget;
+
 public:
     AirLift();
+    // DO NOT USE
     AirLift(std::string details);
+    AirLift(int armies, Player *player, Territory *src, Territory *target);
     AirLift(const AirLift &a);
+    ~AirLift();
+
+    AirLift &operator=(const AirLift &a);
+
+    int getArmies() const;
+    Player *getPlayer() const;
+    Territory *getTerritorySource() const;
+    Territory *getTerritoryTarget() const;
+    void setArmies(int armies);
+    void setPlayer(Player *p);
+    void setTerritorySource(Territory *t);
+    void setTerritoryTarget(Territory *t);
+    void updateDetails();
 
     bool validate();
     bool execute();
@@ -211,3 +247,7 @@ void testAssignmentOperator();
 void testDeployExec();
 
 void testAdvanceExec();
+
+void testAirliftExec();
+
+void testBombExec();

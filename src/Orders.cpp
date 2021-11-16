@@ -130,7 +130,8 @@ Deploy::Deploy() : Order("Deploy type", ""), armiesToMove(0),
 Deploy::Deploy(string orderdetails) : Order("Deploy type", orderdetails)
 {
 }
-Deploy::Deploy(string orderdetails, Player* p) : Deploy(orderdetails)
+/** TODO:  TO INTEGRATE IN THE ACTUAL METHOD */
+Deploy::Deploy(string orderdetails, Player *p) : Deploy(orderdetails)
 {
     playerDeploying->setReinforcementPool(playerDeploying->getReinforcementPool() - 1);
 }
@@ -217,7 +218,7 @@ bool Deploy::execute()
 {
     if (!validate()) // if invalid order
     {
-        cout << "Invalide Deploy order. Exit of Deploy::execute" << endl;
+        cout << "Invalid Deploy order. Exit of Deploy::execute" << endl;
         // Note about the Logger: do we notify if the order is invalid?
         return false;
     }
@@ -314,6 +315,7 @@ Advance &Advance::operator=(const Advance &a)
     return *this;
 }
 
+/** TODO: Check if src and target are adjacent   */
 bool Advance::validate()
 {
     cout << "Debug: Validate Advance order." << endl;
@@ -334,6 +336,8 @@ bool Advance::execute()
         return false;
     }
     cout << "Debug: Execute Advance order.";
+
+    // Case 1
     if (getTerritoryTarget()->getOwner() == playerAdvancing)
     {
         // if target belong to player, basically deploy src -> target
@@ -353,6 +357,7 @@ bool Advance::execute()
             return false;
         }
     }
+    // Case 2
     else
     {
         // if target belong to enemy...
@@ -376,10 +381,11 @@ bool Advance::execute()
     return bonus;
 }
 // Return true if win
+// Note: simulateAttack modifies the number of armies being advanced, as they are killed
 bool Advance::simulateAttack()
 {
     cout << "Attacking enemy!" << endl;
-    /** TODO: Implement randomized battle result
+    /** DONE: Implement randomized battle result
      * Attacking army and Defending alternate their attack on each other
      * Attacking army -> Defending army: each unit has 60% chance to kill
      * Defending army -> Attacking army: each unit has 70% chance to kill
@@ -429,7 +435,7 @@ bool Advance::simulateAttack()
         territoryTarget->setOwner(this->getPlayer());
     }
 
-    updateDetails();
+    updateDetails(); // Advance order is modified
     return win;
 }
 
@@ -469,29 +475,87 @@ string Advance::stringToLog()
     return "TODO";
 }
 
-Bomb::Bomb() : Order("Bomb type", "")
+Bomb::Bomb() : Order("Bomb type", ""), playerBombing(new Player), territoryTarget(new Territory)
 {
 }
+// DO NOT USE (A1 Legacy)
 Bomb::Bomb(string orderdetails) : Order("Bomb type", orderdetails)
 {
 }
-Bomb::Bomb(const Bomb &b)
+Bomb::Bomb(Player *player, Territory *territory)
 {
-    Bomb cpyBomb = b;
-    setCommand(cpyBomb.getCommand());
-    setDetails(cpyBomb.getDetails());
+    playerBombing = player;
+    territoryTarget = territory;
+    string _command = "Bomb type";
+    setCommand(_command);
+    updateDetails();
 }
-// Fake validate and execute methods to implement later
+
+Bomb::Bomb(const Bomb &b) : Order(b.getCommand(), b.getDetails()), playerBombing(new Player(*b.getPlayer())),
+                            territoryTarget(new Territory(*b.getTerritory()))
+{
+}
+Bomb::~Bomb()
+{
+    delete playerBombing;
+    delete territoryTarget;
+}
+Bomb &Bomb::operator=(const Bomb &b)
+{
+    Order::operator=(b); // self-assign guard + assign base fields
+    if (playerBombing)
+        delete playerBombing;
+    if (territoryTarget)
+        delete territoryTarget;
+
+    this->playerBombing = new Player(*b.getPlayer());
+    this->territoryTarget = new Territory(*b.getTerritory());
+    return *this;
+}
+
+/** TODO: Check adjacency of target to at least one territory of player! */
 bool Bomb::validate()
 {
-    cout << "Validate Bomb order.";
+    cout << "Validate Bomb order." << endl;
+    // TODO: Check adjacency
+    // Check if target territory is enemy's
+    if (getTerritory()->getOwner() == playerBombing)
+        return false;
+
     return true;
 }
 bool Bomb::execute()
 {
+    if (!validate())
+    {
+        cout << "Invalid Bomb order." << endl;
+        return false;
+    }
     cout << "Execute Bomb order.";
+    getTerritory()->setNumberOfArmies(
+        getTerritory()->getNumberOfArmies() / 2);
+
     notify(this);
     return true;
+}
+
+Player *Bomb::getPlayer() const { return playerBombing; }
+Territory *Bomb::getTerritory() const { return territoryTarget; }
+void Bomb::setPlayer(Player *p)
+{
+    playerBombing = p;
+    updateDetails();
+}
+void Bomb::setTerritory(Territory *t)
+{
+    territoryTarget = t;
+    updateDetails();
+}
+void Bomb::updateDetails()
+{
+    string _desc = getCommand() + " = {" + getPlayer()->getName() + " bombs " +
+                   getTerritory()->getName() + "}.";
+    setDetails(_desc);
 }
 
 string Bomb::stringToLog()
@@ -529,28 +593,117 @@ string Blockade::stringToLog()
     return "TODO";
 }
 
-AirLift::AirLift() : Order("Airlift type", "")
+AirLift::AirLift() : Order("Airlift type", ""), armiesToMove(0),
+                     playerAirlifting(new Player), territorySource(new Territory), territoryTarget(new Territory)
 {
 }
+// DO NOT USE (A1 legacy code)
 AirLift::AirLift(string orderdetails) : Order("AirLift type", orderdetails)
 {
 }
-AirLift::AirLift(const AirLift &a)
+AirLift::AirLift(int armies, Player *player, Territory *src, Territory *target)
 {
-    AirLift cpyAirLift = a;
-    setCommand(cpyAirLift.getCommand());
-    setDetails(cpyAirLift.getDetails());
+    armiesToMove = armies;
+    playerAirlifting = player;
+    territorySource = src;
+    territoryTarget = target;
+    string _command = "AirLift type";
+    setCommand(_command);
+    updateDetails();
 }
+AirLift::AirLift(const AirLift &a) : Order(a.getCommand(), a.getDetails()),
+                                     armiesToMove(a.getArmies()), playerAirlifting(new Player(*a.getPlayer())),
+                                     territorySource(new Territory(*a.getTerritorySource())), territoryTarget(new Territory(*a.getTerritoryTarget()))
+{
+}
+AirLift::~AirLift()
+{
+    delete playerAirlifting;
+    delete territorySource;
+    delete territoryTarget;
+}
+
+AirLift &AirLift::operator=(const AirLift &a)
+{
+    Order::operator=(a);
+    this->armiesToMove = a.getArmies();
+    if (playerAirlifting)
+        delete playerAirlifting;
+    if (territorySource)
+        delete territorySource;
+    if (territoryTarget)
+        delete territoryTarget;
+
+    this->playerAirlifting = new Player(*a.getPlayer());
+    this->territorySource = new Territory(*a.getTerritorySource());
+    this->territoryTarget = new Territory(*a.getTerritoryTarget());
+
+    return *this;
+}
+
 bool AirLift::validate()
 {
-    cout << "Validate AirLift order.";
+    cout << "Validate AirLift order." << endl;
+    if (getTerritorySource()->getOwner() != playerAirlifting ||
+        getTerritoryTarget()->getOwner() != playerAirlifting)
+        return false; // Only airlift from and to own territories
     return true;
 }
+
 bool AirLift::execute()
 {
     cout << "Execute AirLift order.";
+    if (!validate())
+    {
+        cout << "Debug: Invalid AirLift order." << endl;
+        return false;
+    }
+    // Check if armiesToMove ≤ number of armies on territory source
+    if (getArmies() > getTerritorySource()->getNumberOfArmies())
+    {
+        cout << "Debug: Invalid number of armies to AirLift" << endl;
+        return false;
+    }
+    // Remove army units from source and AirLift army units to target
+    getTerritorySource()->setNumberOfArmies(
+        getTerritorySource()->getNumberOfArmies() - getArmies());
+    getTerritoryTarget()->setNumberOfArmies(
+        getTerritoryTarget()->getNumberOfArmies() + getArmies());
+
+    updateDetails();
     notify(this);
     return true;
+}
+
+int AirLift::getArmies() const { return armiesToMove; }
+Player *AirLift::getPlayer() const { return playerAirlifting; }
+Territory *AirLift::getTerritorySource() const { return territorySource; }
+Territory *AirLift::getTerritoryTarget() const { return territoryTarget; }
+void AirLift::setArmies(int armies)
+{
+    armiesToMove = armies;
+    updateDetails();
+}
+void AirLift::setPlayer(Player *p)
+{
+    playerAirlifting = p;
+    updateDetails();
+}
+void AirLift::setTerritorySource(Territory *t)
+{
+    territorySource = t;
+    updateDetails();
+}
+void AirLift::setTerritoryTarget(Territory *t)
+{
+    territoryTarget = t;
+    updateDetails();
+}
+void AirLift::updateDetails()
+{
+    string _desc = getCommand() + " = {" + getPlayer()->getName() + " airlifts " +
+                   to_string(getArmies()) + " army units from " + getTerritorySource()->getName() + " to " + getTerritoryTarget()->getName() + "}.";
+    setDetails(_desc);
 }
 
 string AirLift::stringToLog()
@@ -597,7 +750,7 @@ OrderList::OrderList()
 // To Review (deep copy, see getList)
 OrderList::OrderList(const OrderList &ol)
 {
-    list = vector<Order*>();
+    list = vector<Order *>();
     list = ol.list;
 }
 OrderList::~OrderList()

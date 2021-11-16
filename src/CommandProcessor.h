@@ -2,8 +2,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "LoggingObserver.h"
 
-class Command
+class Command : public ILoggable, public Subject
 {
 private:
     std::string nameCommand;
@@ -15,9 +16,11 @@ public:
     ~Command();
     std::string getNameCommand();
     void setNameCommand(std::string name);
+    void saveEffect();
+    string stringToLog();
 };
 
-class CommandProcessor
+class CommandProcessor : public ILoggable, public Subject
 {
 private:
     std::vector<Command *> commands;
@@ -25,8 +28,8 @@ private:
     void saveCommand(Command c); // save Command in commands
 public:
     Command *getCommand();
-    void saveEffect(Command c); // storing string (command effect) after command is executed in GameEngine::doTransition()
     bool validate(Command c);
+    string stringToLog();
 };
 
 class FileCommandProcessorAdapter
