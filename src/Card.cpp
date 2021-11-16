@@ -43,10 +43,13 @@ Card::~Card()
 // Then removes that card from the deck
 void Card::play(Player& player, Deck& deck)
 {
-    player.issueOrder(Order::getOrder());
+    // A1 implementation 
+
+    // player.issueOrder(Order::getOrder());
     deck.returnCard(this);
-    cout << "\n" << m_effect << " was played by " << player.getName() << "\n";
+    // cout << "\n" << m_effect << " was played by " << player.getName() << "\n";
 }
+
 
 Card::Effect* Card::getEffect()
 {

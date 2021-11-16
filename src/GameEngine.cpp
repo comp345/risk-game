@@ -356,7 +356,8 @@ void GameEngine::testGameEngine()
     }
 }
 
-string GameEngine::stringToLog() {
+string GameEngine::stringToLog()
+{
     return "GameEngine transitioned to a new state:" + currentState->nameState;
 }
 
@@ -544,7 +545,36 @@ void GameEngine::issueOrdersPhase()
             cout << "\nGameEngine:: Player: " << currentPlayers.at(i)->getName() << " is currently in the issue order phase.\n";
 
             if (currentPlayers.at(i)->isDoneIssuing())
+            {
+
+                // When done issuing orders, start issuing 1 card order per turn until both player are done...
+                // flawed but will demo how to create special order
+                Player *player = currentPlayers.at(i);
+                cout << "DEBUG: Player " << player->getName() << " wants to play card..." << endl;
+                if (player->getHand()->getCards().size() > 0)
+                {
+                    Territory *territorySrc = new Territory;
+                    Territory *territoryTarget = new Territory;
+                    if (player->getPriorityDefending().size() > 0)
+                    {
+                        territorySrc = new Territory(*(player->getPriorityDefending().top()));
+                        player->popPriorityDefend();
+                    } else { territorySrc = nullptr; }
+                    if (player->getPriorityAttacking().size() > 0)
+                    {
+                        territoryTarget = new Territory(*(player->getPriorityAttacking().top()));
+                        player->popPriorityAttack();
+                    } else { territoryTarget = nullptr; }
+                    Card *lastCard = player->getHand()->useLast();
+                    cout << " ... played a card... " << endl;
+                    Player &playerRef = *player;
+                    Deck &deckRef = *deck;
+                    lastCard->play(playerRef, deckRef);
+                    createOrderFromCard(lastCard, player, territorySrc, territoryTarget);
+                }
+
                 continue;
+            }
 
             // (1) Deploy: until reinforc pool == 0
             if (currentPlayers.at(i)->getReinforcementPool() > 0)
@@ -574,8 +604,6 @@ void GameEngine::issueOrdersPhase()
                 // For A3? Add ability to play cards altho we can see create advance orders
                 // (2) Card
                 Player *currentPlayer = currentPlayers.at(i);
-                
-
             }
 
             // After a player issue one order, check if reinforcementPool 0 or queues empty
@@ -585,9 +613,38 @@ void GameEngine::issueOrdersPhase()
     }
 }
 
-Order *GameEngine::createOrderFromCard(Card *card)
+Order *GameEngine::createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget)
 {
-    return NULL;
+    string checkTypeCard = card->getCommand();
+
+    if (checkTypeCard == "Airlift type")
+    {
+        if (!territoryTarget or !territorySrc)
+            throw "invalid special order (GameEngine::createOrderFromCard)";
+        return new AirLift(1, player, territorySrc, territoryTarget);
+    }
+
+    if (checkTypeCard == "Bomb type")
+    {
+        if (!territoryTarget)
+            throw "invalid special order (GameEngine::createOrderFromCard)";
+        return new Bomb(player, territoryTarget);
+    }
+    if (checkTypeCard == "Blockade type")
+    {
+        Blockade *b = new Blockade();
+        b->setDetails("Debugging creating Blockade order from card!");
+        return b;
+    }
+    if (checkTypeCard == "Negotiate type")
+    {
+        Negotiate *n = new Negotiate();
+        n->setDetails("Debugging creating Negotiate order from card!");
+        return n;
+    }
+
+    else
+        return NULL;
 }
 
 bool hasOrders(vector<Player *> currentPlayers)

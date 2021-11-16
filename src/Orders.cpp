@@ -569,7 +569,7 @@ Blockade::Blockade() : Order("Blockade type", "")
 Blockade::Blockade(string orderdetails) : Order("Blockade type", orderdetails)
 {
 }
-Blockade::Blockade(const Blockade &b)
+Blockade::Blockade(const Blockade &b) // USING IT FOR A2
 {
     Blockade cpyBlockade = b;
     setCommand(cpyBlockade.getCommand());
@@ -714,7 +714,7 @@ string AirLift::stringToLog()
 Negotiate::Negotiate() : Order("Negotiate type", "")
 {
 }
-Negotiate::Negotiate(string orderdetails) : Order("Negotiate type", orderdetails)
+Negotiate::Negotiate(string orderdetails) : Order("Negotiate type", orderdetails) // USING IT FOR A2
 {
 }
 Negotiate::Negotiate(const Negotiate &n)

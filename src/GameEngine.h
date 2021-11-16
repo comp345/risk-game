@@ -120,6 +120,8 @@ namespace A2
         void reinforcementPhase(Player *p);
         void issueOrdersPhase();
         void executeOrdersPhase();
+        Order* createOrderFromCard(Card *card, Player* player, Territory* territorySrc, Territory* territoryTarget);
+
 
         // Noah: Data members should be private and only accessed with public methods
         vector<Player *> currentPlayers;
@@ -128,7 +130,6 @@ namespace A2
         bool allPlayersDone();
         Player *hasWinner();
         void auditPlayers();
-        Order* createOrderFromCard(Card* card);
     };
 
 }
