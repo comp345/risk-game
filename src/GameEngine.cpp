@@ -557,13 +557,13 @@ void GameEngine::issueOrdersPhase()
                     Territory *territoryTarget = new Territory;
                     if (player->getPriorityDefending().size() > 0)
                     {
-                        territorySrc = new Territory(*(player->getPriorityDefending().top()));
-                        player->popPriorityDefend();
+                        territorySrc = player->popPriorityDefend();
+                        // player->popPriorityDefend();
                     } else { territorySrc = nullptr; }
                     if (player->getPriorityAttacking().size() > 0)
                     {
-                        territoryTarget = new Territory(*(player->getPriorityAttacking().top()));
-                        player->popPriorityAttack();
+                        territoryTarget = player->popPriorityAttack();
+                        // player->popPriorityAttack();
                     } else { territoryTarget = nullptr; }
                     Card *lastCard = player->getHand()->useLast();
                     cout << " ... played a card... " << endl;
