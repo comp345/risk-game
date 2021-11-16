@@ -41,12 +41,12 @@ public:
     CommandProcessor(std::string fileInput, State*& setState);
     ~CommandProcessor();
     bool validateCommand(State*& currentState, std::string command);
-    void printCommands();
+    virtual void printCommands();
     virtual Command* getCommand(State*& currentState); // Class driver, runs everything - input is a ref to currentState pointer
     std::string getCurrentStateName(State*& currentState);
 };
 
-class FileCommandProcessorAdapter: CommandProcessor
+class FileCommandProcessorAdapter: public CommandProcessor
 {
     friend class FileLineReader; 
 private:
