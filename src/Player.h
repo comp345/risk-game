@@ -3,9 +3,6 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "Orders.h"
-#include "Card.h"
-#include "Map.h"
 #include <queue>
 
 class Territory;

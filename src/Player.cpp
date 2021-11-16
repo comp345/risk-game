@@ -3,6 +3,8 @@
 #include <iostream>
 #include <queue>
 #include <algorithm>
+#include "Orders.h"
+#include "Map.h"
 
 using namespace std;
 

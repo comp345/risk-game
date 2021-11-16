@@ -2,7 +2,6 @@
 #include <vector>
 #include <string>
 #include <iostream>
-// #include "Player.h"
 #include "Map.h"
 #include "LoggingObserver.h"
 

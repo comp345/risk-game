@@ -50,8 +50,8 @@ Deploy * createDeployOrder() {
     Deploy *d1 = new Deploy(army, p1, t1);
     return d1;
 }
-
-int main()
-{
-    testLogging();
-}
+//
+//int main()
+//{
+//    testLogging();
+//}
