@@ -3,17 +3,28 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "Orders.hpp"
-#include "Card.h"
-#include "Map.h"
+#include <queue>
+// #include "LoggingObserver.h"
+// #include "Orders.h"
+// #include "Card.h"
+// #include "Map.h"
 
 class Territory;
 class Hand;
+class Order;
+class OrderList;
 
 using namespace std;
 
-class Player {
+struct compareArmySize
+{
+    bool operator()(Territory const* t1, Territory const* t2);
+};
+
+class Player
+{
 public:
+
     Player();
 
     Player(const Player &); //copy constructor
@@ -49,15 +60,42 @@ public:
 
     //operator overloading
     //assignment operator overloading
-    Player& operator=(const Player& p);
+    Player &operator=(const Player &p);
     //stream insertion operator overloading
-    friend ostream& operator<<(ostream& out, const Player& p);
-    friend istream& operator>>(istream& in, Player& p);
+    friend ostream &operator<<(ostream &out, const Player &p);
+    friend istream &operator>>(istream &in, Player &p);
+
+    int getTerritorySize();
+    int getPrevTerritorySize();
+    void setPrevTerritorySize();
+
+
+
+    void addToPriorityAttack(Territory *toAdd);
+    void addToPriorityDefend(Territory *toAdd);
+    Territory* popPriorityDefend();
+    Territory* popPriorityAttack();
+
+    priority_queue<Territory *, vector<Territory *>, compareArmySize> getPriorityAttacking();
+    priority_queue<Territory *, vector<Territory *>, compareArmySize> getPriorityDefending();
+
+    bool isDoneIssuing();
+    void toggleDoneIssuing();
+
+    int getReinforcementPool();
+    void setReinforcementPool(int val);
 
 private:
+    int reinforcementPool;
+    int prevTerritorySize;
+    priority_queue<Territory *, vector<Territory *>, compareArmySize> priorityAttacking;
+    priority_queue<Territory *, vector<Territory *>, compareArmySize> priorityDefending;
+
     string name;
     vector<Territory *> territories;
     Hand *hand;
     OrderList *orderList;
+
+    bool doneIssuing;
     int plArmies;
 };

@@ -28,32 +28,35 @@ public:
 
     Player* getOwner();
 
-    int getNeighbors();
+    vector<Territory*> getNeighbors();
 
     string getName();
 
     int getNumberOfArmies();
 
-    void setNeighbors(int n);
+    // void setNeighbors(int n);
 
     void setName(string n);
 
     void setOwner(Player* p);
 
     void setNumberOfArmies(int n);
+    void addNeighbor(Territory* t);
 
     //operators
     Territory &operator=(const Territory &t); //overloaded assignment operator
     friend std::ostream &operator<<(std::ostream &out, const Territory &t); //overloaded stream insertion operator
     friend std::istream &operator>>(std::istream &in, const Territory &t); //overloaded stream extraction operator
 
-
+    bool operator<(const Territory& rhs); 
+int numArmies = 0;
 private:
     int ID;
     string name;
     Player* owner;
-    int numArmies = 0;
-    int neighbors = 0;
+    
+    // int neighbors = 0;
+    vector<Territory*> neighbors;
 };
 
 struct Continent {
@@ -63,8 +66,8 @@ struct Continent {
     std::vector<Territory *> territories; //to show list of territories on creating a continent
 
     std::string name;
-    int numOfTerritories;
-    int numOfArmies;
+    int numOfTerritories;       //numOfTerritories DOES NOT RETURN CORRECT NUMBER
+    int controlBonus;
 };
 
 class Map {
@@ -126,3 +129,5 @@ private:
     bool containsHeader(std::fstream& infile, std::string header);
     bool mapStatus = true;
 }; 
+
+void testA2Map();

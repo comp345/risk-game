@@ -3,13 +3,14 @@
 #include <string>
 #include <vector>
 #include "GameEngine2.h"
+#include "LoggingObserver.h"
 
 class CommandProcessor;
 class FileCommandProcessorAdapter;
 class FileLineReader;
 class State;
 
-class Command
+class Command : public ILoggable, public Subject
 {
 private:
     std::string commandName;
@@ -23,9 +24,10 @@ public:
     void saveEffect(std::string commandEffect);
     void setCommandName(std::string name);
     std::string getCommandEffect();
+    string stringToLog();
 };
 
-class CommandProcessor
+class CommandProcessor : public ILoggable, public Subject
 {
     friend class GameEngine; //To let gameengine access stuff in here
 protected:
@@ -33,7 +35,7 @@ protected:
     virtual std::string readCommand(State*& currentState); //Get console arg
     void saveCommand(Command* c); // save Command in commands
 private:
-    State *currentState; 
+    State *currentState;
 public:
     std::string fileName;
     CommandProcessor();
@@ -43,24 +45,25 @@ public:
     virtual void printCommands();
     virtual Command* getCommand(State*& currentState); // Class driver, runs everything - input is a ref to currentState pointer
     std::string getCurrentStateName(State*& currentState);
+    string stringToLog();
 };
 
 class FileCommandProcessorAdapter: virtual public CommandProcessor
 {
-    friend class FileLineReader; 
+    friend class FileLineReader;
 private:
     FileLineReader* reader;
     std::string fileName;
     bool readFile;
-    std::vector<std::string> listOfCommands; 
+    std::vector<std::string> listOfCommands;
     std::string readCommand(std::string fileName, State*& currentState); // Overloaded version for adapter pattern
 public:
     FileCommandProcessorAdapter(std::string newFile);
     Command* getCommand(State*& currentState);
     std::string validateCommand(State*& currentState, std::vector<std::string> &commands);
 };
- 
-class FileLineReader 
+
+class FileLineReader
 {
     friend class FileCommandProcessorAdapter;
 private:

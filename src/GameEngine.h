@@ -5,15 +5,19 @@
 #include <vector>
 #include "LoggingObserver.h"
 #include "Player.h"
+#include "Map.h"
 #include "CommandProcessor.h"
-/* The states and transitions are stored in a linked list like structure */
+#include "Card.h"
 
+/* The states and transitions are stored in a linked list like structure */
+class Deck;
 // States are Nodes in the game flow
 
 class State;
 class Transition;
 class FileCommandProcessorAdapter;
 class CommandProcessor;
+// class GameEngine;
 
 class State
 {
@@ -117,7 +121,7 @@ public:
     bool validateCommand(std::string command);
 
     void testGameEngine();
-
+    void testPart3();
     string stringToLog() override;
 
     /* A2 */
@@ -142,13 +146,20 @@ public:
     // A2 Part 3
     void mainGameLoop();
 
-    void reinforcementPhase();
+    void reinforcementPhase(Player*);
 
     void issueOrdersPhase();
 
     void executeOrdersPhase();
 
-};
+        // Noah: Data members should be private and only accessed with public methods
+        vector<Player *> currentPlayers;
+        Deck* deck;
+        bool allPlayersDone();
+        Player *hasWinner();
+        void auditPlayers();
+        Order* createOrderFromCard(Card* card);
+    };
 
 class StartupPhase {
 private:
