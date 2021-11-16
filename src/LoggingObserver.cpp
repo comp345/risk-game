@@ -49,7 +49,10 @@ void LogObserver::update(ILoggable *iLoggable) {
 }
 
 LogObserver::LogObserver() {
-
+    ofstream logFile;
+    logFile.open("../gamelog.txt", std::ios_base::app);
+    logFile << "-------------------------" << endl;
+    logFile.close();
 }
 
 LogObserver::~LogObserver() {

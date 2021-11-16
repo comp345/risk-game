@@ -49,6 +49,7 @@ public:
     // To implement
     virtual bool validate() = 0;
     virtual bool execute() = 0;
+    string stringToLog() override;
 };
 
 class Deploy : public Order
@@ -79,7 +80,6 @@ public:
 
     bool validate();
     bool execute();
-    string stringToLog() override;
 };
 
 class Advance : public Order
@@ -115,7 +115,6 @@ public:
     bool execute();
     // return true if win
     bool simulateAttack();
-    string stringToLog() override;
 };
 
 class Bomb : public Order
@@ -141,7 +140,6 @@ public:
 
     bool validate();
     bool execute();
-    string stringToLog() override;
 };
 
 class Blockade : public Order
@@ -153,7 +151,6 @@ public:
 
     bool validate();
     bool execute();
-    string stringToLog() override;
 };
 /** TODO:  In issueOrderPhase, AirLift only created when AIRLIFT Card is played */
 class AirLift : public Order
@@ -186,7 +183,6 @@ public:
 
     bool validate();
     bool execute();
-    string stringToLog() override;
 };
 
 class Negotiate : public Order
@@ -199,7 +195,6 @@ public:
 
     bool validate();
     bool execute();
-    string stringToLog() override;
 };
 
 class OrderList : public ILoggable, public Subject

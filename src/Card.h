@@ -50,10 +50,6 @@ public:
 
     Card &operator=(const Card &rhs);
 
-    string stringToLog();
-    // string stringToLog() override; // TO OVERRIDE later
-
-
 protected:
     Effect *m_effect;
 
