@@ -7,7 +7,7 @@
 #include "Player.h"
 #include "Orders.h"
 #include "Card.h"
-
+#include <exception>
 #include "GameEngine.h"
 
 using namespace std;
@@ -258,6 +258,7 @@ void GameEngine::testGameEngine()
             if (isCommandValid)
             {
                 cout << "Valid command. Current state is: " << engine.getCurrentStateName() << endl;
+                
             }
             else
             {
@@ -265,8 +266,6 @@ void GameEngine::testGameEngine()
                 cout << "Invalid command. Replay current state: " << engine.getCurrentStateName() << endl;
             }
 
-            // Noah comment on part 3: why
-            // engine.currentState = new State("mapvalidated");
 
             if (engine.currentState->nameState == "mapvalidated")
             {
@@ -387,16 +386,10 @@ void GameEngine::mainGameLoop()
         deck->draw(*currentPlayers.at(1));
         deck->draw(*currentPlayers.at(1));
 
-        //dummy order
-        // Deploy *deployOrder = new Deploy("random order");
-        // currentPlayers.at(0)->getOrderList()->add(deployOrder);
-        // currentPlayers.at(0)->getOrderList()->add(deployOrder);
-        // currentPlayers.at(1)->getOrderList()->add(deployOrder);
-        // currentPlayers.at(1)->getOrderList()->add(deployOrder);
 
-        Territory *currentPlayerTerritory = currentPlayers.front()->getTerritories().front();
-        Advance *advanceOrder = new Advance(1, currentPlayers.front(), currentPlayers.front()->getTerritories().front(), currentPlayers.front()->getTerritories().back());
-        currentPlayers.front()->getOrderList()->add(advanceOrder);
+        // Territory *currentPlayerTerritory = currentPlayers.front()->getTerritories().front();
+        // Advance *advanceOrder = new Advance(1, currentPlayers.front(), currentPlayers.front()->getTerritories().front(), currentPlayers.front()->getTerritories().back());
+        // currentPlayers.front()->getOrderList()->add(advanceOrder);
 
         issueOrdersPhase();
     }
@@ -411,7 +404,17 @@ void GameEngine::mainGameLoop()
     if (winner != NULL)
     {
         currentState = new State("win");
-        cout << "\nPlayer " << winner->getName() << " won the game!\n";
+        cout << "\nPlayer " << winner->getName() << " won the game! Do you wish to replay? (y/n)\n";
+        string input;
+        cin >> input;
+        //If the user says yes then start at the first transition
+        if(input == "y"){
+            doTransition(transitions.at(0)->nameTransition);
+        }else if(input == "n"){
+            //Else break out the game.
+            doTransition(transitions.back()->nameTransition);
+        }
+             
     }
 
     // loop to check if a player should be removed from the game
@@ -451,13 +454,11 @@ Player *GameEngine::hasWinner()
 
 void GameEngine::reinforcementPhase(Player *p)
 {
-    // Check if player won territories in the last round. If yes, draw one card for each
-    // -> Player class needs prevTerritoriesSize() and currentTerritoriesSize()
+    // Check if player won territories in the last round. If yes, draw one card max
     int numConqueredTerritories = p->getTerritorySize() - p->getPrevTerritorySize();
-    for (int i = 0; i < numConqueredTerritories; ++i)
-    {
+    if (numConqueredTerritories > 0)
         deck->draw(*p);
-    }
+
     // update prevTerritorySize
     p->setPrevTerritorySize();
 
@@ -535,9 +536,6 @@ void GameEngine::issueOrdersPhase()
             p->addToPriorityDefend(toDefend);
         }
     }
-    // Round Robin
-    // no reinforcement
-    // empty
     while (!allPlayersDone())
     {
         for (int i = 0; i < currentPlayers.size(); i++)
@@ -548,7 +546,7 @@ void GameEngine::issueOrdersPhase()
             {
 
                 // When done issuing orders, start issuing 1 card order per turn until both player are done...
-                // flawed but will demo how to create special order
+                // flawed but will work
                 Player *player = currentPlayers.at(i);
                 cout << "DEBUG: Player " << player->getName() << " wants to play card..." << endl;
                 if (player->getHand()->getCards().size() > 0)
@@ -558,19 +556,34 @@ void GameEngine::issueOrdersPhase()
                     if (player->getPriorityDefending().size() > 0)
                     {
                         territorySrc = player->popPriorityDefend();
-                        // player->popPriorityDefend();
-                    } else { territorySrc = nullptr; }
+                    }
+                    else
+                    {
+                        territorySrc = nullptr;
+                    }
                     if (player->getPriorityAttacking().size() > 0)
                     {
                         territoryTarget = player->popPriorityAttack();
-                        // player->popPriorityAttack();
-                    } else { territoryTarget = nullptr; }
+                    }
+                    else
+                    {
+                        territoryTarget = nullptr;
+                    }
                     Card *lastCard = player->getHand()->useLast();
-                    cout << " ... played a card... " << endl;
                     Player &playerRef = *player;
                     Deck &deckRef = *deck;
-                    lastCard->play(playerRef, deckRef);
-                    createOrderFromCard(lastCard, player, territorySrc, territoryTarget);
+                    lastCard->play(playerRef, deckRef); // return card to deck
+
+                    try
+                    {
+                        // Method throws exception to handle
+                        createOrderFromCard(lastCard, player, territorySrc, territoryTarget);
+                        cout << " ... played a card... " << endl;
+                    }
+                    catch (std::exception e)
+                    {
+                        cout << "Cannot create special order from card (not enough resources)" << endl;
+                    }
                 }
 
                 continue;
@@ -599,12 +612,6 @@ void GameEngine::issueOrdersPhase()
                 currentPlayer->popPriorityAttack();
                 currentPlayer->popPriorityDefend();
             }
-            else
-            {
-                // For A3? Add ability to play cards altho we can see create advance orders
-                // (2) Card
-                Player *currentPlayer = currentPlayers.at(i);
-            }
 
             // After a player issue one order, check if reinforcementPool 0 or queues empty
             if (currentPlayers.at(i)->getPriorityDefending().size() == 0 or currentPlayers.at(i)->getPriorityAttacking().size() == 0)
@@ -619,27 +626,36 @@ Order *GameEngine::createOrderFromCard(Card *card, Player *player, Territory *te
 
     if (checkTypeCard == "Airlift type")
     {
+        cout << "... player desires to create an AirLift order by using a valid card!..." << endl;
         if (!territoryTarget or !territorySrc)
-            throw "invalid special order (GameEngine::createOrderFromCard)";
-        return new AirLift(1, player, territorySrc, territoryTarget);
+            throw std::exception();
+        AirLift *a = new AirLift(1, player, territorySrc, territoryTarget);
+        cout << a->getDetails() << endl;
+        return a;
     }
 
     if (checkTypeCard == "Bomb type")
     {
+        cout << "... player desires to create a Bomb order by using a valid card!..." << endl;
+
         if (!territoryTarget)
-            throw "invalid special order (GameEngine::createOrderFromCard)";
-        return new Bomb(player, territoryTarget);
+            throw std::exception();
+        Bomb * b = new Bomb(player, territoryTarget);
+        cout << b->getDetails() << endl;
+        return b;
     }
     if (checkTypeCard == "Blockade type")
     {
         Blockade *b = new Blockade();
         b->setDetails("Debugging creating Blockade order from card!");
+        cout << b->getDetails() << endl;
         return b;
     }
     if (checkTypeCard == "Negotiate type")
     {
         Negotiate *n = new Negotiate();
         n->setDetails("Debugging creating Negotiate order from card!");
+        cout << n->getDetails() << endl;
         return n;
     }
 
@@ -672,17 +688,18 @@ void GameEngine::executeOrdersPhase()
 
             cout << "GameEngine:: Player: " << currentPlayer->getName() << " is currently in the execute order phase.\n";
             //Check to see if that player has a deploy order
-            for (Order *order : currentPlayer->getOrderList()->getList())
-            {
-                // cout << order->getCommand() << "\n";
-                if (order->getCommand() == "Deploy type")
-                {
-                    hasDeploy = true;
-                    break;
-                }
-            }
+            // for (Order *order : currentPlayer->getOrderList()->getList())
+            // {
+            //     // cout << order->getCommand() << "\n";
+            //     if (order->getCommand() == "Deploy type")
+            //     {
+            //         hasDeploy = true;
+            //         break;
+            //     }
+            // }
 
-            if (hasDeploy = true)
+            //if (hasDeploy = true)
+            if (currentPlayer->getOrderList()->getList().at(0)->getCommand = "Deploy type")
             {
                 //Go through all the order
                 for (Order *order : currentPlayers.at(i)->getOrderList()->getList())
@@ -691,6 +708,7 @@ void GameEngine::executeOrdersPhase()
                     if (order->getCommand() == "Deploy type")
                     {
                         cout << "GameEngine:: Player: " << currentPlayer->getName() << " is issuing a deploy order.\n";
+                        cout << "==>" << order->getDetails() << endl;
                         order->execute();
                         played = true;
                         break;
@@ -709,6 +727,7 @@ void GameEngine::executeOrdersPhase()
                 {
                     //Play the other orders
                     cout << "GameEngine:: Player: " << currentPlayer->getName() << " is issuing a " << order->getCommand() << " order.\n";
+                    cout << "==>" << order->getDetails() << endl;
                     order->execute();
                     played = true;
                     break;
@@ -733,5 +752,5 @@ void GameEngine::executeOrdersPhase()
     // }
 
     //the main game loop goes back to the reinforcement phase
-    currentState = new State("assignreinforcement");
+    doTransition(transitions.at(7)->nameTransition);
 }
