@@ -563,8 +563,7 @@ void GameEngine::issueOrdersPhase()
                 /* To do for A3: Able to use same territory in deploy order for advance (add stack to store popped defending territory?) */
                 currentPlayers.at(i)->popPriorityDefend();
             }
-            else
-            if (currentPlayers.at(i)->getPriorityDefending().size() > 0 and currentPlayers.at(i)->getPriorityAttacking().size() > 0)
+            else if (currentPlayers.at(i)->getPriorityDefending().size() > 0 and currentPlayers.at(i)->getPriorityAttacking().size() > 0)
             {
                 // (3) Advance
                 Player *currentPlayer = currentPlayers.at(i);
@@ -578,7 +577,11 @@ void GameEngine::issueOrdersPhase()
             }
             else
             {
+                // For A3? Add ability to play cards altho we can see create advance orders
                 // (2) Card
+                Player *currentPlayer = currentPlayers.at(i);
+                
+
             }
 
             // After a player issue one order, check if reinforcementPool 0 or queues empty
