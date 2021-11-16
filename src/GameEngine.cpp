@@ -272,6 +272,7 @@ bool GameEngine::doTransition(string command)
         if (currentState->transitions.at(i)->nameTransition == command)
         {
             *currentState = *currentState->transitions.at(i)->nextState;
+            notify(this);
             return true;
         }
     }
@@ -535,10 +536,6 @@ void StartupPhase::startup() {
     //territory assignment
     cout << "Distributing territories to the players: \n" << endl;
     Map *map = eng->getMap();
-    for (vector<Territory *>::iterator it = map->territoryNodeList.begin(); it != map->territoryNodeList.end(); ++it) {
-        cout << " "
-             << (**it).getName();
-    }
     if (!map->territoryNodeList.empty()) {
         shuffle(begin(map->territoryNodeList), end(map->territoryNodeList), default_random_engine());
 

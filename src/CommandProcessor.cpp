@@ -94,6 +94,7 @@ void Command::saveEffect(string command)
         commandEffect = "Invalid command was entered - " + command;
         cout << "No effect - " << commandEffect << std::endl;
     }
+    notify(this);
 }
 
 CommandProcessor::CommandProcessor()
@@ -162,6 +163,7 @@ std::string CommandProcessor::readCommand(State*& currentState)
 void CommandProcessor::saveCommand(Command* c)
 {
     commands.push_back(c);
+    notify(this);
 }
 
 Command* CommandProcessor::getCommand(State*& currentState)
