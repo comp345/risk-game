@@ -6,7 +6,6 @@
 #include "GameEngine2.h"
 
 using namespace std;
-using namespace A2;
 
 int main(int, char **)
 {
