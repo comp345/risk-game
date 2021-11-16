@@ -28,8 +28,6 @@ Command::Command(const Command &c)
 
 Command::~Command()
 {
-    commandName = "";
-    commandEffect = "";
 }
 
 string Command::getCommandName()
@@ -41,7 +39,7 @@ void Command::setCommandName(string name)
     commandName = name;
 }
 
-string Command::getEffectName()
+string Command::getCommandEffect()
 {
     return this->commandEffect;
 }
@@ -52,43 +50,43 @@ void Command::saveEffect(string command)
     if(command == "loadmap")
     {
         commandEffect = "Map has been loaded!";
-        //cout << "The effect - " << commandEffect << std::endl; 
+        cout << "The effect - " << commandEffect << std::endl; 
 
     }
     else if(command == "validatemap")
     {
         commandEffect = "Map has been validated!";
-        //cout << "The effect - " << commandEffect << std::endl; 
+        cout << "The effect - " << commandEffect << std::endl; 
 
     }
     else if (command == "addplayer")
     {
         commandEffect = "Player added!";
-        //cout << "The effect - " << commandEffect << std::endl; 
+        cout << "The effect - " << commandEffect << std::endl; 
 
     }
     else if (command == "gamestart")
     {
         commandEffect = "Game Engine Started!";
-       // cout << "The effect - " << commandEffect << std::endl; 
+        cout << "The effect - " << commandEffect << std::endl; 
 
     }
     else if (command == "replay")
     {
         commandEffect = "Starting over";
-        //cout << "The effect - " << commandEffect << std::endl; 
+        cout << "The effect - " << commandEffect << std::endl; 
 
     }
     else if (command == "exit")
     {
         commandEffect = "Exiting...!";
-        //cout << "The effect - " << commandEffect << std::endl; 
+        cout << "The effect - " << commandEffect << std::endl; 
 
     }
     else
     {
         commandEffect = "Invalid command was entered - " + command;
-        //cout << "No effect - " << commandEffect << std::endl; 
+        cout << "No effect - " << commandEffect << std::endl; 
     }
 }
 
@@ -174,10 +172,11 @@ Command* CommandProcessor::getCommand(State*& currentState)
 // Prob going to be useful later
 void CommandProcessor::printCommands()
 {
+    cout << "Hitting the print";
     for(Command *i : commands) 
     {
         cout << "Command name: " << i->getCommandName() << endl;
-        cout << "Command effect: " << i->getEffectName() << endl;
+        cout << "Command effect: " << i->getCommandEffect() << endl;
     }
 }
 
@@ -203,7 +202,7 @@ std::string FileCommandProcessorAdapter::readCommand(std::string fileName, State
 
     if (!validatedCommand.empty())
     {
-        cout << "Valid command. Current state is: " << this->getCurrentStateName(currentState) <<  << endl;
+        cout << "Valid command. Current state is: " << this->getCurrentStateName(currentState)  << endl;
     }
     else
     {
@@ -252,7 +251,6 @@ FileLineReader::FileLineReader(std::string newFile)
 
 FileLineReader::~FileLineReader()
 {
-    fileName = "";
     listOfCommands = {};
 }
     

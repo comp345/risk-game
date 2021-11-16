@@ -24,7 +24,7 @@ std::string checkCliArgs(int argNumber,char *argv[])
     return fileName;
 }
 
-int main(int argc, char *argv[], char **)
+void testCommandProcessor(int argc, char *argv[])
 {
     string fileName = checkCliArgs(argc, argv);
     if(fileName.empty())
@@ -37,5 +37,9 @@ int main(int argc, char *argv[], char **)
         GameEngine engine{fileName};
         engine.testGameEngine();
     }
+}
+int main(int argc, char *argv[], char **)
+{
+    testCommandProcessor(argc, argv);
     return 0;
 }

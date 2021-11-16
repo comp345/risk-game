@@ -23,25 +23,25 @@ public:
     std::string getCommandName();
     void saveEffect(std::string commandEffect);
     void setCommandName(std::string name);
-    std::string getEffectName();
+    std::string getCommandEffect();
 };
 
 class CommandProcessor
 {
     friend class GameEngine; //To let gameengine access stuff in here
 protected:
+    std::vector<Command *> commands;
     virtual std::string readCommand(State*& currentState); //Get console arg
     void saveCommand(Command* c); // save Command in commands
 private:
-    std::vector<Command *> commands;
     State *currentState; 
-    void printCommands();
 public:
     std::string fileName;
     CommandProcessor();
     CommandProcessor(std::string fileInput, State*& setState);
     ~CommandProcessor();
     bool validateCommand(State*& currentState, std::string command);
+    void printCommands();
     virtual Command* getCommand(State*& currentState); // Class driver, runs everything - input is a ref to currentState pointer
     std::string getCurrentStateName(State*& currentState);
 };
@@ -59,7 +59,6 @@ public:
     FileCommandProcessorAdapter(std::string newFile);
     Command* getCommand(State*& currentState);
     std::string validateCommand(State*& currentState, std::vector<std::string> &commands);
-
 };
  
 class FileLineReader 

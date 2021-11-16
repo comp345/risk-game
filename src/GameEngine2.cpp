@@ -233,11 +233,13 @@ void GameEngine::testGameEngine()
             else if(output->getCommandName() == "quit")
                 exit(0);        
             cout << "\n";
-        
         }
-
+    cout << "\n";
+    cout << "Voila tous les commands: " << endl;
+    commandProcessor->printCommands();
     }
     else
+    {
         while(true)
         {
             output = fileAdapter->getCommand(currentState);
@@ -251,6 +253,10 @@ void GameEngine::testGameEngine()
                exit(0);
             cout << "\n";
         }
+    cout << "\n";
+    cout << "Voila tous les commands: " << endl;
+    fileAdapter->printCommands();
+    }
 }
 
 string GameEngine::stringToLog() {
