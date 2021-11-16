@@ -5,7 +5,6 @@
 
 using namespace std;
 
-using namespace A2;
 
 // int main()
 // {

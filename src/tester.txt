@@ -1,0 +1,11 @@
+wefwef
+loadmap
+wefewefew
+loadmap
+validatemap
+bullshit
+addplayer
+addplayer
+addplayer
+gamestart
+quit

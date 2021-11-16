@@ -7,7 +7,7 @@
 #include "Map.h"
 
 namespace fs = filesystem;
-using namespace A2;
+
 
 State::State() {
     nameState = "";
@@ -111,21 +111,21 @@ GameEngine::GameEngine() {
     Transition *loadmapTransition = new Transition("loadmap", maploadedState);
     Transition *validatemapTransition = new Transition("validatemap", mapvalidatedState);
     Transition *addplayerTransition = new Transition("addplayer", playersaddedState);
-    Transition *assigncountriesTransition = new Transition("assigncountries", assignreinforcementState);
+    Transition *gamestart = new Transition("gamestart", assignreinforcementState);
     Transition *issueorderTransition = new Transition("issueorder", issueordersState);
     Transition *endissueordersTransition = new Transition("endissueorders", executeordersState);
     Transition *execorderTransition = new Transition("execorder", executeordersState);
     Transition *endexecordersTransition = new Transition("endexecorders", assignreinforcementState);
     Transition *winTransition = new Transition("win", winState);
-    Transition *playTransition = new Transition("play", startState);
-    Transition *endTransition = new Transition("end", finalState);
+    Transition *playTransition = new Transition("replay", startState);
+    Transition *endTransition = new Transition("quit", finalState);
 
     // Add transition to collection of transitions
     transitions = vector<Transition *>();
     transitions.push_back(loadmapTransition);
     transitions.push_back(validatemapTransition);
     transitions.push_back(addplayerTransition);
-    transitions.push_back(assigncountriesTransition);
+    transitions.push_back(gamestart);
     transitions.push_back(issueorderTransition);
     transitions.push_back(endissueordersTransition);
     transitions.push_back(execorderTransition);
@@ -140,7 +140,7 @@ GameEngine::GameEngine() {
     maploadedState->addTransition(validatemapTransition);
     mapvalidatedState->addTransition(addplayerTransition);
     playersaddedState->addTransition(addplayerTransition);
-    playersaddedState->addTransition(assigncountriesTransition);
+    playersaddedState->addTransition(gamestart);
     assignreinforcementState->addTransition(issueorderTransition);
     issueordersState->addTransition(issueorderTransition);
     issueordersState->addTransition(endissueordersTransition);
@@ -149,7 +149,88 @@ GameEngine::GameEngine() {
     executeordersState->addTransition(winTransition);
     winState->addTransition(playTransition);
     winState->addTransition(endTransition);
+
+    commandProcessor = new CommandProcessor();
+    isFile = false;
 }
+
+GameEngine::GameEngine(std::string newFile)
+{
+    // Create the states and add to states collection
+    State *startState = new State("start");
+    State *maploadedState = new State("maploaded");
+    State *mapvalidatedState = new State("mapvalidated");
+    State *playersaddedState = new State("playersadded");
+    State *assignreinforcementState = new State("assignreinforcement");
+    State *issueordersState = new State("issueorder");
+    State *executeordersState = new State("executeorders");
+    State *winState = new State("win");
+    State *finalState = new State("final");
+
+    // Adding all states in the collection of the GameEngine
+    states = vector<State *>();
+    states.push_back(startState);
+    states.push_back(maploadedState);
+    states.push_back(mapvalidatedState);
+    states.push_back(playersaddedState);
+    states.push_back(assignreinforcementState);
+    states.push_back(issueordersState);
+    states.push_back(executeordersState);
+    states.push_back(winState);
+    states.push_back(finalState);
+
+    // Setting current state to the start state
+    currentState = startState;
+
+    // Create the transitions
+    Transition *loadmapTransition = new Transition("loadmap", maploadedState);
+    Transition *validatemapTransition = new Transition("validatemap", mapvalidatedState);
+    Transition *addplayerTransition = new Transition("addplayer", playersaddedState);
+    Transition *gamestart = new Transition("gamestart", assignreinforcementState);
+    Transition *issueorderTransition = new Transition("issueorder", issueordersState);
+    Transition *endissueordersTransition = new Transition("endissueorders", executeordersState);
+    Transition *execorderTransition = new Transition("execorder", executeordersState);
+    Transition *endexecordersTransition = new Transition("endexecorders", assignreinforcementState);
+    Transition *winTransition = new Transition("win", winState);
+    Transition *playTransition = new Transition("replay", startState);
+    Transition *endTransition = new Transition("quit", finalState);
+
+    // Add transition to collection of transitions
+    transitions = vector<Transition *>();
+    transitions.push_back(loadmapTransition);
+    transitions.push_back(validatemapTransition);
+    transitions.push_back(addplayerTransition);
+    transitions.push_back(gamestart);
+    transitions.push_back(issueorderTransition);
+    transitions.push_back(endissueordersTransition);
+    transitions.push_back(execorderTransition);
+    transitions.push_back(endexecordersTransition);
+    transitions.push_back(winTransition);
+    transitions.push_back(playTransition);
+    transitions.push_back(endTransition);
+
+    // Add transitions to the states
+    startState->addTransition(loadmapTransition);
+    maploadedState->addTransition(loadmapTransition);
+    maploadedState->addTransition(validatemapTransition);
+    mapvalidatedState->addTransition(addplayerTransition);
+    playersaddedState->addTransition(addplayerTransition);
+    playersaddedState->addTransition(gamestart);
+    assignreinforcementState->addTransition(issueorderTransition);
+    issueordersState->addTransition(issueorderTransition);
+    issueordersState->addTransition(endissueordersTransition);
+    executeordersState->addTransition(execorderTransition);
+    executeordersState->addTransition(endexecordersTransition);
+    executeordersState->addTransition(winTransition);
+    winState->addTransition(playTransition);
+    winState->addTransition(endTransition);
+
+    // Create Adapter and pass file
+    fileName = newFile;
+    fileAdapter = new FileCommandProcessorAdapter(newFile);
+    isFile = true;
+}
+
 
 string GameEngine::getCurrentStateName() {
     return currentState->nameState;
@@ -172,22 +253,16 @@ string GameEngine::getNextStateName(string command) {
     return ""; //TODO: throw exception
 }
 
-// Only check if command is valid. Does NOT act upon the command, even if it is valid.
-bool GameEngine::validateCommand(string command) {
-    for (int i = 0; i < currentState->transitions.size(); ++i) {
-        if (currentState->transitions.at(i)->nameTransition == command) {
-            return true;
-        }
-    }
-    return false;
-}
-
 // Check if command is valid. If it is, updates the state. Return true if command was valid, false if else.
 // The success and error messages are not implemented, to allow flexible implementation in differents parts of A2.
-bool GameEngine::doTransition(string command) {
-    for (int i = 0; i < currentState->transitions.size(); ++i) {
-        if (currentState->transitions.at(i)->nameTransition == command) {
-            currentState = currentState->transitions.at(i)->nextState;
+bool GameEngine::doTransition(string command)
+{
+    // cout << "Ending up gettin gin the gameengine transtion " << std::endl;
+    for (int i = 0; i < currentState->transitions.size(); ++i)
+    {
+        if (currentState->transitions.at(i)->nameTransition == command)
+        {
+            *currentState = *currentState->transitions.at(i)->nextState;
             return true;
         }
     }
@@ -196,34 +271,56 @@ bool GameEngine::doTransition(string command) {
 
 // Game play implementation for A1.
 // TODO: Will need to divide game flow into StartUpPhase(), GameLoopPhase(), etc. for A2
-void GameEngine::testGameEngine() {
-    GameEngine engine;
+void GameEngine::testGameEngine()
+{
+    //GameEngine engine{fileName};
+    Command* output;
     cout << "Welcome to WarZone!" << endl;
 
-    while (true) {
-        string keyinput;
-
-        cout << "Enter a valid command to progress in the game."
-             << "(Enter x to quit or press any key when at final State)" << endl;
-
-        cin >> keyinput;
-        if (keyinput == "x" or engine.getCurrentStateName() == "final")
-            break;
-        else {
-            cout << "\n***\n"
-                 << endl;
-
-            // Acting on the command. The function doTransition internally validates the command.
-            // Returns true if command was valid, in order to display correct message.
-            // TODO: switch statement to have different message for each state
-            bool isCommandValid = engine.doTransition(keyinput);
-
-            if (isCommandValid) {
-                cout << "Valid command. Current state is: " << engine.getCurrentStateName() << endl;
-            } else {
-                cout << "Invalid command. Replay current state: " << engine.getCurrentStateName() << endl;
+   //Different execution depending if -f arg is passed
+    if(!isFile)
+    {
+        while(true)
+        {
+            //To handle replay case, getCommand has to be called at a later execution
+            output = commandProcessor->getCommand(currentState);
+            doTransition(output->getCommandName());
+            if(output->getCommandName() == "gamestart")
+            {
+                //Start the gameloop
+                break;
             }
+            else if(output->getCommandName() == "replay")
+            {
+                //Call me later
+                cout << "\n";
+            }
+            else if(output->getCommandName() == "quit")
+                exit(0);
+            cout << "\n";
         }
+    cout << "\n";
+    cout << "Voila tous les commands: " << endl;
+    commandProcessor->printCommands();
+    }
+    else
+    {
+        while(true)
+        {
+            output = fileAdapter->getCommand(currentState);
+            doTransition(output->getCommandName());
+            if(output->getCommandName() == "gamestart")
+            {
+                //Start the gameloop
+                break;
+            }
+            else if(output->getCommandName() == "quit")
+               exit(0);
+            cout << "\n";
+        }
+    cout << "\n";
+    cout << "Voila tous les commands: " << endl;
+    fileAdapter->printCommands();
     }
 }
 

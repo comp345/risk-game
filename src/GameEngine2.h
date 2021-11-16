@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include "LoggingObserver.h"
+#include "CommandProcessor.h"
+
 #include "Player.h"
 /* The states and transitions are stored in a linked list like structure */
 
@@ -78,15 +80,20 @@ namespace A2
 
     private:
         int numberOfPlayers;
-        State *currentState; 
+        State *currentState;
+        bool isFile;
+        std::string fileName;
         std::vector<State *> states; // GameEngine maintains collection of all states
         std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
+        CommandProcessor *commandProcessor;
+        FileCommandProcessorAdapter *fileAdapter;
         std::vector<std::string> listOfFile;
         std::vector<Player*> plVec;
         Map* map;
 
     public:
         GameEngine();
+        GameEngine(std::string fileName);
 
         // return name of current state
         std::string getCurrentStateName(); 
@@ -102,8 +109,8 @@ namespace A2
 
         // check if command is valid. no update.
         bool validateCommand(std::string command);
-        
-        static void testGameEngine();
+
+        void testGameEngine();
         string stringToLog() override;
 
     /* A2 */
