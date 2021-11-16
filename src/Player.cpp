@@ -197,68 +197,7 @@ void Player::issueOrder(string order, string details)
 //adds order to a player's list of orders
 void Player::issueOrder(Order *o)
 {
-
-        // ************************** //
-        // prioritization functions:  //
-        // ************************** //
-
-        // territories are to be attacked in priority
-        // priority_queue<Territory*, vector<Territory*>, compareArmySize> priorityAttacking = priority_queue<Territory*, vector<Territory*>, compareArmySize>();
-        // for (Territory* toAttack : toAttack()){
-        //     priorityAttacking.push(toAttack);
-        // }
-
-        // // territories are to be defended in priority
-        // priority_queue<Territory*, vector<Territory*>, compareArmySize> priorityDefending = priority_queue<Territory*, vector<Territory*>, compareArmySize>();
-        // for (Territory* toDefend : toDefend()){
-        //     priorityDefending.push(toDefend);
-        // }
-
-        // ****************** //
-        // order processing:  //
-        // ****************** //
-
-        // if (o->getCommand() == "deploy")
-        // {
-        //     // As long as the player has armies still to deploy
-        //     if (reinforcementPool != 0)
-        //     {
-        //         cout << o->getCommand() << " has been postponed. " << name << " has reinforcements in their pool that must be deployed.\nEnqueueing an additional deploy order for " << name << "\n";
-        //         Territory *location = priorityDefending.top();
-
-        //         Deploy *deployOrder = new Deploy(1, this, location);
-        //         orderList->add(deployOrder);
-        //         // issueOrder(deployOrder);
-        //     }
-        // }
-
-        // // The player issues advance orders
-        // if (o->getCommand() == "advance")
-        // {
-
-        //     // move armies from one of its own territory to the other in order to defend them
-        //     Advance *advanceOrder = dynamic_cast<Advance *>(o);
-        //     if (advanceOrder->getTerritoryTarget()->getOwner() == this)
-        //     {
-        //         Territory *location = priorityDefending.top();
-
-        //         advanceOrder->setArmies(1);
-        //         advanceOrder->setPlayer(this);
-        //         advanceOrder->setTerritorySource(advanceOrder->getPlayer()->getTerritories().front());
-        //         advanceOrder->setTerritoryTarget(location);
-        //     }
-
-        //     // move armies from one of its territories to a neighboring enemy territory to attack them
-        //     else
-        //     {
-        //     }
-        // }
-
-        orderList->add(o);
-
-        //All players are done issuing orders past this point
-        // if (reinforcementPool == 0)
-        //     doneIssuing = true;
+    orderList->add(o);
 }
 
 Hand *Player::getHand()
@@ -342,7 +281,7 @@ bool Player::isDoneIssuing()
 }
 void Player::toggleDoneIssuing()
 {
-    if(doneIssuing == true)
+    if (doneIssuing == true)
         doneIssuing = false;
     else
         doneIssuing = true;
@@ -358,15 +297,15 @@ void Player::setReinforcementPool(int val)
     reinforcementPool = val;
 }
 
-Territory* Player::popPriorityDefend()
+Territory *Player::popPriorityDefend()
 {
-    Territory* p = priorityDefending.top();
+    Territory *p = priorityDefending.top();
     priorityDefending.pop();
     return p;
 }
-Territory* Player::popPriorityAttack()
+Territory *Player::popPriorityAttack()
 {
-    Territory* p = priorityAttacking.top();
+    Territory *p = priorityAttacking.top();
     priorityAttacking.pop();
     return p;
 }
