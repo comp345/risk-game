@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string.h>
-#include "GameEngine2.h"
+#include "CommandProcessor.h"
 
 using namespace std;
 
@@ -35,8 +35,8 @@ void testCommandProcessor(int argc, char *argv[])
     }
 }
 
-int main(int argc, char *argv[], char **)
-{
-    testCommandProcessor(argc, argv);
-    return 0;
-}
+//int main(int argc, char *argv[], char **)
+//{
+//    testCommandProcessor(argc, argv);
+//    return 0;
+//}

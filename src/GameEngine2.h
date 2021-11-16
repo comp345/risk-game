@@ -10,9 +10,9 @@
 
 // States are Nodes in the game flow
 
+class State;
 class Transition;
-class GameEngine;
-
+class FileCommandProcessorAdapter;
 class CommandProcessor;
 
 class State

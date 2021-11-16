@@ -2,13 +2,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "GameEngine2.h"
 
 class CommandProcessor;
 class FileCommandProcessorAdapter;
 class FileLineReader;
 class State;
-
-    // Transitions are the command that allow to change states in the game flow
 
 class Command
 {
