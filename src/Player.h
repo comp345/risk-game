@@ -45,6 +45,7 @@ public:
     void setCards(Hand *pHand);
     int getPlArmies();
     void setPlArmies(int armies);
+    void setPlName(string plName);
 
     //operator overloading
     //assignment operator overloading

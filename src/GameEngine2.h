@@ -110,10 +110,13 @@ namespace A2
 
         // A2 Part 2
         int getNumOfPlayers();
-        std::vector<Player*> getPlayersVect();
+        vector<Player*> getPlayersVect();
+        void setNumOfPlayers(int plNumb);
         void getMapList();
+        void randPlVec();
         void preStartup();
         Map* getMap();
+        void setMap(Map* m);
 
         // A2 Part 3
         void mainGameLoop();
@@ -133,7 +136,7 @@ namespace A2
         void startup();
         void setGameEng(GameEngine* en);
         void operator=(const StartupPhase& sp);
-        friend ostream& operator<<(ostream& out, const StartupPhase& sp);
+        friend ostream &operator<<(ostream &out, const StartupPhase &sp);
         friend istream& operator>>(istream& in, const StartupPhase& sp);
     };
 

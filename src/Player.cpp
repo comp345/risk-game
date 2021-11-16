@@ -14,15 +14,16 @@ Player::Player()
 Player::Player(string n)
 {
     this->name = n;
+    this->plArmies;
     this->hand = new Hand();
     this->orderList = new OrderList();
 }
 
 //parametrized constructor
-Player::Player(int armies, string n, vector<Territory*> t, Hand* h, OrderList* o)
+Player::Player(int armies, string plName, vector<Territory*> t, Hand* h, OrderList* o)
 {
     this->plArmies=armies;
-    this->name = n;
+    this->name = plName;
     this->territories = t;
     this->hand = h;
     this->orderList = o;
@@ -40,42 +41,48 @@ Player::Player(const Player& p)
 //destructor
 Player::~Player()
 {
-    territories.clear();
-    delete orderList;
-    orderList = nullptr;
-    delete hand;
-    hand = nullptr;
-
     for (Territory* t : territories) {
         delete t;
         t = nullptr;
     }
+    //territories.clear();
+    delete orderList;
+    orderList = nullptr;
+    delete hand;
+    hand = nullptr;
+    plArmies=0;
+    name="";
 }
 
 //operator overloading
 //assignment operator overloading
 Player& Player::operator=(const Player& p) {
-    if (this == &p)
-        return *this;
+//    if (this == &p)
+//        return *this;
 
     territories = p.territories;
     hand = new Hand(*(p.hand));
     orderList = new OrderList(*(p.orderList));
+    plArmies=p.plArmies;
+    name=p.name;
     return *this;
 }
 
 //stream insertion operator overloading
 ostream& operator<<(ostream& out, const Player& p) {
+    out<<"\nName of player: "<<p.name<<endl;
+
+    out<<"Army of player: "<<p.plArmies<<endl;
+
     out << "Territories: (should print if assigned!)" << endl;
     for (Territory* t : p.territories) {
         out << *t << endl;
     }
-
+    out << "Orders: should be printing here (for debugging)\n";
     if (p.orderList != nullptr) {
         for (Order* o : p.orderList->getList()) {
             out << "Orders: " << *o << endl;
         }
-        out << "Orders should be printing here (for debugging)\n";
     }
 
     else {
@@ -84,7 +91,7 @@ ostream& operator<<(ostream& out, const Player& p) {
 
     if (p.hand != nullptr) {
         for (Card* c : p.hand->getCards()) {
-            out << "\nCard: " << c << endl;
+            out << "\nCard: " << *c << endl;
         }
     }
 
@@ -127,7 +134,7 @@ void Player::issueOrder(Order* o)
     orderList->add(o);
 }
 
-Hand *Player::getHand() {
+Hand* Player::getHand() {
     return hand;
 }
 
@@ -143,12 +150,18 @@ OrderList *Player::getOrderList() {
     return orderList;
 }
 
-void Player::setTerritories(vector<Territory *> terr) {
-    territories = terr;
+void Player::setTerritories(vector<Territory *> t1) {
+    //territories = terr;
+    for(Territory* t: t1){
+        this->territories.push_back(t);
+    }
 }
 
 void Player::setCards(Hand *pHand) {
     hand = pHand;
+}
+void Player::setPlName(string plName) {
+    name=plName;
 }
 
 //Goes through all the orders that are in the list of orders of a given player and prints them

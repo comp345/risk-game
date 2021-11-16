@@ -275,6 +275,31 @@ void Map::showLoadedMap() {
     cout<<"\n \n"<<endl;
 
 }
+Map &Map::operator=(const Map &m)
+{
+    // self-assignment guard
+    if (this == &m)
+        return *this;
+    territoryNodeList=m.territoryNodeList;
+    continentList=m.continentList;
+    counter=m.counter;
+    return *this;
+}
+ostream &operator<<(ostream &out,  Map &m)
+{
+//    string command = o.command;
+//    string details = o.details;
+//    // insert every data field (to do)
+//    out << "{ Order object: Command type(" << command << "), Details(" << details << ")}";
+//    out<<m.territoryNodeList<<endl;
+//    for (vector<Territory *>::iterator it = m.territoryNodeList.begin(); it != m.territoryNodeList.end(); ++it)
+//    {
+//        out << " "
+//             << (**it).getName();
+//    }
+
+    return out;
+}
 
 // ********************** //
 // Map Loader functions:  //

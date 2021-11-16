@@ -10,8 +10,11 @@ using namespace A2;
 
 int main(int, char **)
 {
-    GameEngine engine;
+    GameEngine *engine= new GameEngine();
+    StartupPhase sp;
     //engine.testGameEngine();
-    engine.preStartup();
+    engine->preStartup();
+    sp.setGameEng(engine);
+    sp.startup();
     return 0;
 }

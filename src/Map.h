@@ -97,6 +97,9 @@ public:
 
     std::vector<Territory *> getTerritories();
     void showLoadedMap();
+    Map &operator=(const Map& m);
+    friend ostream &operator<<(ostream &out, const Map &m);
+    friend istream& operator>>(istream& in, const Map& m);
 
 private:
     int counter;
