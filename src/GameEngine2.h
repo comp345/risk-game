@@ -15,8 +15,6 @@ class GameEngine;
 
 class CommandProcessor;
 
-class FileCommandProcessorAdapter;
-
 class State
 {
     friend class GameEngine;
