@@ -5,9 +5,7 @@
 #include <random>
 #include <algorithm>
 #include <cmath>
-#include <algorithm>
 #include "GameEngine.h"
-#include "Map.h"
 #include "Map.h"
 #include "Player.h"
 #include "Orders.h"
@@ -550,7 +548,7 @@ void StartupPhase::startup() {
                 if (!map->territoryNodeList.empty()) {
                     vector<Territory *> territories;
                     territories.push_back(map->territoryNodeList.back());
-                    p->setTerritories(territories);
+                    p->addTerritories(territories);
                     map->territoryNodeList.pop_back();
                 }
             }

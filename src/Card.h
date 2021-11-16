@@ -6,8 +6,6 @@
 #include "Orders.h"
 
 
-
-
 class Deck;
 class Hand;
 class Player;

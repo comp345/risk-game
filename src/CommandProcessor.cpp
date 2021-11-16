@@ -7,12 +7,11 @@
 using namespace std;
 
 string Command::stringToLog() {
-    return "Command executed: " + nameCommand;
+    return "Command executed: " + this->getCommandEffect();
 }
 
 string CommandProcessor::stringToLog() {
-    // return "New command saved: " + commands.back()->getNameCommand();
-    return "New command saved: TODO";
+     return "New command saved: " + commands.back()->getCommandName();
 }
 
 Command::Command()

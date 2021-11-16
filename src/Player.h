@@ -3,33 +3,36 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "Orders.h"
+#include "Card.h"
+#include "Map.h"
 #include <queue>
-// #include "LoggingObserver.h"
-// #include "Orders.h"
-// #include "Card.h"
-// #include "Map.h"
 
 class Territory;
+
 class Hand;
+
 class Order;
+
 class OrderList;
 
 using namespace std;
 
-struct compareArmySize
-{
-    bool operator()(Territory const* t1, Territory const* t2);
+struct compareArmySize {
+    bool operator()(Territory const *t1, Territory const *t2);
 };
 
-class Player
-{
+class Player {
 public:
 
     Player();
 
     Player(const Player &); //copy constructor
     Player(string);
-    Player(int,string, vector<Territory *>, Hand *, OrderList *);
+
+    Player(int, string, vector<Territory *>, Hand *, OrderList *);
+
+    Player(string plName, vector<Territory *> t, Hand *h, OrderList *o);
 
     ~Player(); //destructor
     vector<Territory *> toAttack();
@@ -54,36 +57,51 @@ public:
     void setTerritories(vector<Territory *> vector1);
 
     void setCards(Hand *pHand);
+
     int getPlArmies();
+
     void setPlArmies(int armies);
+
     void setPlName(string plName);
 
     //operator overloading
     //assignment operator overloading
     Player &operator=(const Player &p);
+
     //stream insertion operator overloading
     friend ostream &operator<<(ostream &out, const Player &p);
+
     friend istream &operator>>(istream &in, Player &p);
 
     int getTerritorySize();
+
     int getPrevTerritorySize();
+
     void setPrevTerritorySize();
 
 
-
     void addToPriorityAttack(Territory *toAdd);
+
     void addToPriorityDefend(Territory *toAdd);
-    Territory* popPriorityDefend();
-    Territory* popPriorityAttack();
+
+    Territory *popPriorityDefend();
+
+    Territory *popPriorityAttack();
 
     priority_queue<Territory *, vector<Territory *>, compareArmySize> getPriorityAttacking();
+
     priority_queue<Territory *, vector<Territory *>, compareArmySize> getPriorityDefending();
 
     bool isDoneIssuing();
+
     void toggleDoneIssuing();
 
     int getReinforcementPool();
+
     void setReinforcementPool(int val);
+
+    void addTerritories(vector<Territory *> t1);
+
 
 private:
     int reinforcementPool;
