@@ -457,5 +457,18 @@ Map *MapLoader::loadMap(string fileName) {
     }
 
     infile.close();
+    auto it = graph->territoryNodeList.begin();
+    while (it != graph->territoryNodeList.end())
+    {
+        // remove empty territories
+        if ((*it)->getName() == "")
+        {
+            // `erase()` invalidates the iterator, use returned iterator
+            it = graph->territoryNodeList.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
     return graph;
 }
