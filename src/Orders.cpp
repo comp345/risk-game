@@ -733,21 +733,38 @@ Negotiate::Negotiate(string orderdetails) : Order("Negotiate type", orderdetails
 }
 Negotiate::Negotiate(const Negotiate &n)
 {
-    Negotiate cpyNegotiate = n;
-    setCommand(cpyNegotiate.getCommand());
-    setDetails(cpyNegotiate.getDetails());
+    setCommand(n.getCommand());
+    setDetails(n.getDetails());
+    source = n.source;
+    target = n.target;
+}
+Negotiate::Negotiate(Player* source1, Player* target1) : Order("Negotiate", "prevent attacks between the current player and another player until the end of the turn")
+{
+    source = source1;
+    target = target1;
 }
 bool Negotiate::validate()
 {
-    cout << "Validate Negotiate order.";
-    return true;
-}
+    if (source != target)
+    {
+        std::cout << "The Negotiate Order is valid.\n";
+        return true;
+    };
+    std::cout << "The Negotiate Order is invalid.\n";
+    return false;
+};
 bool Negotiate::execute()
 {
-    cout << "Execute Negotiate order.";
-    notify(this);
-    return true;
-}
+    if (validate())
+    {
+        //TODO: not sure how to implement
+        notify(this);
+        return true;
+    }
+    return false;
+};
+
+//---------------------------
 
 // Implementation of OrderList
 OrderList::OrderList()

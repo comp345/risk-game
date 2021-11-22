@@ -192,8 +192,12 @@ public:
 
 class Negotiate : public Order
 {
+private:
+    Player* source;
+    Player* target;
 public:
     Negotiate();
+    Negotiate(Player *source1, Player *target1);
     Negotiate(std::string details);
     // Copy constructor to-do
     Negotiate(const Negotiate &n);
