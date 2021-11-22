@@ -60,10 +60,6 @@ Player::Player(int armies, string plName, vector<Territory *> t, Hand *h, OrderL
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
 }
 
-bool Territory::operator<(const Territory &rhs) {
-    return (this->numArmies <= rhs.numArmies);
-}
-
 //copy constructor: Deep copy, cannot be used for reference semantic or to
 Player::Player(const Player &p) {
     // cout << "Entering Player::Player(const Player& p)" <<endl;

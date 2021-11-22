@@ -166,7 +166,23 @@ Map::Map()
     counter = 0;
 }
 
-Map::~Map() {}
+Map::~Map() {
+    neighborsList->clear();
+    continentList.clear();
+    territoryNodeList.clear();
+
+    for (Continent *c: continentList) {
+        delete c;
+        c = nullptr;
+    }
+    for (Territory *t: territoryNodeList) {
+        delete t;
+        t = nullptr;
+    }
+    for (vector<Territory *> t: neighborsList) {
+        t.clear();
+    }
+}
 
 //creating a territory node inside map with a counter to count list of territories
 Territory *Map::createTerritoryNode()
@@ -174,6 +190,10 @@ Territory *Map::createTerritoryNode()
     Territory *t = new Territory(counter);
     counter++;
     return t;
+}
+
+bool Territory::operator<(const Territory &rhs) {
+    return (this->numArmies <= rhs.numArmies);
 }
 
 //Initialized nodes for countries and neighbors

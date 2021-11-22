@@ -60,7 +60,7 @@ Deploy * createDeployOrder() {
     return d1;
 }
 
-int main()
-{
-    testLogging();
-}
+//int main()
+//{
+//    testLogging();
+//}
