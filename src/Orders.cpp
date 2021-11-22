@@ -312,16 +312,13 @@ Advance &Advance::operator=(const Advance &a)
     return *this;
 }
 
-/** TODO: Check if src and target are adjacent   */
 bool Advance::validate()
 {
     cout << "Debug: Validate Advance order." << endl;
     if (this->getTerritorySource()->getOwner() != playerAdvancing)
         return false;
-    /** to add: check adjacency of territorytarget to territorysource, else return false
-     * 
-     */
-    return true;
+
+    return getTerritorySource()->isNeighbor(territoryTarget);
 }
 // Returns true if exect
 bool Advance::execute()
@@ -339,7 +336,7 @@ bool Advance::execute()
     {
         // if target belong to player, basically deploy src -> target
 
-        /** TODO: check that num of armies ordered to advance is not greater than armies on territory source
+        /** check that num of armies ordered to advance is not greater than armies on territory source
          */
         if (getArmies() <= getTerritorySource()->getNumberOfArmies())
         {
@@ -505,16 +502,22 @@ Bomb &Bomb::operator=(const Bomb &b)
     return *this;
 }
 
-/** TODO: Check adjacency of target to at least one territory of player! */
+//TODO: check if adjacency works
 bool Bomb::validate()
 {
     cout << "Validate Bomb order." << endl;
-    // TODO: Check adjacency
+    bool adjacent = false;
+    for (Territory* t : playerBombing->getTerritories()) {
+        if (t->isNeighbor(getTerritory())) {
+            adjacent = true;
+            break;
+        }
+    }
     // Check if target territory is enemy's
     if (getTerritory()->getOwner() == playerBombing)
         return false;
 
-    return true;
+    return adjacent;
 }
 bool Bomb::execute()
 {

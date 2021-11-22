@@ -42,13 +42,14 @@ public:
 
     void setNumberOfArmies(int n);
     void addNeighbor(Territory* t);
+    bool isNeighbor(Territory *t);
 
     //operators
     Territory &operator=(const Territory &t); //overloaded assignment operator
     friend std::ostream &operator<<(std::ostream &out, const Territory &t); //overloaded stream insertion operator
     friend std::istream &operator>>(std::istream &in, const Territory &t); //overloaded stream extraction operator
 
-    bool operator<(const Territory& rhs); 
+    bool operator<(const Territory& rhs);
 int numArmies = 0;
 private:
     int ID;

@@ -146,6 +146,16 @@ void Territory::addNeighbor(Territory *t)
 {
     neighbors.push_back(t);
 }
+/** TODO: Check this works   */
+bool Territory::isNeighbor(Territory *t)
+{
+    for (Territory* n : getNeighbors()) {
+        if (n == t) {
+            return true;
+        }
+    }
+    return false;
+}
 
 Continent::Continent()
 {
