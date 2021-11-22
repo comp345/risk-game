@@ -143,8 +143,14 @@ public:
 
 class Blockade : public Order
 {
+private:
+    Territory *target;
+    Player *player;
+    Player *neutral;
+
 public:
     Blockade();
+    Blockade(Territory *target1, Player *p1, Player *neutral1);
     Blockade(std::string details);
     Blockade(const Blockade &b);
 

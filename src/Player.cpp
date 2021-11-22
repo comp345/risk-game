@@ -202,7 +202,6 @@ void Player::setTerritories(vector<Territory *> t1) {
     prevTerritorySize = territories.size();
 }
 
-//TODO: add to .h, and change in GameEngine
 void Player::addTerritories(vector<Territory *> t1) {
     //territories = terr;
     for (Territory *t: t1) {

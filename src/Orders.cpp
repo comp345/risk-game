@@ -560,19 +560,57 @@ Blockade::Blockade(const Blockade &b) // USING IT FOR A2
     Blockade cpyBlockade = b;
     setCommand(cpyBlockade.getCommand());
     setDetails(cpyBlockade.getDetails());
+    target = b.target;
+    player = b.player;
+    neutral = b.neutral;
 }
-// Fake validate and execute methods to implement later
+
+Blockade::Blockade(Territory* target1, Player* p1, Player* neutral1)
+{
+    target = target1;
+    player = p1;
+    neutral = neutral1;
+};
 bool Blockade::validate()
 {
-    cout << "Validate Blockade order.";
-    return true;
+    if ((target->getOwner() == player))
+    {
+        std::cout << "\nThe Blockade Order is valid.";
+        return true;
+    }
+    std::cout << "\nThe Blockade Order is invalid.";
+    return false;
 }
 bool Blockade::execute()
 {
-    cout << "Execute Blockade order.";
-    notify(this);
-    return true;
+    if (validate())
+    {
+        target->setNumberOfArmies(target->getNumberOfArmies() * 2);
+        target->setOwner(neutral);
+        int count = 0;
+
+        //removing the territories from player and assigning them to neutral player
+        vector<Territory*> playerTerr = player->getTerritories();
+        for (vector<Territory*>::iterator it = playerTerr.begin(); it != playerTerr.end(); ++it)
+        {
+            if (*it == target)
+            {
+                break;
+            }
+            ++count;
+        }
+
+        playerTerr.erase(playerTerr.begin() + count);
+
+        neutral->getTerritories().push_back(target);
+        return true;
+    }
+    else {
+        return false;
+    }
 }
+
+// ---------------------------
 
 AirLift::AirLift() : Order("Airlift type", ""), armiesToMove(0),
                      playerAirlifting(new Player), territorySource(new Territory), territoryTarget(new Territory)
