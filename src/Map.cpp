@@ -130,6 +130,7 @@ void Territory::setName(string n)
 void Territory::setOwner(Player *p)
 {
     owner = p;
+    p->addTerritories({this});
 }
 
 vector<Territory *> Territory::getNeighbors()
