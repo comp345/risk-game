@@ -505,7 +505,6 @@ Bomb &Bomb::operator=(const Bomb &b)
 //TODO: check if adjacency works
 bool Bomb::validate()
 {
-    cout << "Validate Bomb order." << endl;
     bool adjacent = false;
     for (Territory* t : playerBombing->getTerritories()) {
         if (t->isNeighbor(getTerritory())) {
@@ -526,7 +525,7 @@ bool Bomb::execute()
         cout << "Invalid Bomb order." << endl;
         return false;
     }
-    cout << "Execute Bomb order.";
+    cout << "Execute Bomb order." << endl;;
     getTerritory()->setNumberOfArmies(
         getTerritory()->getNumberOfArmies() / 2);
 

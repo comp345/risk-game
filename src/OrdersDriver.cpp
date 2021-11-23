@@ -7,7 +7,7 @@
 using namespace std;
 
 int main() {
-    testBlockadeExec();
+    testOrdersExec();
 }
 
 void testOrdersDriver()
@@ -637,12 +637,7 @@ void testAirliftExec()
      // TODO: Another test: on source territory owned by enemy
 }
 
-void testBombExec()
-{
-     
-}
-
-void testBlockadeExec()
+void testOrdersExec()
 {
     // ************************************************** //
     //   Initialize parameters for the orders to test...
@@ -691,13 +686,22 @@ void testBlockadeExec()
     cout << endl
          << endl;
 
-    // ******************************* //
-    // Creating Valid Blockade orders   //
-    // ******************************* //
-    cout << "Creating Valid Blockade Orders" << endl
-         << endl;
+    /****		Showing Bomb			**/
+    std::cout << "\n\n--- BOMB: Player 2 bombs Player 1's Territory ---";
+    Order* o5 = new Bomb(p2, t2);
+    std::cout << "\nBEFORE: " << t2->getName() << " armies: " << t2->getNumberOfArmies() << endl;
+    o5->execute();
+    std::cout << "\nAFTER: " << t2->getName() << " armies: " << t2->getNumberOfArmies() << endl;
 
-    	/****		Showing Blockade			**/
+
+    /****		Showing Invalid Bomb (its own territory)			**/
+    std::cout << "\n\n--- BOMB: Player 2 bombs Player 2's Territory ---";
+    Order* b2 = new Bomb(p2, t3);
+    std::cout << "\nBEFORE: " << t3->getName() << " armies: " << t3->getNumberOfArmies() << endl;
+    b2->execute();
+    std::cout << "\nAFTER: " << t3->getName() << " armies: " << t3->getNumberOfArmies() << endl;
+
+    /****		Showing Blockade			**/
 	std::cout << "\n\n--- BLOCKADE: Player 1 blockades its N_Ireland territory---";
 	Player* neutral = new Player("Neutral");
 	Order* o6 = new Blockade(t1, p1, neutral);

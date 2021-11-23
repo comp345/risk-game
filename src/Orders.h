@@ -254,6 +254,4 @@ void testAdvanceExec();
 
 void testAirliftExec();
 
-void testBombExec();
-
-void testBlockadeExec();
+void testOrdersExec();
