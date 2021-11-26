@@ -62,6 +62,7 @@ private:
 public:
     CardBomb(Effect* effect);
     CardBomb(const CardBomb &b);
+    // CardBomb(Player *p, Territory * target);
     ~CardBomb();
 
     std::ostream &write(std::ostream &os) const;

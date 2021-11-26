@@ -82,7 +82,8 @@ public:
     friend std::ostream &operator<<(std::ostream &out, const State &s);
 };
 
-class GameEngine : public ILoggable, public Subject {
+class GameEngine : public ILoggable, public Subject
+{
     friend class State;
 
     friend class Transition;
@@ -90,9 +91,10 @@ class GameEngine : public ILoggable, public Subject {
 private:
     int numberOfPlayers;
     State *currentState;
+    bool validTransition;
     bool isFile;
     std::string fileName;
-    std::vector<State *> states; // GameEngine maintains collection of all states
+    std::vector<State *> states;           // GameEngine maintains collection of all states
     std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
     CommandProcessor *commandProcessor;
     FileCommandProcessorAdapter *fileAdapter;
@@ -148,20 +150,24 @@ public:
     void reinforcementPhase(Player *p);
     void issueOrdersPhase();
     void executeOrdersPhase();
-    Order* createOrderFromCard(Card *card, Player* player, Territory* territorySrc, Territory* territoryTarget);
+    Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget);
 
+    // Noah: Data members should be private and only accessed with public methods
+    vector<Player *> currentPlayers;
+    Deck *deck;
+    bool allPlayersDone();
+    Player *hasWinner();
+    void auditPlayers();
 
-        // Noah: Data members should be private and only accessed with public methods
-        vector<Player *> currentPlayers;
-        Deck* deck;
-        bool allPlayersDone();
-        Player *hasWinner();
-        void auditPlayers();
-    };
+    // Noah additions for refacting A2 part 3
+    void refactoring_mainGameLoop();
+};
 
-class StartupPhase {
+class StartupPhase
+{
 private:
     GameEngine *eng;
+
 public:
     StartupPhase();
 
@@ -179,4 +185,3 @@ public:
 
     friend istream &operator>>(istream &in, const StartupPhase &sp);
 };
-

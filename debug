@@ -1,8 +1,8 @@
 loadmap
 validatemap 
 addplayer 
-assigncountries 
+gamestart 
 issueorder
 endissueorders
-execorder
+execorder // command doesnt work?
 endexecorders
