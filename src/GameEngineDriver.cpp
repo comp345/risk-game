@@ -12,17 +12,15 @@ void debuggingStateMachine(GameEngine * e);
 int main()
 {
     // A2 Part 1
-    GameEngine * e = new GameEngine();
+    GameEngine e; // solves the bug -> GameEngine * e = new GameEngine(); BUGGY
     // e.testGameEngine();
 
-    // A2 Part 3
-    // e.testPart3();
-
     // Noah refactoring a2 part 3
-    // refactoringA2P3();
+    refactoringA2P3();
 
-    // Debuggin the state machine : the replay transition -> leads us to win state, not to start
-    debuggingStateMachine(e);
+    // debuggingStateMachine(&e);
+        
+    
 
     return 0;
 }

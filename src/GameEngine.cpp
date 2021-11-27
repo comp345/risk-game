@@ -294,7 +294,7 @@ bool GameEngine::doTransition(string command)
     {
         if (currentState->transitions.at(i)->nameTransition == command)
         {
-            *currentState = *currentState->transitions.at(i)->nextState;
+            currentState = currentState->transitions.at(i)->nextState;
             validTransition = true;
             notify(this);
             return true;
@@ -1267,20 +1267,20 @@ void fakeStartup(GameEngine *engine)
 // Rewriting the mainLoop test as a free function
 void refactoringA2P3()
 {
-    GameEngine *engine = new GameEngine();
+    GameEngine engine;
 
     bool stillPlaying = true;
 
     while (stillPlaying)
     {
         cout << "Debug: Entering fakeStartup phase" << endl;
-        fakeStartup(engine);
+        fakeStartup(&engine);
 
         cout << "Debug: Entering mainGamePlay phase" << endl;
-        engine->refactoring_mainGameLoop();
+        engine.refactoring_mainGameLoop();
         cout << "Debug: Exiting mainGamePlay phase" << endl;
 
-        if (engine->getCurrentStateName() == "start")
+        if (engine.getCurrentStateName() == "start")
         {
             cout << "Debug: replay ... (press any keys to continue)" << endl;
 
@@ -1332,32 +1332,28 @@ void GameEngine::refactoring_mainGameLoop()
     {
         this->doTransition("win");
         cout << "\nPlayer " << winner->getName() << " won the game! Do you wish to replay? (y/n)\n";
-        cout << "DEBUG WINNING: State:" << getCurrentStateName() << endl;
-        cout << "Valid next transitions: " << endl;
-        for (auto t : getNextTransitions())
-        {
-            cout << t << endl;
-            cout << "Valid next state:" << endl;
-            cout << getNextStateName(t) << endl;
-        }
+        // cout << "DEBUG WINNING: State:" << getCurrentStateName() << endl;
+        // cout << "Valid next transitions: " << endl;
+        // for (auto t : getNextTransitions())
+        // {
+        //     cout << t << endl;
+        //     cout << "Valid next state:" << endl;
+        //     cout << getNextStateName(t) << endl;
+        // }
         
 
 
         string input;
         cin >> input;
-        //If the user says yes then start at the first transition
         if (input == "y")
         {
-            // doTransition(transitions.at(0)->nameTransition);
             doTransition("replay");
-            cout << "DEBUG State: " << getCurrentStateName() << endl;
+            // cout << "DEBUG State: " << getCurrentStateName() << endl;
         }
         else if (input == "n")
         {
-            //Else break out the game.
-            // doTransition(transitions.back()->nameTransition);
             doTransition("quit");
-            cout << "DEBUG State: " << getCurrentStateName() << endl;
+            // cout << "DEBUG State: " << getCurrentStateName() << endl;
         }
         cout << getCurrentStateName() << endl;
     }
