@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "Orders.h"
 #include "Map.h"
+#include "PlayerStrategies.h"
 
 using namespace std;
 
@@ -142,37 +143,39 @@ istream &operator>>(istream &in, Player &p) {
 
 //returns a list of territories to attack
 vector<Territory *> Player::toAttack() {
-    vector<Territory *> attackableTerritories = vector<Territory *>();
+    return getPlayerStrategy()->toAttack();
 
-    //Get the players territories
-    for (Territory *territory: territories) {
-        //add them to the attackable Territories if they have an army on them
-        if (territory->getNumberOfArmies() > 0)
-            attackableTerritories.push_back(territory);
-    }
+    // vector<Territory *> attackableTerritories = vector<Territory *>();
 
-    vector<Territory *> neighbourTerritories = vector<Territory *>();
-    for (Territory *territory: attackableTerritories) {
+    // //Get the players territories
+    // for (Territory *territory: territories) {
+    //     //add them to the attackable Territories if they have an army on them
+    //     if (territory->getNumberOfArmies() > 0)
+    //         attackableTerritories.push_back(territory);
+    // }
 
-        // cout << "the neighbours of " << territory->getName() << " are as follows:\n";
-        for (Territory *neighbour: territory->getNeighbors()) {
-            // cout << neighbour->getName() << ", owned by " << neighbour->getOwner()->getName() <<"\n";
+    // vector<Territory *> neighbourTerritories = vector<Territory *>();
+    // for (Territory *territory: attackableTerritories) {
 
-            // If we haven't already seen the territory, add it to the list.
-            if (!count(neighbourTerritories.begin(), neighbourTerritories.end(), neighbour))
+    //     // cout << "the neighbours of " << territory->getName() << " are as follows:\n";
+    //     for (Territory *neighbour: territory->getNeighbors()) {
+    //         // cout << neighbour->getName() << ", owned by " << neighbour->getOwner()->getName() <<"\n";
 
-                // If it already belongs to us then we dont have to attack it.
-                if (neighbour->getOwner() != this)
-                    neighbourTerritories.push_back(neighbour);
-        }
-    }
+    //         // If we haven't already seen the territory, add it to the list.
+    //         if (!count(neighbourTerritories.begin(), neighbourTerritories.end(), neighbour))
 
-    return neighbourTerritories;
+    //             // If it already belongs to us then we dont have to attack it.
+    //             if (neighbour->getOwner() != this)
+    //                 neighbourTerritories.push_back(neighbour);
+    //     }
+    // }
+
+    // return neighbourTerritories;
 }
 
 //returns a list of territories to defend
 vector<Territory *> Player::toDefend() {
-    return territories;
+    return getPlayerStrategy()->toDefend();
 }
 
 
