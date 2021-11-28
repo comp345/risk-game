@@ -591,7 +591,7 @@ bool Blockade::execute()
         target->setOwner(neutral);
         int count = 0;
 
-        //removing the territories from player and assigning them to neutral player
+        //removing the target territory from player and assigning it to neutral player
         vector<Territory*> playerTerr = player->getTerritories();
         for (vector<Territory*>::iterator it = playerTerr.begin(); it != playerTerr.end(); ++it)
         {
