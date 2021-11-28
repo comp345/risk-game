@@ -4,15 +4,15 @@
 #include <string>
 #include <vector>
 #include "LoggingObserver.h"
-#include "Player.h"
-#include "Map.h"
-#include "CommandProcessor.h"
-#include "Card.h"
 
 /* The states and transitions are stored in a linked list like structure */
 class Deck;
 // States are Nodes in the game flow
-
+class Order;
+class Map;
+class Player;
+class Territory;
+class Card;
 class State;
 class Transition;
 class FileCommandProcessorAdapter;

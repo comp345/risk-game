@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include "CommandProcessor.h"
+#include "GameEngine.h"
 
 using namespace std;
 

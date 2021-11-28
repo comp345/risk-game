@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string.h>
 #include "CommandProcessor.h"
+#include "GameEngine.h"
 
 using namespace std;
 

@@ -1,12 +1,9 @@
 #include<iostream>
 #include<string>
 #include "Card.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include <ctime>
+#include <cstdlib>
+#include "Player.h"
 using namespace std;
 
 // Extra helper functions (Noah)

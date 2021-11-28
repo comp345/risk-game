@@ -3,6 +3,8 @@
 #include <string>
 #include "Orders.h"
 #include "Card.h"
+#include "Map.h"
+#include "Player.h"
 
 using namespace std;
 
