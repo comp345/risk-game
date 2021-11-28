@@ -177,7 +177,8 @@ vector<Territory *> Player::toDefend() {
 
 
 //adds order to a player's list of orders
-void Player::issueOrder(Order *o) {
+void Player::issueOrder(Order *o, PlayerStrategy* ps) {
+    setPlayerStrategy(ps);
     orderList->add(o);
 }
 
@@ -290,4 +291,12 @@ Territory *Player::popPriorityAttack() {
     Territory *p = priorityAttacking.top();
     priorityAttacking.pop();
     return p;
+}
+
+PlayerStrategy* Player::getPlayerStrategy(){
+    return ps;
+}
+
+void Player::setPlayerStrategy(PlayerStrategy* ps){
+    this->ps = ps;
 }

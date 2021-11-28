@@ -40,7 +40,7 @@ public:
 
     void issueOrder(string, string);
 
-    void issueOrder(Order *o);
+    void issueOrder(Order *o, PlayerStrategy* ps);
 
     void printOrders();
 
@@ -100,6 +100,9 @@ public:
     void setReinforcementPool(int val);
 
     void addTerritories(vector<Territory *> t1);
+
+    PlayerStrategy* getPlayerStrategy();
+    void setPlayerStrategy(PlayerStrategy* ps);
 
 
 private:

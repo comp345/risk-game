@@ -13,6 +13,9 @@
 #include <exception>
 #include "GameEngine.h"
 
+
+#include "PlayerStrategies.h"
+
 namespace fs = filesystem;
 using namespace std;
 
@@ -1072,7 +1075,7 @@ void GameEngine::issueOrdersPhase()
                 // Create Deploy -> decrease reinforcement)
                 Deploy *deploy = new Deploy(1, currentPlayers.at(i), territoryTarget);
                 cout << "Issueing: " << deploy->getDetails() << endl;
-                currentPlayers.at(i)->issueOrder(deploy);
+                currentPlayers.at(i)->issueOrder(deploy, currentPlayers.at(i)->getPlayerStrategy());
                 /* To do for A3: Able to use same territory in deploy order for advance (add stack to store popped defending territory?) */
                 currentPlayers.at(i)->popPriorityDefend();
             }
@@ -1084,7 +1087,7 @@ void GameEngine::issueOrdersPhase()
                 Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
                 Advance *advance = new Advance(1, currentPlayer, territorySource, territoryTarget);
                 cout << "Issueing! " << advance->getDetails() << endl;
-                currentPlayer->issueOrder(advance);
+                currentPlayer->issueOrder(advance, currentPlayer->getPlayerStrategy());
                 currentPlayer->popPriorityAttack();
                 currentPlayer->popPriorityDefend();
             }
