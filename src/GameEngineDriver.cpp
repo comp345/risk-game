@@ -15,10 +15,16 @@ int main()
     GameEngine e; // solves the bug -> GameEngine * e = new GameEngine(); BUGGY
     // e.testGameEngine();
 
+
+
     // Noah refactoring a2 part 3
     refactoringA2P3();
 
-    // debuggingStateMachine(&e);
+
+
+    // Debugging the state machine
+    // GameEngine * eng = new GameEngine();
+    // debuggingStateMachine(eng);
         
     
 

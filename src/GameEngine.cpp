@@ -1239,17 +1239,6 @@ void fakeStartup(GameEngine *engine)
     cout << "Welcome to WarZone!" << endl;
     cout << "Current State: " << engine->getCurrentStateName() << endl;
 
-    cout << "DEBUG: check whats in engine after replay" << endl;
-    cout << "Map:" << endl;
-    if (engine->getMap())
-    {
-        cout << engine->getMap() << endl;
-    }
-    else
-    {
-        cout << "No map" << endl;
-    }
-
     /** Stand-in Startup Phase (Automatic) 
      * */
     // loadmap (now in mapvalidated state)
@@ -1355,16 +1344,16 @@ void refactoringA2P3()
 
     while (stillPlaying)
     {
-        GameEngine engine; // need to re-instantiate engine after each game (else, segmentation fault error... badly defined GameEngine Constructors?)
+        GameEngine * engine = new GameEngine(); // need to re-instantiate engine after each game (else, segmentation fault error... badly defined GameEngine Constructors?)
 
         cout << "Debug: Entering fakeStartup phase" << endl;
-        fakeStartup(&engine);
+        fakeStartup(engine);
 
         cout << "Debug: Entering mainGamePlay phase" << endl;
-        engine.refactoring_mainGameLoop();
+        engine->refactoring_mainGameLoop();
         cout << "Debug: Exiting mainGamePlay phase" << endl;
 
-        if (engine.getCurrentStateName() == "start")
+        if (engine->getCurrentStateName() == "start")
         {
             cout << "Debug: replay ... (press any keys to continue)" << endl;
 
@@ -1399,12 +1388,10 @@ void GameEngine::refactoring_mainGameLoop()
     this->doTransition("issueorder");
     issueOrdersPhase();
     this->doTransition("endissueorders");
-    // cout << "DEBUG WINNING. State : " << getCurrentStateName() << endl; // we are in execorder state
 
     // PHASE 3: Execute Orders Phase
     this->doTransition("execorder");
     executeOrdersPhase();
-    // cout << "DEBUG WINNING. State : " << getCurrentStateName() << endl;
 
     Player *winner = hasWinner();
 
@@ -1414,26 +1401,17 @@ void GameEngine::refactoring_mainGameLoop()
     {
         this->doTransition("win");
         cout << "\nPlayer " << winner->getName() << " won the game! Do you wish to replay? (y/n)\n";
-        // cout << "DEBUG WINNING: State:" << getCurrentStateName() << endl;
-        // cout << "Valid next transitions: " << endl;
-        // for (auto t : getNextTransitions())
-        // {
-        //     cout << t << endl;
-        //     cout << "Valid next state:" << endl;
-        //     cout << getNextStateName(t) << endl;
-        // }
+
 
         string input;
         cin >> input;
         if (input == "y")
         {
             doTransition("replay");
-            // cout << "DEBUG State: " << getCurrentStateName() << endl;
         }
         else if (input == "n")
         {
             doTransition("quit");
-            // cout << "DEBUG State: " << getCurrentStateName() << endl;
         }
         cout << getCurrentStateName() << endl;
     }
