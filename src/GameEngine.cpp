@@ -61,13 +61,13 @@ void State::addTransition(Transition *t)
 Transition::Transition()
 {
     nameTransition = "";
-    nextState = nullptr;
+    nextState = new State();
 }
 
 Transition::Transition(string name)
 {
     nameTransition = name;
-    nextState = nullptr;
+    nextState = new State();
 }
 
 Transition::Transition(string name, State *s)
@@ -92,6 +92,10 @@ Transition &Transition::operator=(const Transition &t)
     if (this == &t)
         return *this;
     this->nameTransition = t.nameTransition;
+    if (nextState)
+    {
+        delete nextState;
+    }
     this->nextState = new State(*(t.nextState));
     return *this;
 }
@@ -259,6 +263,74 @@ GameEngine::GameEngine(std::string newFile)
     isFile = true;
 }
 
+GameEngine::GameEngine(const GameEngine &e)
+{
+    numberOfPlayers = e.numberOfPlayers;
+    currentState = new State(*e.currentState);
+    validTransition = e.validTransition;
+    isFile = e.isFile;
+    fileName = e.fileName;
+    states = vector<State *>(e.states);
+    transitions = vector<Transition *>(e.transitions);
+    commandProcessor = new CommandProcessor(*e.commandProcessor);
+    fileAdapter = new FileCommandProcessorAdapter(*e.fileAdapter);
+    listOfFile = vector<string>(e.listOfFile);
+    plVec = vector<Player *>(e.plVec);
+}
+
+GameEngine::~GameEngine()
+{
+}
+
+GameEngine &GameEngine::operator=(const GameEngine &e)
+{
+    if (this == &e)
+        return *this;
+
+    if (currentState)
+    {
+        delete currentState;
+    }
+    currentState = new State(*e.currentState);
+    if (commandProcessor)
+    {
+        delete commandProcessor;
+    }
+    commandProcessor = new CommandProcessor(*e.commandProcessor);
+    if (fileAdapter)
+    {
+        delete fileAdapter;
+    }
+
+    for (vector<State *>::iterator it = states.begin(); it != states.end(); ++it)
+    {
+        State *a = *it;
+        delete a;
+        a = NULL;
+    }
+    states.clear();
+    states = vector<State *>(e.states);
+
+    for (vector<Transition *>::iterator it = transitions.begin(); it != transitions.end(); ++it)
+    {
+        Transition *a = *it;
+        delete a;
+        a = NULL;
+    }
+    transitions.clear();
+    transitions = vector<Transition *>(e.transitions);
+    for (vector<Player *>::iterator it = plVec.begin(); it != plVec.end(); ++it)
+    {
+        Player *a = *it;
+        delete a;
+        a = NULL;
+    }
+    plVec.clear();
+    plVec = vector<Player *>(e.plVec);
+
+    return *this;
+}
+
 string GameEngine::getCurrentStateName()
 {
     return currentState->nameState;
@@ -379,8 +451,8 @@ bool checkWinCondition()
 //helper methods
 Map *GameEngine::getMap()
 {
-    cout << "got map!\n"
-         << endl;
+    // cout << "got map!\n"
+    //      << endl;
     return map;
 }
 
@@ -1167,6 +1239,17 @@ void fakeStartup(GameEngine *engine)
     cout << "Welcome to WarZone!" << endl;
     cout << "Current State: " << engine->getCurrentStateName() << endl;
 
+    cout << "DEBUG: check whats in engine after replay" << endl;
+    cout << "Map:" << endl;
+    if (engine->getMap())
+    {
+        cout << engine->getMap() << endl;
+    }
+    else
+    {
+        cout << "No map" << endl;
+    }
+
     /** Stand-in Startup Phase (Automatic) 
      * */
     // loadmap (now in mapvalidated state)
@@ -1267,12 +1350,13 @@ void fakeStartup(GameEngine *engine)
 // Rewriting the mainLoop test as a free function
 void refactoringA2P3()
 {
-    GameEngine engine;
 
     bool stillPlaying = true;
 
     while (stillPlaying)
     {
+        GameEngine engine; // need to re-instantiate engine after each game (else, segmentation fault error... badly defined GameEngine Constructors?)
+
         cout << "Debug: Entering fakeStartup phase" << endl;
         fakeStartup(&engine);
 
@@ -1285,7 +1369,6 @@ void refactoringA2P3()
             cout << "Debug: replay ... (press any keys to continue)" << endl;
 
             string x;
-
             cin >> x;
         }
         else
@@ -1316,14 +1399,13 @@ void GameEngine::refactoring_mainGameLoop()
     this->doTransition("issueorder");
     issueOrdersPhase();
     this->doTransition("endissueorders");
-    cout << "DEBUG WINNING. State : " << getCurrentStateName() << endl; // we are in execorder state
+    // cout << "DEBUG WINNING. State : " << getCurrentStateName() << endl; // we are in execorder state
 
     // PHASE 3: Execute Orders Phase
     this->doTransition("execorder");
     executeOrdersPhase();
-    cout << "DEBUG WINNING. State : " << getCurrentStateName() << endl;
+    // cout << "DEBUG WINNING. State : " << getCurrentStateName() << endl;
 
-    // loop shall continue until only one of the players owns all the territories
     Player *winner = hasWinner();
 
     // Test a forced win
@@ -1340,8 +1422,6 @@ void GameEngine::refactoring_mainGameLoop()
         //     cout << "Valid next state:" << endl;
         //     cout << getNextStateName(t) << endl;
         // }
-        
-
 
         string input;
         cin >> input;
