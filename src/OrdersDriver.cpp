@@ -637,6 +637,7 @@ void testAirliftExec()
      // TODO: Another test: on source territory owned by enemy
 }
 
+// Tests for Bomb, Blockade, Negotiate
 void testOrdersExec()
 {
     // ************************************************** //
@@ -687,16 +688,18 @@ void testOrdersExec()
          << endl;
 
     /****		Showing Bomb			**/
-    std::cout << "\n\n--- BOMB: Player 2 bombs Player 1's Territory ---";
+    std::cout << "\n\n--- BOMB: Player 2 bombs Player 1's Territory ---" << endl;
     Order* o5 = new Bomb(p2, t2);
+    cout << o5->getDetails() << endl;
     std::cout << "\nBEFORE: " << t2->getName() << " armies: " << t2->getNumberOfArmies() << endl;
     o5->execute();
     std::cout << "\nAFTER: " << t2->getName() << " armies: " << t2->getNumberOfArmies() << endl;
 
 
     /****		Showing Invalid Bomb (its own territory)			**/
-    std::cout << "\n\n--- BOMB: Player 2 bombs Player 2's Territory ---";
+    std::cout << "\n\n--- BOMB: Player 2 bombs Player 2's Territory ---" << endl;
     Order* b2 = new Bomb(p2, t3);
+    cout << b2->getDetails() << endl;
     std::cout << "\nBEFORE: " << t3->getName() << " armies: " << t3->getNumberOfArmies() << endl;
     b2->execute();
     std::cout << "\nAFTER: " << t3->getName() << " armies: " << t3->getNumberOfArmies() << endl;
@@ -705,6 +708,7 @@ void testOrdersExec()
 	std::cout << "\n\n--- BLOCKADE: Player 1 blockades its N_Ireland territory---";
 	Player* neutral = new Player("Neutral");
 	Order* o6 = new Blockade(t1, p1, neutral);
+     cout << o6->getDetails() << endl;
 	std::cout << "\nBEFORE: " << t1->getName() << " armies: " << t1->getNumberOfArmies();
     std::cout << "\nBEFORE: " << t1->getName() << " owner: Player " << t1->getOwner()->getName();
 	o6->execute();
@@ -714,6 +718,7 @@ void testOrdersExec()
     /****		Showing Invalid Blockade	(not its territory)		**/
     std::cout << "\n\n--- BLOCKADE: Player 1 blockades its N_Ireland territory---";
     Order* o8 = new Blockade(t4, p1, neutral);
+    cout << o8->getDetails() << endl;
     std::cout << "\nBEFORE: " << t4->getName() << " armies: " << t4->getNumberOfArmies();
     std::cout << "\nBEFORE: " << t4->getName() << " owner: Player " << t4->getOwner()->getName();
     o8->execute();

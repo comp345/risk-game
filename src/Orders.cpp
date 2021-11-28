@@ -120,7 +120,8 @@ void Order::setDetails(std::string orderDetails)
     details = orderDetails;
 }
 
-string Order::stringToLog() {
+string Order::stringToLog()
+{
     return "Order was executed: " + this->getDetails();
 }
 
@@ -506,8 +507,10 @@ Bomb &Bomb::operator=(const Bomb &b)
 bool Bomb::validate()
 {
     bool adjacent = false;
-    for (Territory* t : playerBombing->getTerritories()) {
-        if (t->isNeighbor(getTerritory())) {
+    for (Territory *t : playerBombing->getTerritories())
+    {
+        if (t->isNeighbor(getTerritory()))
+        {
             adjacent = true;
             break;
         }
@@ -525,7 +528,8 @@ bool Bomb::execute()
         cout << "Invalid Bomb order." << endl;
         return false;
     }
-    cout << "Execute Bomb order." << endl;;
+    cout << "Execute Bomb order." << endl;
+    ;
     getTerritory()->setNumberOfArmies(
         getTerritory()->getNumberOfArmies() / 2);
 
@@ -551,28 +555,50 @@ void Bomb::updateDetails()
                    getTerritory()->getName() + "}.";
     setDetails(_desc);
 }
-Blockade::Blockade() : Order("Blockade type", "")
+
+/* ---------------------- Blockade ------------------------- */
+Blockade::Blockade() : Order("Blockade type", ""), target(new Territory),
+                       player(new Player), neutral(new Player)
 {
 }
 Blockade::Blockade(string orderdetails) : Order("Blockade type", orderdetails)
 {
 }
-Blockade::Blockade(const Blockade &b) // USING IT FOR A2
+Blockade::Blockade(const Blockade &b) : Order(b.getCommand(), b.getDetails()),
+                                        player(new Player(*b.getPlayer())), target(new Territory(*b.getTerritory())),
+                                        neutral(new Player(*b.getNeutral()))
 {
-    Blockade cpyBlockade = b;
-    setCommand(cpyBlockade.getCommand());
-    setDetails(cpyBlockade.getDetails());
-    target = b.target;
-    player = b.player;
-    neutral = b.neutral;
 }
 
-Blockade::Blockade(Territory* target1, Player* p1, Player* neutral1)
+// Constructor used to issue orders
+Blockade::Blockade(Territory *target1, Player *p1, Player *neutral1)
 {
     target = target1;
     player = p1;
     neutral = neutral1;
+    string _command = "Blockade type";
+    setCommand(_command);
+    updateDetails();
 };
+ Blockade::~Blockade()
+ {}
+Blockade& Blockade::operator=(const Blockade& b)
+{
+    Order::operator=(b); // self assignment guard
+    if (player) delete player;
+    if (target) delete target;
+    if (neutral) delete neutral;
+    player = 
+    return *this;
+}
+
+void Blockade::updateDetails()
+{
+    string _details = "Player " + player->getName() + " blockades " + target->getName() + ", owned by " + target->getOwner()->getName();
+    string desc = getCommand() + " = {" + _details + "}";
+    setDetails(desc);
+}
+
 bool Blockade::validate()
 {
     if ((target->getOwner() == player))
@@ -592,24 +618,45 @@ bool Blockade::execute()
         int count = 0;
 
         //removing the territories from player and assigning them to neutral player
-        vector<Territory*> playerTerr = player->getTerritories();
-        for (vector<Territory*>::iterator it = playerTerr.begin(); it != playerTerr.end(); ++it)
-        {
-            if (*it == target)
-            {
-                break;
-            }
-            ++count;
-        }
+        // vector<Territory *> playerTerr = player->getTerritories();
+        // for (vector<Territory *>::iterator it = playerTerr.begin(); it != playerTerr.end(); ++it)
+        // {
+        //     if (*it == target)
+        //     {
+        //         break;
+        //     }
+        //     ++count;
+        // }
 
-        playerTerr.erase(playerTerr.begin() + count);
+        // playerTerr.erase(playerTerr.begin() + count);
 
-        neutral->getTerritories().push_back(target);
+        // neutral->getTerritories().push_back(target);
+
         return true;
     }
-    else {
+    else
+    {
         return false;
     }
+}
+
+Player *Blockade::getPlayer() const { return player; }
+Territory *Blockade::getTerritory() const { return target; }
+Player *Blockade::getNeutral() const { return neutral; }
+void Blockade::setPlayer(Player *p)
+{
+    player = p;
+    updateDetails();
+}
+void Blockade::setTerritory(Territory *t)
+{
+    target = t;
+    updateDetails();
+}
+void Blockade::setNeutral(Player *n)
+{
+    neutral = n;
+    updateDetails();
 }
 
 // ---------------------------
@@ -740,7 +787,7 @@ Negotiate::Negotiate(const Negotiate &n)
     source = n.source;
     target = n.target;
 }
-Negotiate::Negotiate(Player* source1, Player* target1) : Order("Negotiate", "prevent attacks between the current player and another player until the end of the turn")
+Negotiate::Negotiate(Player *source1, Player *target1) : Order("Negotiate", "prevent attacks between the current player and another player until the end of the turn")
 {
     source = source1;
     target = target1;

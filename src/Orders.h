@@ -153,6 +153,18 @@ public:
     Blockade(Territory *target1, Player *p1, Player *neutral1);
     Blockade(std::string details);
     Blockade(const Blockade &b);
+    ~Blockade();
+    Blockade& operator=(const Blockade& b);
+
+    Player * getPlayer() const;
+    Territory * getTerritory() const;
+    Player * getNeutral()const;
+    void setPlayer(Player * p);
+    void setTerritory(Territory * t);
+    void setNeutral(Player * n);
+
+
+    void updateDetails();
 
     bool validate();
     bool execute();
