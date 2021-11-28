@@ -24,6 +24,7 @@ Player::Player() {
     this->doneIssuing = false;
     priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
+    this->ps = new NeutralPlayerStrategy(this);
 }
 
 Player::Player(string n) {
@@ -34,6 +35,7 @@ Player::Player(string n) {
     this->doneIssuing = false;
     this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
+    this->ps = new NeutralPlayerStrategy(this);
 }
 
 //parametrized constructor
@@ -46,6 +48,8 @@ Player::Player(string plName, vector<Territory *> t, Hand *h, OrderList *o) {
     this->prevTerritorySize = territories.size();
     this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
+    //Link player with strategy
+    this->ps = new NeutralPlayerStrategy(this);
 }
 
 //parametrized constructor
@@ -59,6 +63,8 @@ Player::Player(int armies, string plName, vector<Territory *> t, Hand *h, OrderL
     this->prevTerritorySize = territories.size();
     this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
+    //Link player with strategy
+    this->ps = new NeutralPlayerStrategy(this);
 }
 
 //copy constructor: Deep copy, cannot be used for reference semantic or to
@@ -72,6 +78,8 @@ Player::Player(const Player &p) {
     this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     // cout << "Exiting Player::Player(const Player& p)" <<endl;
+    //Link player with strategy
+    this->ps = p.ps;
 }
 
 //destructor
@@ -81,6 +89,9 @@ Player::~Player() {
     orderList = nullptr;
     delete hand;
     hand = nullptr;
+
+//    delete ps;
+//    ps = nullptr;
 
     for (Territory *t: territories) {
         delete t;
@@ -104,6 +115,7 @@ Player &Player::operator=(const Player &p) {
     orderList = new OrderList(*(p.orderList));
     plArmies = p.plArmies;
     name = p.name;
+    ps = p.ps;
     return *this;
 }
 
@@ -144,33 +156,6 @@ istream &operator>>(istream &in, Player &p) {
 //returns a list of territories to attack
 vector<Territory *> Player::toAttack() {
     return getPlayerStrategy()->toAttack();
-
-    // vector<Territory *> attackableTerritories = vector<Territory *>();
-
-    // //Get the players territories
-    // for (Territory *territory: territories) {
-    //     //add them to the attackable Territories if they have an army on them
-    //     if (territory->getNumberOfArmies() > 0)
-    //         attackableTerritories.push_back(territory);
-    // }
-
-    // vector<Territory *> neighbourTerritories = vector<Territory *>();
-    // for (Territory *territory: attackableTerritories) {
-
-    //     // cout << "the neighbours of " << territory->getName() << " are as follows:\n";
-    //     for (Territory *neighbour: territory->getNeighbors()) {
-    //         // cout << neighbour->getName() << ", owned by " << neighbour->getOwner()->getName() <<"\n";
-
-    //         // If we haven't already seen the territory, add it to the list.
-    //         if (!count(neighbourTerritories.begin(), neighbourTerritories.end(), neighbour))
-
-    //             // If it already belongs to us then we dont have to attack it.
-    //             if (neighbour->getOwner() != this)
-    //                 neighbourTerritories.push_back(neighbour);
-    //     }
-    // }
-
-    // return neighbourTerritories;
 }
 
 //returns a list of territories to defend
@@ -180,9 +165,8 @@ vector<Territory *> Player::toDefend() {
 
 
 //adds order to a player's list of orders
-void Player::issueOrder(Order *o, PlayerStrategy* ps) {
-    setPlayerStrategy(ps);
-    orderList->add(o);
+void Player::issueOrder(Order *o) {
+    getPlayerStrategy()->issueOrder(o);
 }
 
 Hand *Player::getHand() {

@@ -34,13 +34,13 @@ public:
     Player(string plName, vector<Territory *> t, Hand *h, OrderList *o);
 
     ~Player(); //destructor
-    vector<Territory *> toAttack();
+    virtual vector<Territory *> toAttack();
 
-    vector<Territory *> toDefend();
+    virtual vector<Territory *> toDefend();
 
     void issueOrder(string, string);
 
-    void issueOrder(Order *o, PlayerStrategy* ps);
+    void issueOrder(Order *o);
 
     void printOrders();
 

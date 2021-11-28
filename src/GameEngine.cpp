@@ -713,7 +713,6 @@ void StartupPhase::startup()
 // A2 Part 3 : Main Gameplay
 void GameEngine::testPart3()
 {
-
     GameEngine engine;
     cout << "Welcome to WarZone!" << endl;
     cout << "Current State: " << engine.getCurrentStateName() << endl;
@@ -840,6 +839,7 @@ void GameEngine::testPart3()
 
 void GameEngine::mainGameLoop()
 {
+    
     if (getCurrentStateName() == "assignreinforcement")
     {
         for (Player *p : currentPlayers)
@@ -1004,17 +1004,23 @@ void GameEngine::issueOrdersPhase()
     // Updating each players' toAttack and toDefend queues
     for (Player *p : currentPlayers)
     {
+        cout << endl << "Player " << p->getName() << " is now building his priority based on the " << p->getPlayerStrategy()->strategyName() << endl;
+
         // territories are to be attacked in priority
-        for (Territory *toAttack : p->toAttack())
+        for (Territory *toAttack : p->getPlayerStrategy()->toAttack())
         {
+            cout << toAttack->getName() << endl;
             p->addToPriorityAttack(toAttack);
         }
+
         // Defend
-        for (Territory *toDefend : p->toDefend())
+        for (Territory *toDefend : p->getPlayerStrategy()->toDefend())
         {
             p->addToPriorityDefend(toDefend);
         }
     }
+
+    
     while (!allPlayersDone())
     {
         for (int i = 0; i < currentPlayers.size(); i++)
@@ -1071,11 +1077,11 @@ void GameEngine::issueOrdersPhase()
             // (1) Deploy: until reinforc pool == 0
             if (currentPlayers.at(i)->getReinforcementPool() > 0)
             {
-                Territory *territoryTarget = currentPlayers.at(i)->getPriorityDefending().top();
+                 Territory *territoryTarget = currentPlayers.at(i)->getPriorityDefending().top();
                 // Create Deploy -> decrease reinforcement)
                 Deploy *deploy = new Deploy(1, currentPlayers.at(i), territoryTarget);
                 cout << "Issueing: " << deploy->getDetails() << endl;
-                currentPlayers.at(i)->issueOrder(deploy, currentPlayers.at(i)->getPlayerStrategy());
+                currentPlayers.at(i)->issueOrder(deploy);
                 /* To do for A3: Able to use same territory in deploy order for advance (add stack to store popped defending territory?) */
                 currentPlayers.at(i)->popPriorityDefend();
             }
@@ -1087,7 +1093,7 @@ void GameEngine::issueOrdersPhase()
                 Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
                 Advance *advance = new Advance(1, currentPlayer, territorySource, territoryTarget);
                 cout << "Issueing! " << advance->getDetails() << endl;
-                currentPlayer->issueOrder(advance, currentPlayer->getPlayerStrategy());
+                currentPlayer->issueOrder(advance);
                 currentPlayer->popPriorityAttack();
                 currentPlayer->popPriorityDefend();
             }
@@ -1385,11 +1391,12 @@ void GameEngine::refactoring_mainGameLoop()
         reinforcementPhase(p);
         cout << "\nPlayer: " << p->getName() << " has " << p->getReinforcementPool() << " in his reinforcement pool.\n";
     }
-
+    
     // PHASE 2: Issue Orders Phase
 
     this->doTransition("issueorder");
     issueOrdersPhase();
+
     this->doTransition("endissueorders");
 
     // PHASE 3: Execute Orders Phase

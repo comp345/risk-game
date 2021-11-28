@@ -1,45 +1,65 @@
+#pragma once
+#include<vector>
+using std::vector;
+
+#include<string>
+using std::string;
+
 class Player;
+class Territory;
+class Order;
 
 class PlayerStrategy{
 public:
-    virtual void issueOrder() = 0;
+    PlayerStrategy();
+    PlayerStrategy(Player* p);
+    PlayerStrategy(const PlayerStrategy& p);
+
+    PlayerStrategy &operator=(const PlayerStrategy &ps);
+
+    virtual void issueOrder(Order* o) = 0;
     virtual vector<Territory *> toAttack() = 0;
     virtual vector<Territory *> toDefend() = 0;
+
+    //testing function
+    virtual string strategyName() = 0;
+
+    virtual ~PlayerStrategy();
+
+    void setPlayer(Player* p);
+    Player* getPlayer();
 private:
     Player* p;
 };
 
 class NeutralPlayerStrategy: public PlayerStrategy{
 public:
-    void issueOrder();
-    virtual vector<Territory *> toAttack();
-    virtual vector<Territory *> toDefend();
+    NeutralPlayerStrategy(Player* p);
+    ~NeutralPlayerStrategy();
+    // NeutralPlayerStrategy(const NeutralPlayerStrategy& p);
+    // NeutralPlayerStrategy &operator=(const NeutralPlayerStrategy &ps);
+
+    void issueOrder(Order* o);
+    vector<Territory *> toAttack();
+    vector<Territory *> toDefend();
+
+    string strategyName();
 };
 
-class CheaterPlayerStrategy: public PlayerStrategy{
-public:
-    void issueOrder();
-    virtual vector<Territory *> toAttack();
-    virtual vector<Territory *> toDefend();
-};
 
-class HumanPlayerStrategy: public PlayerStrategy{
-public:
-    void issueOrder();
-    virtual vector<Territory *> toAttack();
-    virtual vector<Territory *> toDefend();
-};
 
-class AggressivePlayerStrategy: public PlayerStrategy{
-public:
-    void issueOrder();
-    virtual vector<Territory *> toAttack();
-    virtual vector<Territory *> toDefend();
-};
+// class CheaterPlayerStrategy: public PlayerStrategy{
 
-class BenevolentPlayerStrategy: public PlayerStrategy{
-public:
-    void issueOrder();
-    virtual vector<Territory *> toAttack();
-    virtual vector<Territory *> toDefend();
-};
+// };
+
+// class HumanPlayerStrategy: public PlayerStrategy{
+
+// };
+
+// class AggressivePlayerStrategy: public PlayerStrategy{
+
+// };
+
+// class BenevolentPlayerStrategy: public PlayerStrategy{
+
+// };
