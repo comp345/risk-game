@@ -209,10 +209,18 @@ private:
     Player* target;
 public:
     Negotiate();
-    Negotiate(Player *source1, Player *target1);
-    Negotiate(std::string details);
+    Negotiate(Player *source1, Player *target1); // <-- one used for issue order
+    Negotiate(std::string details); // don't use
     // Copy constructor to-do
     Negotiate(const Negotiate &n);
+    ~Negotiate();
+    Negotiate& operator=(const Negotiate &n);
+
+    Player * getSource() const;
+    Player * getTarget() const;
+    void setSource(Player * p);
+    void setTarget(Player * p);
+    void updateDetails();
 
     bool validate();
     bool execute();

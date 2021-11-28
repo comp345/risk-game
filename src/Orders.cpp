@@ -580,15 +580,29 @@ Blockade::Blockade(Territory *target1, Player *p1, Player *neutral1)
     setCommand(_command);
     updateDetails();
 };
- Blockade::~Blockade()
- {}
-Blockade& Blockade::operator=(const Blockade& b)
+Blockade::~Blockade()
 {
-    Order::operator=(b); // self assignment guard
-    if (player) delete player;
-    if (target) delete target;
-    if (neutral) delete neutral;
-    player = 
+    delete player;
+    delete target;
+    delete neutral;
+}
+
+Blockade &Blockade::operator=(const Blockade &b)
+{
+    if (this == &b)
+        return *this;
+    if (player)
+        delete player;
+    if (target)
+        delete target;
+    if (neutral)
+        delete neutral;
+    player = new Player(*b.getPlayer());
+    target = new Territory(*b.getTerritory());
+    neutral = new Player(*b.getNeutral());
+    string _command = "Blockade type";
+    setCommand("Blockade type");
+    updateDetails();
     return *this;
 }
 
@@ -617,20 +631,20 @@ bool Blockade::execute()
         target->setOwner(neutral);
         int count = 0;
 
-        //removing the territories from player and assigning them to neutral player
-        // vector<Territory *> playerTerr = player->getTerritories();
-        // for (vector<Territory *>::iterator it = playerTerr.begin(); it != playerTerr.end(); ++it)
-        // {
-        //     if (*it == target)
-        //     {
-        //         break;
-        //     }
-        //     ++count;
-        // }
+        //removing the target from player territory list
+        vector<Territory *> playerTerr = player->getTerritories();
+        for (vector<Territory *>::iterator it = playerTerr.begin(); it != playerTerr.end(); ++it)
+        {
+            if (*it == target)
+            {
+                break;
+            }
+            ++count;
+        }
 
-        // playerTerr.erase(playerTerr.begin() + count);
+        playerTerr.erase(playerTerr.begin() + count);
 
-        // neutral->getTerritories().push_back(target);
+        neutral->getTerritories().push_back(target);
 
         return true;
     }
@@ -706,6 +720,8 @@ AirLift &AirLift::operator=(const AirLift &a)
     this->territorySource = new Territory(*a.getTerritorySource());
     this->territoryTarget = new Territory(*a.getTerritoryTarget());
 
+    updateDetails();
+
     return *this;
 }
 
@@ -774,9 +790,13 @@ void AirLift::updateDetails()
     setDetails(_desc);
 }
 
-Negotiate::Negotiate() : Order("Negotiate type", "")
+/* ---------------------- Negotiate ---------------------------*/
+Negotiate::Negotiate() : Order("Negotiate type", ""),
+                         source(new Player), target(new Player)
 {
 }
+
+// do not use
 Negotiate::Negotiate(string orderdetails) : Order("Negotiate type", orderdetails) // USING IT FOR A2
 {
 }
@@ -787,11 +807,36 @@ Negotiate::Negotiate(const Negotiate &n)
     source = n.source;
     target = n.target;
 }
-Negotiate::Negotiate(Player *source1, Player *target1) : Order("Negotiate", "prevent attacks between the current player and another player until the end of the turn")
+Negotiate::Negotiate(Player *source1, Player *target1)
 {
     source = source1;
     target = target1;
+    string _command = "Negotiate type";
+    setCommand(_command);
+    updateDetails();
 }
+
+Negotiate::~Negotiate()
+{
+    delete source;
+    delete target;
+}
+
+Negotiate &Negotiate::operator=(const Negotiate &n)
+{
+    if (this == &n)
+        return *this;
+    if (source)
+        delete source;
+    if (target)
+        delete target;
+    source = new Player(*n.getSource());
+    target = new Player(*n.getTarget());
+    updateDetails();
+
+    return *this;
+}
+
 bool Negotiate::validate()
 {
     if (source != target)
@@ -807,13 +852,25 @@ bool Negotiate::execute()
     if (validate())
     {
         //TODO: not sure how to implement
+        
         notify(this);
         return true;
     }
     return false;
 };
 
-//---------------------------
+Player* Negotiate::getSource() const { return source; }
+Player* Negotiate::getTarget() const { return target; }
+void Negotiate::setSource(Player *p) { source = p; updateDetails(); }
+void Negotiate::setTarget(Player *p) { target = p; updateDetails(); }
+void Negotiate::updateDetails() 
+{
+    string _details = "Player " + source->getName() + " negotiates with " + target->getName();
+    string desc = getCommand() + " = {" + _details + "}";
+    setDetails(desc);
+}
+
+//-----------------------------------------------------------------------
 
 // Implementation of OrderList
 OrderList::OrderList()
