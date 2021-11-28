@@ -852,7 +852,29 @@ bool Negotiate::execute()
     if (validate())
     {
         //TODO: not sure how to implement
-        
+        /*
+            Source player and Target player cannot attack each other during a turn
+            
+            Definition of "one turn" : one sequence of execution during which every player 
+            executes exactly one order.
+            
+            When sourcePlayer negotiates with targetPlayer, the effect of the next order 
+            execution of targetPlayer, if it is an advance order, is DROPPED 
+            automatically if it results in an attack. (DROPPED ONCE). Same for 
+            sourcePlayer (DROPPED ONCE).
+
+            => add this implementation by adding Player * isNegotiating  to Player class.
+            => add implementation inside Advance/simulatedAttack method: Check if player is negotiating...
+            
+            => add impl. to Order execute: when the turn of both player has pass, 
+            remove the negotiating flag on both players.
+            What if player is negotiating with multiple players? Player should maintain
+            a vector of negotiate...
+        */
+       this->getSource()->setNegotiatingWith(this->getTarget());
+       this->getTarget()->setNegotiatingWith(this->getSource());
+
+
         notify(this);
         return true;
     }

@@ -725,11 +725,33 @@ void testOrdersExec()
      std::cout << "\nAFTER: " << t4->getName() << " armies: " << t4->getNumberOfArmies();
      std::cout << "\nAFTER: " << t4->getName() << " owner: Player " << t4->getOwner()->getName();
 
+     cout << endl << endl;
      /****		Showing Negotiate		****/
+     cout << endl
+          << "PRE NEGOTIATE : Check if Players are negotiating with someone" << endl;
+     cout << to_string(p1->isNegotiating()) << endl;
+     if (p1->isNegotiating())
+     {
+          cout << p1->getNegotiatingWith()->getName() << endl;
+     }
+
      std::cout << "\n\n--- NEGOTIATE: Player 1 negotiates with Player 2 ---\n";
      Order *o7 = new Negotiate(p1, p2);
      cout << o7->getDetails() << endl;
      o7->execute();
+
+     cout << endl << "POST-Negotiate: p1 and p2 should be negotiating with the other" << endl;
+     cout << "Player " << p1->getName() << " negotiates with ";
+     if (p1->isNegotiating())
+     {
+          cout << p1->getNegotiatingWith()->getName() << endl;
+     }
+     cout << "Player " << p2->getName() << " negotiates with ";
+     if (p2->isNegotiating())
+     {
+          cout << p2->getNegotiatingWith()->getName() << endl;
+     }
+
 
      /** TODO: Testing that advance orders will not result in attack by source or target players on each other */
      Order *o9 = new Advance(1, p1, t1, t2);
