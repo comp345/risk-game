@@ -13,6 +13,8 @@ class Order;
 
 class OrderList;
 
+class PlayerStrategy;
+
 using namespace std;
 
 struct compareArmySize {
@@ -110,6 +112,7 @@ private:
     vector<Territory *> territories;
     Hand *hand;
     OrderList *orderList;
+    PlayerStrategy* ps;
 
     bool doneIssuing;
     int plArmies;
