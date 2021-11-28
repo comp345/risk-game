@@ -164,7 +164,6 @@ GameEngine::GameEngine() {
     deck = new Deck(30);
 
     commandProcessor = new CommandProcessor();
-    isFile = false;
 }
 
 GameEngine::GameEngine(std::string newFile)
@@ -240,8 +239,7 @@ GameEngine::GameEngine(std::string newFile)
 
     // Create Adapter and pass file
     fileName = newFile;
-    fileAdapter = new FileCommandProcessorAdapter(newFile);
-    isFile = true;
+    commandProcessor = new FileCommandProcessorAdapter(newFile);
 }
 
 
@@ -289,52 +287,28 @@ void GameEngine::testGameEngine()
     //GameEngine engine{fileName};
     Command* output;
     cout << "Welcome to WarZone!" << endl;
-
-    //Different execution depending if -f arg is passed
-    if(!isFile)
+    while(true)
     {
-        while(true)
+        //To handle replay case, getCommand has to be called at a later execution
+        output = commandProcessor->getCommand(currentState);
+        doTransition(output->getCommandName());
+        if(output->getCommandName() == "gamestart")
         {
-            //To handle replay case, getCommand has to be called at a later execution
-            output = commandProcessor->getCommand(currentState);
-            doTransition(output->getCommandName());
-            if(output->getCommandName() == "gamestart")
-            {
-                //Start the gameloop
-                break;
-            }
-            else if(output->getCommandName() == "replay")
-            {
-                //Call me later
-                cout << "\n";
-            }
-            else if(output->getCommandName() == "quit")
-                exit(0);
+            //Start the gameloop
+            break;
+        }
+        else if(output->getCommandName() == "replay")
+        {
+            //Call me later
             cout << "\n";
         }
+        else if(output->getCommandName() == "quit")
+            exit(0);
         cout << "\n";
-        cout << "Voila tous les commands: " << endl;
-        commandProcessor->printCommands();
     }
-    else
-    {
-        while(true)
-        {
-            output = fileAdapter->getCommand(currentState);
-            doTransition(output->getCommandName());
-            if(output->getCommandName() == "gamestart")
-            {
-                //Start the gameloop
-                break;
-            }
-            else if(output->getCommandName() == "quit")
-                exit(0);
-            cout << "\n";
-        }
-        cout << "\n";
-        cout << "Voila tous les commands: " << endl;
-        fileAdapter->printCommands();
-    }
+    cout << "\n";
+    cout << "Voila tous les commands: " << endl;
+    commandProcessor->printCommands();
 }
 
 string GameEngine::stringToLog() {

@@ -216,7 +216,7 @@ std::string FileCommandProcessorAdapter::readCommand(std::string fileName, State
     {
         cout << "Invalid command. Must check transition for current state: " << this->getCurrentStateName(currentState) << endl;
     }
-return validatedCommand;
+    return validatedCommand;
 }
 
 Command* FileCommandProcessorAdapter::getCommand(State*& currentState)

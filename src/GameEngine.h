@@ -90,12 +90,10 @@ class GameEngine : public ILoggable, public Subject {
 private:
     int numberOfPlayers;
     State *currentState;
-    bool isFile;
     std::string fileName;
     std::vector<State *> states; // GameEngine maintains collection of all states
     std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
     CommandProcessor *commandProcessor;
-    FileCommandProcessorAdapter *fileAdapter;
     std::vector<std::string> listOfFile;
     std::vector<Player *> plVec;
     Map *map;
