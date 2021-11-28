@@ -43,30 +43,20 @@ void PlayerStrategy::setPlayer(Player *p)
 
 
 
-
-
-NeutralPlayerStrategy::NeutralPlayerStrategy(Player *p) : PlayerStrategy(p)
+AggressivePlayerStrategy::AggressivePlayerStrategy(Player *p) : PlayerStrategy(p)
 {
 };
 
-NeutralPlayerStrategy::~NeutralPlayerStrategy()
+AggressivePlayerStrategy::~AggressivePlayerStrategy()
 {
 }
 
-// NeutralPlayerStrategy::NeutralPlayerStrategy(const NeutralPlayerStrategy& p){
-// }
-// NeutralPlayerStrategy &NeutralPlayerStrategy::operator=(const NeutralPlayerStrategy &ps){
-//     if (this == &ps)
-//         return *this;
-//     return *this;
-// }
-
-void NeutralPlayerStrategy::issueOrder(Order* o)
+void AggressivePlayerStrategy::issueOrder(Order* o)
 {
     getPlayer()->getOrderList()->add(o);
 }
 
-vector<Territory *> NeutralPlayerStrategy::toAttack()
+vector<Territory *> AggressivePlayerStrategy::toAttack()
 {
     vector<Territory *> attackableTerritories = vector<Territory *>();
 
@@ -99,12 +89,76 @@ vector<Territory *> NeutralPlayerStrategy::toAttack()
     return neighbourTerritories;
 };
 
-vector<Territory *> NeutralPlayerStrategy::toDefend()
+vector<Territory *> AggressivePlayerStrategy::toDefend()
 {
     return getPlayer()->getTerritories();
 };
 
-string NeutralPlayerStrategy::strategyName()
+string AggressivePlayerStrategy::strategyName()
 {
-    return "Neutral strategy";
+    return "Aggressive strategy";
+}
+
+
+
+
+
+
+
+
+
+BenevolentPlayerStrategy::BenevolentPlayerStrategy(Player *p) : PlayerStrategy(p)
+{
+};
+
+BenevolentPlayerStrategy::~BenevolentPlayerStrategy()
+{
+}
+
+void BenevolentPlayerStrategy::issueOrder(Order* o)
+{
+    getPlayer()->getOrderList()->add(o);
+}
+
+vector<Territory *> BenevolentPlayerStrategy::toAttack()
+{
+    vector<Territory *> attackableTerritories = vector<Territory *>();
+
+    //Get the players territories
+    for (Territory *territory : getPlayer()->getTerritories())
+    {
+        //add them to the attackable Territories if they have an army on them
+        if (territory->getNumberOfArmies() > 0)
+            attackableTerritories.push_back(territory);
+    }
+
+    vector<Territory *> neighbourTerritories = vector<Territory *>();
+    for (Territory *territory : attackableTerritories)
+    {
+
+        // cout << "the neighbours of " << territory->getName() << " are as follows:\n";
+        for (Territory *neighbour : territory->getNeighbors())
+        {
+            // cout << neighbour->getName() << ", owned by " << neighbour->getOwner()->getName() <<"\n";
+
+            // If we haven't already seen the territory, add it to the list.
+            if (!count(neighbourTerritories.begin(), neighbourTerritories.end(), neighbour))
+
+                // If it already belongs to us then we dont have to attack it.
+                if (neighbour->getOwner() != getPlayer())
+                    neighbourTerritories.push_back(neighbour);
+        }
+    }
+
+    return neighbourTerritories;
+};
+
+vector<Territory *> BenevolentPlayerStrategy::toDefend()
+{
+    return getPlayer()->getTerritories();
+};
+
+string BenevolentPlayerStrategy::strategyName()
+{
+    return "Benevolent strategy";
 }

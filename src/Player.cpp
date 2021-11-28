@@ -24,7 +24,7 @@ Player::Player() {
     this->doneIssuing = false;
     priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
-    this->ps = new NeutralPlayerStrategy(this);
+    this->ps = new AggressivePlayerStrategy(this);
 }
 
 Player::Player(string n) {
@@ -35,7 +35,7 @@ Player::Player(string n) {
     this->doneIssuing = false;
     this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
-    this->ps = new NeutralPlayerStrategy(this);
+    this->ps = new AggressivePlayerStrategy(this);
 }
 
 //parametrized constructor
@@ -49,7 +49,7 @@ Player::Player(string plName, vector<Territory *> t, Hand *h, OrderList *o) {
     this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     //Link player with strategy
-    this->ps = new NeutralPlayerStrategy(this);
+    this->ps = new AggressivePlayerStrategy(this);
 }
 
 //parametrized constructor
@@ -64,7 +64,7 @@ Player::Player(int armies, string plName, vector<Territory *> t, Hand *h, OrderL
     this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     //Link player with strategy
-    this->ps = new NeutralPlayerStrategy(this);
+    this->ps = new AggressivePlayerStrategy(this);
 }
 
 //copy constructor: Deep copy, cannot be used for reference semantic or to
