@@ -36,6 +36,13 @@ Command::~Command()
 {
 }
 
+Command& Command::operator=(const Command& c)
+{
+    commandName = c.commandName;
+    commandEffect = c.commandEffect;
+    return *this;
+}
+
 string Command::getCommandName()
 {
     return commandName;
@@ -100,6 +107,12 @@ void Command::saveEffect(string command)
 CommandProcessor::CommandProcessor()
 {
     fileName = "";
+    currentState = new State();
+}
+CommandProcessor::CommandProcessor(const CommandProcessor& c)
+{
+    fileName = c.fileName;
+    currentState = new State(*c.currentState);
 }
 
 CommandProcessor::CommandProcessor(std::string fileInput, State*& setState)
@@ -110,6 +123,16 @@ CommandProcessor::CommandProcessor(std::string fileInput, State*& setState)
 
 CommandProcessor::~CommandProcessor()
 {
+}
+CommandProcessor& CommandProcessor::operator=(const CommandProcessor& c)
+{
+    if (this == &c)
+        return *this;
+    if (currentState) { delete currentState; }
+    fileName = c.fileName;
+    currentState = new State(*c.currentState);
+
+    return *this;
 }
 
 bool CommandProcessor::validateCommand(State*& currentState, string command)

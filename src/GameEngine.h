@@ -107,6 +107,12 @@ public:
 
     GameEngine(std::string fileName);
 
+    GameEngine(const GameEngine &e);
+
+    ~GameEngine();
+
+    GameEngine& operator=(const GameEngine& e);
+
     // return name of current state
     std::string getCurrentStateName();
 
