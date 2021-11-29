@@ -38,14 +38,10 @@ Card::~Card()
 
 // Creates an Order, and adds it to the players list of order
 // Then removes that card from the deck
-void Card::play(Player& player, Deck& deck)
-{
-    // A1 implementation 
-
-    // player.issueOrder(Order::getOrder());
-    deck.returnCard(this);
-    // cout << "\n" << m_effect << " was played by " << player.getName() << "\n";
-}
+/** TODO:  A3 Implementation -> card.play called in GameEngine  
+ * - Virtual play method?
+ * */ 
+// void Card::play(Player& player, Deck& deck) {}
 
 
 Card::Effect* Card::getEffect()
