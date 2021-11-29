@@ -531,6 +531,16 @@ bool Bomb::validate()
     if (getTerritory()->getOwner() == playerBombing)
         return false;
 
+    for (auto negotiatee : playerBombing->getNegotiatingWith())
+    {
+        if (negotiatee == territoryTarget->getOwner())
+        {
+            cout << "Debug: Bomb::validate() Negotiation is happening between bombing player "
+                 << playerBombing->getName() << " and target territory owner, "
+                 << territoryTarget->getOwner()->getName() << endl;
+            return false;
+        }
+    }
     return adjacent;
 }
 bool Bomb::execute()

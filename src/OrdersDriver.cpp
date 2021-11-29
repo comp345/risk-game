@@ -798,7 +798,7 @@ void testOrdersExec()
 
 
      cout << endl << endl;
-     /** TODO: Testing that advance orders will not result in attack by source or target players on each other */
+     /** Testing that advance orders will not result in attack by source or target players on each other */
      // This advance order: Hoax tries to advance to adjacent territory belonging to Toast. This would normally end in attack
      // But since Hoax and Toast are negotiating, this will become invalid
      Order *o9 = new Advance(1, p1, t2, t4);
