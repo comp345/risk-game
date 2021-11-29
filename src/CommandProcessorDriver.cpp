@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string.h>
 #include "CommandProcessor.h"
+#include "GameEngine.h"
 
 using namespace std;
 
@@ -16,6 +17,7 @@ std::string checkCliArgs(int argNumber, char *argv[])
             fileName = argv[2];
         }
     }
+    cout << fileName;
     return fileName;
 }
 
@@ -34,8 +36,8 @@ void testCommandProcessor(int argc, char *argv[])
     }
 }
 
-//int main(int argc, char *argv[], char **)
-//{
-//    testCommandProcessor(argc, argv);
-//    return 0;
-//}
+int main(int argc, char *argv[], char **)
+{
+   testCommandProcessor(argc, argv);
+   return 0;
+}

@@ -99,6 +99,13 @@ public:
 
     void addTerritories(vector<Territory *> t1);
 
+    // implementation of Negotiate order
+    bool isNegotiating(Player * p);
+    void addNegotiatingWith(Player * p);
+    void removeNegotiatingWith(Player * p);
+    vector<Player *> getNegotiatingWith() const;
+    void removeAllNegotiation();
+
 
 private:
     int reinforcementPool;
@@ -113,4 +120,8 @@ private:
 
     bool doneIssuing;
     int plArmies;
+
+    // implementation of Negotiate order
+    vector<Player*> negotiatingWith; 
+
 };

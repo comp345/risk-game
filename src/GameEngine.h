@@ -4,15 +4,15 @@
 #include <string>
 #include <vector>
 #include "LoggingObserver.h"
-#include "Player.h"
-#include "Map.h"
-#include "CommandProcessor.h"
-#include "Card.h"
 
 /* The states and transitions are stored in a linked list like structure */
 class Deck;
 // States are Nodes in the game flow
-
+class Order;
+class Map;
+class Player;
+class Territory;
+class Card;
 class State;
 class Transition;
 class FileCommandProcessorAdapter;
@@ -92,12 +92,10 @@ private:
     int numberOfPlayers;
     State *currentState;
     bool validTransition;
-    bool isFile;
     std::string fileName;
     std::vector<State *> states;           // GameEngine maintains collection of all states
     std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
     CommandProcessor *commandProcessor;
-    FileCommandProcessorAdapter *fileAdapter;
     std::vector<std::string> listOfFile;
     std::vector<Player *> plVec;
     Map *map;
