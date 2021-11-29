@@ -13,6 +13,8 @@ class Order;
 
 class OrderList;
 
+class PlayerStrategy;
+
 using namespace std;
 
 struct compareArmySize {
@@ -32,9 +34,9 @@ public:
     Player(string plName, vector<Territory *> t, Hand *h, OrderList *o);
 
     ~Player(); //destructor
-    vector<Territory *> toAttack();
+    virtual vector<Territory *> toAttack();
 
-    vector<Territory *> toDefend();
+    virtual vector<Territory *> toDefend();
 
     void issueOrder(string, string);
 
@@ -105,6 +107,8 @@ public:
     void removeNegotiatingWith(Player * p);
     vector<Player *> getNegotiatingWith() const;
     void removeAllNegotiation();
+    PlayerStrategy* getPlayerStrategy();
+    void setPlayerStrategy(PlayerStrategy* ps);
 
 
 private:
@@ -117,6 +121,7 @@ private:
     vector<Territory *> territories;
     Hand *hand;
     OrderList *orderList;
+    PlayerStrategy* ps;
 
     bool doneIssuing;
     int plArmies;

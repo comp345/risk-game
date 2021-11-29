@@ -13,6 +13,9 @@
 #include <exception>
 #include "CommandProcessor.h"
 
+
+#include "PlayerStrategies.h"
+
 namespace fs = filesystem;
 using namespace std;
 
@@ -677,7 +680,6 @@ void StartupPhase::startup()
 // A2 Part 3 : Main Gameplay
 void GameEngine::testPart3()
 {
-
     GameEngine engine;
     cout << "Welcome to WarZone!" << endl;
     cout << "Current State: " << engine.getCurrentStateName() << endl;
@@ -804,6 +806,7 @@ void GameEngine::testPart3()
 
 void GameEngine::mainGameLoop()
 {
+    
     if (getCurrentStateName() == "assignreinforcement")
     {
         for (Player *p : currentPlayers)
@@ -968,21 +971,36 @@ void GameEngine::issueOrdersPhase()
     // Updating each players' toAttack and toDefend queues
     for (Player *p : currentPlayers)
     {
+        cout << endl << "Player " << p->getName() << " is now building his attack priority based on the " << p->getPlayerStrategy()->strategyName() << endl;
+
         // territories are to be attacked in priority
-        for (Territory *toAttack : p->toAttack())
+        for (Territory *toAttack : p->getPlayerStrategy()->toAttack())
         {
+            cout << toAttack->getName() << endl;
             p->addToPriorityAttack(toAttack);
         }
+
+        cout << "... Building his defensive priority ..." << endl;
+
         // Defend
-        for (Territory *toDefend : p->toDefend())
+        // Note
+        for (Territory *toDefend : p->getPlayerStrategy()->toDefend())
         {
+            cout << toDefend->getName() << endl;
             p->addToPriorityDefend(toDefend);
         }
     }
+
+    
     while (!allPlayersDone())
     {
         for (int i = 0; i < currentPlayers.size(); i++)
         {
+            if(currentPlayers.at(i)->getPlayerStrategy()->strategyName() == "Neutral strategy"){
+            currentPlayers.at(i)->toggleDoneIssuing();
+            continue;
+            }
+
             cout << "\nGameEngine:: Player: " << currentPlayers.at(i)->getName() << " is currently in the issue order phase.\n";
 
             if (currentPlayers.at(i)->isDoneIssuing())
@@ -1035,7 +1053,7 @@ void GameEngine::issueOrdersPhase()
             // (1) Deploy: until reinforc pool == 0
             if (currentPlayers.at(i)->getReinforcementPool() > 0)
             {
-                Territory *territoryTarget = currentPlayers.at(i)->getPriorityDefending().top();
+                 Territory *territoryTarget = currentPlayers.at(i)->getPriorityDefending().top();
                 // Create Deploy -> decrease reinforcement)
                 Deploy *deploy = new Deploy(1, currentPlayers.at(i), territoryTarget);
                 cout << "Issueing: " << deploy->getDetails() << endl;
@@ -1057,8 +1075,10 @@ void GameEngine::issueOrdersPhase()
             }
 
             // After a player issue one order, check if reinforcementPool 0 or queues empty
-            if (currentPlayers.at(i)->getPriorityDefending().size() == 0 or currentPlayers.at(i)->getPriorityAttacking().size() == 0)
+            if (currentPlayers.at(i)->getPriorityDefending().size() == 0 or currentPlayers.at(i)->getPriorityAttacking().size() == 0) {
                 currentPlayers.at(i)->toggleDoneIssuing();
+
+            }
         }
     }
 }
@@ -1127,7 +1147,14 @@ void GameEngine::executeOrdersPhase()
         for (int i = 0; i < currentPlayers.size(); i++)
         {
             Player *currentPlayer = currentPlayers.at(i);
-            bool played = false;
+            bool played;
+
+            if(currentPlayer->getPlayerStrategy()->strategyName() != "Neutral strategy"){
+                played = false;
+            }else{
+                played = true;
+                continue;
+            }
 
             cout << "GameEngine:: Player: " << currentPlayer->getName() << " is currently in the execute order phase.\n";
             //Check to see if that player has a deploy order
@@ -1142,7 +1169,8 @@ void GameEngine::executeOrdersPhase()
             // }
 
             //if (hasDeploy = true)
-            if (currentPlayer->getOrderList()->getList().at(0)->getCommand() == "Deploy type")
+
+            if (currentPlayer->getPlayerStrategy()->strategyName() != "Benevolent strategy" && currentPlayer->getOrderList()->getList().front()->getCommand() == "Deploy type")
             {
                 //Go through all the order
                 for (Order *order : currentPlayers.at(i)->getOrderList()->getList())
@@ -1262,6 +1290,7 @@ void fakeStartup(GameEngine *engine)
             p2Territories.push_back(t);
         }
         p2->setTerritories(p2Territories);
+        p2->setPlayerStrategy(new NeutralPlayerStrategy(p2));
 
         cout << "\n\n"
              << p2->getName() << " was created! \n";
@@ -1349,11 +1378,12 @@ void GameEngine::refactoring_mainGameLoop()
         reinforcementPhase(p);
         cout << "\nPlayer: " << p->getName() << " has " << p->getReinforcementPool() << " in his reinforcement pool.\n";
     }
-
+    
     // PHASE 2: Issue Orders Phase
 
     this->doTransition("issueorder");
     issueOrdersPhase();
+
     this->doTransition("endissueorders");
 
     // PHASE 3: Execute Orders Phase
