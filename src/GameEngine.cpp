@@ -293,10 +293,6 @@ GameEngine &GameEngine::operator=(const GameEngine &e)
         delete commandProcessor;
     }
     commandProcessor = new CommandProcessor(*e.commandProcessor);
-    // if (fileAdapter)
-    // {
-    //     delete fileAdapter;
-    // }
 
     for (vector<State *>::iterator it = states.begin(); it != states.end(); ++it)
     {
