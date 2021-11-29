@@ -1013,6 +1013,12 @@ void GameEngine::issueOrdersPhase()
             p->addToPriorityAttack(toAttack);
         }
 
+        cout << "----- DEBUG: Pre-building defensive priority ... -----" << endl;
+         for (Territory *toDefend : p->getPlayerStrategy()->toDefend())
+        {
+            cout << toDefend->getName() << endl;
+        }
+
         cout << "... Building his defensive priority ..." << endl;
 
         // Defend
