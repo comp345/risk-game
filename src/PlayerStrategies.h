@@ -32,22 +32,6 @@ private:
     Player* p;
 };
 
-class NeutralPlayerStrategy: public PlayerStrategy{
-public:
-    NeutralPlayerStrategy(Player* p);
-    ~NeutralPlayerStrategy();
-    // NeutralPlayerStrategy(const NeutralPlayerStrategy& p);
-    // NeutralPlayerStrategy &operator=(const NeutralPlayerStrategy &ps);
-
-    void issueOrder(Order* o);
-    vector<Territory *> toAttack();
-    vector<Territory *> toDefend();
-
-    string strategyName();
-};
-
-
-
 // class CheaterPlayerStrategy: public PlayerStrategy{
 
 // };
@@ -78,4 +62,23 @@ public:
     vector<Territory *> toDefend();
 
     string strategyName();
+};
+
+class NeutralPlayerStrategy: public PlayerStrategy{
+public:
+    NeutralPlayerStrategy(Player* p);
+    ~NeutralPlayerStrategy();
+    // NeutralPlayerStrategy(const NeutralPlayerStrategy& p);
+    // NeutralPlayerStrategy &operator=(const NeutralPlayerStrategy &ps);
+
+    void issueOrder(Order* o);
+    vector<Territory *> toAttack();
+    vector<Territory *> toDefend();
+
+    string strategyName();
+
+    void toggleHasBeenAttacked();
+
+private:
+    bool hasBeenAttacked;
 };
