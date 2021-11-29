@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <string>
-// #include "Player.h"
 #include "LoggingObserver.h"
 #include "Orders.h"
 
@@ -34,7 +33,8 @@ public:
     ~Card();
 
     // Methods
-    void play(Player &player, Deck &deck);
+    // A3: play is made virtual
+    virtual void play(Player &player, Deck &deck) = 0;
 
     Effect *getEffect();
 
@@ -64,6 +64,8 @@ public:
     CardBomb(const CardBomb &b);
     // CardBomb(Player *p, Territory * target);
     ~CardBomb();
+    void play(Player &player, Deck &deck);
+
 
     std::ostream &write(std::ostream &os) const;
 };
@@ -76,6 +78,8 @@ public:
     Reinforcement(const Reinforcement& reinforcement);
     ~Reinforcement();
 
+    void play(Player &player, Deck &deck);
+
     std::ostream &write(std::ostream &os) const;
 };
 
@@ -86,6 +90,8 @@ public:
     CardBlockade(Effect* effect);
     CardBlockade(const CardBlockade& blockade);
     ~CardBlockade();
+
+    void play(Player &player, Deck &deck);
 
     std::ostream &write(std::ostream &os) const;
 };
@@ -98,6 +104,8 @@ public:
     Airlift(const Airlift& airlift);
     ~Airlift();
 
+    void play(Player &player, Deck &deck);
+
     std::ostream &write(std::ostream &os) const;
 };
 
@@ -108,6 +116,8 @@ public:
     Diplomacy(Effect* effect);
     Diplomacy(const Diplomacy& diplomacy);
     ~Diplomacy();
+
+    void play(Player &player, Deck &deck);
 
     std::ostream &write(std::ostream &os) const;
 };

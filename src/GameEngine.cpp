@@ -11,7 +11,7 @@
 #include "Orders.h"
 #include "Card.h"
 #include <exception>
-#include "GameEngine.h"
+#include "CommandProcessor.h"
 
 
 #include "PlayerStrategies.h"
@@ -184,7 +184,6 @@ GameEngine::GameEngine()
     validTransition = false;
 
     commandProcessor = new CommandProcessor();
-    isFile = false;
 }
 
 // TODO: instead of overloading GameEngine constructor, use default arguments
@@ -262,8 +261,7 @@ GameEngine::GameEngine(std::string newFile)
 
     // Create Adapter and pass file
     fileName = newFile;
-    fileAdapter = new FileCommandProcessorAdapter(newFile);
-    isFile = true;
+    commandProcessor = new FileCommandProcessorAdapter(newFile);
 }
 
 GameEngine::GameEngine(const GameEngine &e)
@@ -271,12 +269,10 @@ GameEngine::GameEngine(const GameEngine &e)
     numberOfPlayers = e.numberOfPlayers;
     currentState = new State(*e.currentState);
     validTransition = e.validTransition;
-    isFile = e.isFile;
     fileName = e.fileName;
     states = vector<State *>(e.states);
     transitions = vector<Transition *>(e.transitions);
     commandProcessor = new CommandProcessor(*e.commandProcessor);
-    fileAdapter = new FileCommandProcessorAdapter(*e.fileAdapter);
     listOfFile = vector<string>(e.listOfFile);
     plVec = vector<Player *>(e.plVec);
 }
@@ -300,10 +296,6 @@ GameEngine &GameEngine::operator=(const GameEngine &e)
         delete commandProcessor;
     }
     commandProcessor = new CommandProcessor(*e.commandProcessor);
-    if (fileAdapter)
-    {
-        delete fileAdapter;
-    }
 
     for (vector<State *>::iterator it = states.begin(); it != states.end(); ++it)
     {
@@ -385,53 +377,28 @@ void GameEngine::testGameEngine()
     //GameEngine engine{fileName};
     Command *output;
     cout << "Welcome to WarZone!" << endl;
-
-    //Different execution depending if -f arg is passed
-    if (!isFile)
+    while(true)
     {
-        while (true)
+        //To handle replay case, getCommand has to be called at a later execution
+        output = commandProcessor->getCommand(currentState);
+        doTransition(output->getCommandName());
+        if(output->getCommandName() == "gamestart")
         {
-            //To handle replay case, getCommand has to be called at a later execution
-            output = commandProcessor->getCommand(currentState);
-            doTransition(output->getCommandName());
-            if (output->getCommandName() == "gamestart")
-            {
-                //Start the gameloop
-                break;
-            }
-            else if (output->getCommandName() == "replay")
-            {
-                //Call me later
-                cout << "\n";
-            }
-            else if (output->getCommandName() == "quit")
-                exit(0);
+            //Start the gameloop
+            break;
+        }
+        else if(output->getCommandName() == "replay")
+        {
+            //Call me later
             cout << "\n";
         }
-
+        else if(output->getCommandName() == "quit")
+            exit(0);
         cout << "\n";
-        cout << "Voila toutes les commandes: " << endl;
-        commandProcessor->printCommands();
     }
-    else
-    {
-        while (true)
-        {
-            output = fileAdapter->getCommand(currentState);
-            doTransition(output->getCommandName());
-            if (output->getCommandName() == "gamestart")
-            {
-                //Start the gameloop
-                break;
-            }
-            else if (output->getCommandName() == "quit")
-                exit(0);
-            cout << "\n";
-        }
-        cout << "\n";
-        cout << "Voila toutes les commandes: " << endl;
-        fileAdapter->printCommands();
-    }
+    cout << "\n";
+    cout << "Voila tous les commands: " << endl;
+    commandProcessor->printCommands();
 }
 
 string GameEngine::stringToLog()
@@ -1016,6 +983,7 @@ void GameEngine::issueOrdersPhase()
         cout << "... Building his defensive priority ..." << endl;
 
         // Defend
+        // Note
         for (Territory *toDefend : p->getPlayerStrategy()->toDefend())
         {
             cout << toDefend->getName() << endl;
