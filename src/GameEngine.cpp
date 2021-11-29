@@ -298,9 +298,13 @@ void GameEngine::testGameEngine()
             //To handle replay case, getCommand has to be called at a later execution
             output = commandProcessor->getCommand(currentState);
             doTransition(output->getCommandName());
+            //StartupPhase s1;
             if(output->getCommandName() == "gamestart")
             {
                 //Start the gameloop
+//                preStartup();
+//                s1.setGameEng(this);
+//                s1.startup();
                 break;
             }
             else if(output->getCommandName() == "replay")
@@ -400,37 +404,105 @@ void GameEngine::preStartup() {
     string path = "../maps/";
     string mName;
     string fpath;
+    vector<string> cmdInput, cmdInput2;
+    string keyIn,keyIn2;
+    string temp;
+    string commandName, mapName;
 
     MapLoader *mapLoader = new MapLoader();
     cout << "Initiating map loading stage: \n" << endl;
     getMapList();
+
+    //commandProcessor->getCommand()
     while (true) {
-        cout << "\n Enter the number of the desired map: \n" << endl;
-        cin >> mapNum;
-        while (mapNum > listOfFile.size() || !(cin >> mapNum)) {
-            cin.clear();
-            cin.ignore(1000, '\n');
-            if (!isdigit(mapNum)) {
-                cout << "Wrong input. Try with a valid number! \n" << endl;
-                continue;//breaking here if we input wrong number on the first try, doesnt work as intended even when entering correct number on 2nd try
-            } else
-                break;
+        //must do loadmap filename -> doTransition(next)
+//        cout << "\n Enter the number of the desired map: \n" << endl;
+//        cin >> mapNum;
+//        while (mapNum > listOfFile.size() || !(cin >> mapNum)) {
+//            cin.clear();
+//            cin.ignore(1000, '\n');
+//            if (!isdigit(mapNum)) {
+//                cout << "Wrong input. Try with a valid number! \n" << endl;
+//                continue;//breaking here if we input wrong number on the first try, doesnt work as intended even when entering correct number on 2nd try
+//            } else
+//                break;
+//        }
+//        mName = listOfFile[mapNum - 1];
+
+        //to grab command manually!
+        cout<< "insert command: \n"<<endl;
+
+        getline(cin, keyIn);
+        //cout<<keyIn<<endl;
+        for(int i=0; i<keyIn.length(); ++i){
+            if(keyIn[i]==' '){
+                cmdInput.push_back(temp);
+                temp="";
+            }else{
+                temp.push_back(keyIn[i]);
+            }
         }
-        mName = listOfFile[mapNum - 1];
-        fpath = path.append(mName);
+        cmdInput.push_back(temp);
+        //storing command name and mapfile name
+
+        commandName=cmdInput[0];
+        mapName=cmdInput[1];
+
+        cout<<"current command: "<<commandName<<"\n"<<endl;
+        cout<<"current mapfile requested: "<<mapName<<"\n"<<endl;//returns filename.map
+
+        fpath = path.append(mapName);
         Map x1 = *mapLoader->loadMap(fpath);
         Map *map1 = new Map(x1);
-        map1->validate();// validates map
-        map1->showLoadedMap();
-        setMap(map1);
+        cout<<"Map "<<mapName<<" has been loaded. \n"<<endl;
+
+        cin>>keyIn2;
+        while(true){
+            if(keyIn2=="validatemap"){
+                map1->validate();// validates map
+                map1->showLoadedMap();
+                setMap(map1);
+                break;
+            }else{
+                cout<<"wrong command dummy! Try again!"<<endl;
+            }
+        }
         break;
     }
     // addplayer loop
     //if(command==addplayer)-> do this
+    string keyIn3;
+    string temp2="";
+    //vector<string>cmdInput2;
+    cout<<"start adding players here! \n"<<endl;
+    cin.ignore();
+    getline(cin,keyIn3);
+    for(int i=0; i<keyIn3.length(); ++i){
+        if(keyIn3[i]==' '){
+            cmdInput2.push_back(temp2);
+            temp2="";
+        }else{
+            temp2.push_back(keyIn3[i]);
+        }
+    }
+    cmdInput2.push_back(temp2);
+    string cmdName2= cmdInput2[0];
+    string cmdPlName= cmdInput2[1];
+//    while(true){
+//        if(cmdName2=="addplayer"){
+//            cout<<"the current command is :" <<cmdName2<<"\n"<<endl;
+//            cout<<"current player name is "<<cmdPlName<<"\n"<<endl;
+//            numberOfPlayers++;
+//            setNumOfPlayers(numberOfPlayers);
+//            cout<<"total number of players so far is: "<<getNumOfPlayers()<<endl;
+//            break;
+//        }
+//        else{
+//            cout<<"SIKE, THATS THE WRONG ORDER!"<<endl;
+//        }
+//    }
+
     while (true) {
-//            string playerNameInput;
-//            cout << "Enter player name: \n" << endl;
-//            cin >> playerNameInput;
         cout << "Enter the number of players (between 2-6): \n" << endl;
         cin >> numberOfPlayers;
         setNumOfPlayers(numberOfPlayers);
@@ -480,7 +552,8 @@ StartupPhase::StartupPhase(const StartupPhase &sp) {
 }
 
 StartupPhase::~StartupPhase() {
-
+//missing destructor
+cout<<"destroyed startup object!"<<endl;
 }
 
 void StartupPhase::operator=(const StartupPhase &sp) {
