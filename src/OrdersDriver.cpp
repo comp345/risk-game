@@ -648,6 +648,8 @@ void testOrdersExec()
      // ************************************************** //
      Player *p1 = new Player("Hoax");
      Player *p2 = new Player("Toast");
+     Player *p3 = new Player("Diplomat Maria");
+     Player *p4 = new Player("Diplomat Arya");
 
      MapLoader *mapLoader = new MapLoader();
      Map x4 = *mapLoader->loadMap("../maps/europe.map");
@@ -730,11 +732,16 @@ void testOrdersExec()
      cout << endl << endl;
      /****		Showing Negotiate		****/
      cout << endl
-          << "PRE NEGOTIATE : Check if Players are negotiating with someone" << endl;
-     cout << to_string(p1->isNegotiating()) << endl;
-     if (p1->isNegotiating())
+          << "Pre negotiation : Check if Players are negotiating with someone" << endl;
+     string isNegotiating = p1->getNegotiatingWith().empty()? "No negotiation": "Negotiation in process...";
+     cout << isNegotiating << endl;
+     if (!p1->getNegotiatingWith().empty())
      {
-          cout << p1->getNegotiatingWith()->getName() << endl;
+          for (Player * negotiatee : p1->getNegotiatingWith())
+          {
+               cout << negotiatee->getName() << endl;
+          }
+          
      }
 
      std::cout << "\n\n--- NEGOTIATE: Player 1 negotiates with Player 2 ---\n";
@@ -744,14 +751,20 @@ void testOrdersExec()
 
      cout << endl << "POST-Negotiate: p1 and p2 should be negotiating with the other" << endl;
      cout << "Player " << p1->getName() << " negotiates with ";
-     if (p1->isNegotiating())
+     if (!p1->getNegotiatingWith().empty())
      {
-          cout << p1->getNegotiatingWith()->getName() << endl;
+          for (Player * negotiatee : p1->getNegotiatingWith())
+          {
+               cout << negotiatee->getName() << endl;
+          }
      }
      cout << "Player " << p2->getName() << " negotiates with ";
-     if (p2->isNegotiating())
+     if (!p2->getNegotiatingWith().empty())
      {
-          cout << p2->getNegotiatingWith()->getName() << endl;
+          for (Player * negotiatee : p2->getNegotiatingWith())
+          {
+               cout << negotiatee->getName() << endl;
+          }
      }
 
 

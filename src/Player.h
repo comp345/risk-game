@@ -100,10 +100,10 @@ public:
     void addTerritories(vector<Territory *> t1);
 
     // implementation of Negotiate order
-    bool isNegotiating();
+    bool isNegotiating(Player * p);
     void setNegotiatingWith(Player * p);
-    void removeNegotiatingWith();
-    Player * getNegotiatingWith() const;
+    void removeNegotiatingWith(Player * p);
+    vector<Player *> getNegotiatingWith() const;
 
 
 private:
@@ -121,6 +121,6 @@ private:
     int plArmies;
 
     // implementation of Negotiate order
-    Player * negotiatingWith; 
+    vector<Player*> negotiatingWith; 
 
 };

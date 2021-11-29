@@ -27,7 +27,7 @@ Player::Player()
     priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
 
     // Implementing Negotiate order
-    negotiatingWith = nullptr;
+    negotiatingWith = vector<Player *>();
 }
 
 Player::Player(string n)
@@ -41,7 +41,7 @@ Player::Player(string n)
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
 
     // Implementing Negotiate order
-    negotiatingWith = nullptr;
+    negotiatingWith = vector<Player *>();
 }
 
 //parametrized constructor
@@ -57,7 +57,7 @@ Player::Player(string plName, vector<Territory *> t, Hand *h, OrderList *o)
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
 
     // Implementing Negotiate order
-    negotiatingWith = nullptr;
+    negotiatingWith = vector<Player *>();
 }
 
 //parametrized constructor
@@ -73,8 +73,8 @@ Player::Player(int armies, string plName, vector<Territory *> t, Hand *h, OrderL
     this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
 
-      // Implementing Negotiate order
-    negotiatingWith = nullptr;
+    // Implementing Negotiate order
+    negotiatingWith = vector<Player *>();
 }
 
 //copy constructor: Deep copy, cannot be used for reference semantic or to
@@ -90,8 +90,8 @@ Player::Player(const Player &p)
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     // cout << "Exiting Player::Player(const Player& p)" <<endl;
 
-      // Implementing Negotiate order
-    this->negotiatingWith = new Player(*p.getNegotiatingWith());
+    // Implementing Negotiate order
+    this->negotiatingWith = p.negotiatingWith;
 }
 
 //destructor
@@ -102,8 +102,11 @@ Player::~Player()
     orderList = nullptr;
     delete hand;
     hand = nullptr;
-    delete negotiatingWith;
-    negotiatingWith = nullptr;
+    for (auto p : negotiatingWith)
+    {
+        delete p;
+    }
+    negotiatingWith.clear();
 
     for (Territory *t : territories)
     {
@@ -125,11 +128,14 @@ Player &Player::operator=(const Player &p)
         delete hand;
     if (orderList)
         delete orderList;
-    if (negotiatingWith)
-        delete negotiatingWith;
+    if (!negotiatingWith.empty())
+    {
+        for (auto n : negotiatingWith) delete n;
+    }
+    negotiatingWith.clear();
     hand = new Hand(*(p.hand));
     orderList = new OrderList(*(p.orderList));
-    negotiatingWith = new Player(*p.getNegotiatingWith());
+    negotiatingWith = p.negotiatingWith;
     plArmies = p.plArmies;
     name = p.name;
     return *this;
@@ -365,21 +371,34 @@ Territory *Player::popPriorityAttack()
 
 // Implementing Negotiate order
 
-bool Player::isNegotiating()
+bool Player::isNegotiating(Player *p)
 {
-    if (negotiatingWith)
-        return true;
+    // Check if our player is negotiating with the passed player by iterating through the vector
+    for (Player *negotiatee : negotiatingWith)
+    {
+        if (negotiatee == p)
+        {
+            return true;
+        }
+    }
     return false;
 }
-void Player::setNegotiatingWith(Player * p)
+void Player::setNegotiatingWith(Player *p)
 {
-    negotiatingWith = p;
+    negotiatingWith.push_back(p);
 }
-void Player::removeNegotiatingWith()
+void Player::removeNegotiatingWith(Player *p)
 {
-    negotiatingWith = nullptr;
+    for (int i = 0; i < negotiatingWith.size(); ++i)
+    {
+        if (negotiatingWith.at(i) == p)
+        {
+            negotiatingWith.erase(negotiatingWith.begin() + i);
+            return;
+        }
+    }
 }
-Player *Player::getNegotiatingWith() const
+vector<Player *> Player::getNegotiatingWith() const
 {
     return negotiatingWith;
 }
