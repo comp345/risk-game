@@ -880,8 +880,8 @@ bool Negotiate::execute()
             => TODO Remove negotiatees from vector (FLUSH negotiatingWith vector) at the end of turn/OrderExecutionPhase.
             (logic to implement in GameEngine?? using Player::removeAllNegotiation)
         */
-        this->getSource()->setNegotiatingWith(this->getTarget());
-        this->getTarget()->setNegotiatingWith(this->getSource());
+        this->getSource()->addNegotiatingWith(this->getTarget());
+        this->getTarget()->addNegotiatingWith(this->getSource());
 
         notify(this);
         return true;

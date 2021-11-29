@@ -383,7 +383,7 @@ bool Player::isNegotiating(Player *p)
     }
     return false;
 }
-void Player::setNegotiatingWith(Player *p)
+void Player::addNegotiatingWith(Player *p)
 {
     negotiatingWith.push_back(p);
 }

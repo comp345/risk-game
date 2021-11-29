@@ -101,7 +101,7 @@ public:
 
     // implementation of Negotiate order
     bool isNegotiating(Player * p);
-    void setNegotiatingWith(Player * p);
+    void addNegotiatingWith(Player * p);
     void removeNegotiatingWith(Player * p);
     vector<Player *> getNegotiatingWith() const;
     void removeAllNegotiation();
