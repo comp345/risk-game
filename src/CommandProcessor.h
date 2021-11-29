@@ -2,7 +2,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "GameEngine.h"
 #include "LoggingObserver.h"
 
 class CommandProcessor;
@@ -53,7 +52,6 @@ public:
 
 class FileCommandProcessorAdapter: virtual public CommandProcessor
 {
-    friend class FileLineReader;
 private:
     FileLineReader* reader;
     std::string fileName;
@@ -68,7 +66,6 @@ public:
 
 class FileLineReader
 {
-    friend class FileCommandProcessorAdapter;
 private:
     std::string fileName;
     std::vector<std::string> listOfCommands;

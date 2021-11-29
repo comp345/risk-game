@@ -2,7 +2,6 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include "Map.h"
 #include "LoggingObserver.h"
 
 // To implement for each Order class/subclass:
@@ -153,6 +152,18 @@ public:
     Blockade(Territory *target1, Player *p1, Player *neutral1);
     Blockade(std::string details);
     Blockade(const Blockade &b);
+    ~Blockade();
+    Blockade& operator=(const Blockade& b);
+
+    Player * getPlayer() const;
+    Territory * getTerritory() const;
+    Player * getNeutral()const;
+    void setPlayer(Player * p);
+    void setTerritory(Territory * t);
+    void setNeutral(Player * n);
+
+
+    void updateDetails();
 
     bool validate();
     bool execute();
@@ -197,10 +208,18 @@ private:
     Player* target;
 public:
     Negotiate();
-    Negotiate(Player *source1, Player *target1);
-    Negotiate(std::string details);
+    Negotiate(Player *source1, Player *target1); // <-- one used for issue order
+    Negotiate(std::string details); // don't use
     // Copy constructor to-do
     Negotiate(const Negotiate &n);
+    ~Negotiate();
+    Negotiate& operator=(const Negotiate &n);
+
+    Player * getSource() const;
+    Player * getTarget() const;
+    void setSource(Player * p);
+    void setTarget(Player * p);
+    void updateDetails();
 
     bool validate();
     bool execute();

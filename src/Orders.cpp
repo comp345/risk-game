@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include "Orders.h"
+#include "Player.h"
+#include "Map.h"
 #include "PlayerStrategies.h"
 
 using namespace std;
@@ -121,7 +123,8 @@ void Order::setDetails(std::string orderDetails)
     details = orderDetails;
 }
 
-string Order::stringToLog() {
+string Order::stringToLog()
+{
     return "Order was executed: " + this->getDetails();
 }
 
@@ -318,6 +321,16 @@ bool Advance::validate()
     cout << "Debug: Validate Advance order." << endl;
     if (this->getTerritorySource()->getOwner() != playerAdvancing)
         return false;
+    for (auto negotiatee : playerAdvancing->getNegotiatingWith())
+    {
+        if (negotiatee == territoryTarget->getOwner())
+        {
+            cout << "Debug: Advance::validate() Negotiation is happening between advancing player "
+                 << playerAdvancing->getName() << " and target territory owner, " 
+                 << territoryTarget->getOwner()->getName() << endl;
+            return false;
+        }
+    }
 
     return getTerritorySource()->isNeighbor(territoryTarget);
 }
@@ -514,8 +527,10 @@ Bomb &Bomb::operator=(const Bomb &b)
 bool Bomb::validate()
 {
     bool adjacent = false;
-    for (Territory* t : playerBombing->getTerritories()) {
-        if (t->isNeighbor(getTerritory())) {
+    for (Territory *t : playerBombing->getTerritories())
+    {
+        if (t->isNeighbor(getTerritory()))
+        {
             adjacent = true;
             break;
         }
@@ -524,6 +539,16 @@ bool Bomb::validate()
     if (getTerritory()->getOwner() == playerBombing)
         return false;
 
+    for (auto negotiatee : playerBombing->getNegotiatingWith())
+    {
+        if (negotiatee == territoryTarget->getOwner())
+        {
+            cout << "Debug: Bomb::validate() Negotiation is happening between bombing player "
+                 << playerBombing->getName() << " and target territory owner, "
+                 << territoryTarget->getOwner()->getName() << endl;
+            return false;
+        }
+    }
     return adjacent;
 }
 bool Bomb::execute()
@@ -533,7 +558,8 @@ bool Bomb::execute()
         cout << "Invalid Bomb order." << endl;
         return false;
     }
-    cout << "Execute Bomb order." << endl;;
+    cout << "Execute Bomb order." << endl;
+    ;
     getTerritory()->setNumberOfArmies(
         getTerritory()->getNumberOfArmies() / 2);
 
@@ -559,28 +585,64 @@ void Bomb::updateDetails()
                    getTerritory()->getName() + "}.";
     setDetails(_desc);
 }
-Blockade::Blockade() : Order("Blockade type", "")
+
+/* ---------------------- Blockade ------------------------- */
+Blockade::Blockade() : Order("Blockade type", ""), target(new Territory),
+                       player(new Player), neutral(new Player)
 {
 }
 Blockade::Blockade(string orderdetails) : Order("Blockade type", orderdetails)
 {
 }
-Blockade::Blockade(const Blockade &b) // USING IT FOR A2
+Blockade::Blockade(const Blockade &b) : Order(b.getCommand(), b.getDetails()),
+                                        player(new Player(*b.getPlayer())), target(new Territory(*b.getTerritory())),
+                                        neutral(new Player(*b.getNeutral()))
 {
-    Blockade cpyBlockade = b;
-    setCommand(cpyBlockade.getCommand());
-    setDetails(cpyBlockade.getDetails());
-    target = b.target;
-    player = b.player;
-    neutral = b.neutral;
 }
 
-Blockade::Blockade(Territory* target1, Player* p1, Player* neutral1)
+// Constructor used to issue orders
+Blockade::Blockade(Territory *target1, Player *p1, Player *neutral1)
 {
     target = target1;
     player = p1;
     neutral = neutral1;
+    string _command = "Blockade type";
+    setCommand(_command);
+    updateDetails();
 };
+Blockade::~Blockade()
+{
+    delete player;
+    delete target;
+    delete neutral;
+}
+
+Blockade &Blockade::operator=(const Blockade &b)
+{
+    if (this == &b)
+        return *this;
+    if (player)
+        delete player;
+    if (target)
+        delete target;
+    if (neutral)
+        delete neutral;
+    player = new Player(*b.getPlayer());
+    target = new Territory(*b.getTerritory());
+    neutral = new Player(*b.getNeutral());
+    string _command = "Blockade type";
+    setCommand("Blockade type");
+    updateDetails();
+    return *this;
+}
+
+void Blockade::updateDetails()
+{
+    string _details = "Player " + player->getName() + " blockades " + target->getName() + ", owned by " + target->getOwner()->getName();
+    string desc = getCommand() + " = {" + _details + "}";
+    setDetails(desc);
+}
+
 bool Blockade::validate()
 {
     if ((target->getOwner() == player))
@@ -599,9 +661,9 @@ bool Blockade::execute()
         target->setOwner(neutral);
         int count = 0;
 
-        //removing the territories from player and assigning them to neutral player
-        vector<Territory*> playerTerr = player->getTerritories();
-        for (vector<Territory*>::iterator it = playerTerr.begin(); it != playerTerr.end(); ++it)
+        //removing the target from player territory list
+        vector<Territory *> playerTerr = player->getTerritories();
+        for (vector<Territory *>::iterator it = playerTerr.begin(); it != playerTerr.end(); ++it)
         {
             if (*it == target)
             {
@@ -613,11 +675,32 @@ bool Blockade::execute()
         playerTerr.erase(playerTerr.begin() + count);
 
         neutral->getTerritories().push_back(target);
+
         return true;
     }
-    else {
+    else
+    {
         return false;
     }
+}
+
+Player *Blockade::getPlayer() const { return player; }
+Territory *Blockade::getTerritory() const { return target; }
+Player *Blockade::getNeutral() const { return neutral; }
+void Blockade::setPlayer(Player *p)
+{
+    player = p;
+    updateDetails();
+}
+void Blockade::setTerritory(Territory *t)
+{
+    target = t;
+    updateDetails();
+}
+void Blockade::setNeutral(Player *n)
+{
+    neutral = n;
+    updateDetails();
 }
 
 // ---------------------------
@@ -666,6 +749,8 @@ AirLift &AirLift::operator=(const AirLift &a)
     this->playerAirlifting = new Player(*a.getPlayer());
     this->territorySource = new Territory(*a.getTerritorySource());
     this->territoryTarget = new Territory(*a.getTerritoryTarget());
+
+    updateDetails();
 
     return *this;
 }
@@ -735,9 +820,13 @@ void AirLift::updateDetails()
     setDetails(_desc);
 }
 
-Negotiate::Negotiate() : Order("Negotiate type", "")
+/* ---------------------- Negotiate ---------------------------*/
+Negotiate::Negotiate() : Order("Negotiate type", ""),
+                         source(new Player), target(new Player)
 {
 }
+
+// do not use
 Negotiate::Negotiate(string orderdetails) : Order("Negotiate type", orderdetails) // USING IT FOR A2
 {
 }
@@ -748,11 +837,36 @@ Negotiate::Negotiate(const Negotiate &n)
     source = n.source;
     target = n.target;
 }
-Negotiate::Negotiate(Player* source1, Player* target1) : Order("Negotiate", "prevent attacks between the current player and another player until the end of the turn")
+Negotiate::Negotiate(Player *source1, Player *target1)
 {
     source = source1;
     target = target1;
+    string _command = "Negotiate type";
+    setCommand(_command);
+    updateDetails();
 }
+
+Negotiate::~Negotiate()
+{
+    delete source;
+    delete target;
+}
+
+Negotiate &Negotiate::operator=(const Negotiate &n)
+{
+    if (this == &n)
+        return *this;
+    if (source)
+        delete source;
+    if (target)
+        delete target;
+    source = new Player(*n.getSource());
+    target = new Player(*n.getTarget());
+    updateDetails();
+
+    return *this;
+}
+
 bool Negotiate::validate()
 {
     if (source != target)
@@ -767,14 +881,52 @@ bool Negotiate::execute()
 {
     if (validate())
     {
-        //TODO: not sure how to implement
+        //TODO: in ExecuteOrder phase, flush all players' negotiateWith vector with helper method
+        /*
+            Source player and Target player cannot attack each other during a turn
+            
+            Definition of "one turn" : ~one sequence of execution during which every player 
+            executes exactly one order.~ OR a whole execution turn (every player finished executing all orders from their list)
+            
+            When sourcePlayer negotiates with targetPlayer, during this turn (aka one whole OrdersExecution phase),
+            any advance orders of one of these player on the other enemy ARE DROPPED.
+
+            => add this implementation by adding Player * isNegotiating (and other helpers)  to Player class. DONE.
+            => add implementation inside Advance: Check if territory is not owed by advancing player + check if
+            player and enemy are negotiating... DONE.
+            
+            => TODO Remove negotiatees from vector (FLUSH negotiatingWith vector) at the end of turn/OrderExecutionPhase.
+            (logic to implement in GameEngine?? using Player::removeAllNegotiation)
+        */
+        this->getSource()->addNegotiatingWith(this->getTarget());
+        this->getTarget()->addNegotiatingWith(this->getSource());
+
         notify(this);
         return true;
     }
     return false;
 };
 
-//---------------------------
+Player *Negotiate::getSource() const { return source; }
+Player *Negotiate::getTarget() const { return target; }
+void Negotiate::setSource(Player *p)
+{
+    source = p;
+    updateDetails();
+}
+void Negotiate::setTarget(Player *p)
+{
+    target = p;
+    updateDetails();
+}
+void Negotiate::updateDetails()
+{
+    string _details = "Player " + source->getName() + " negotiates with " + target->getName();
+    string desc = getCommand() + " = {" + _details + "}";
+    setDetails(desc);
+}
+
+//-----------------------------------------------------------------------
 
 // Implementation of OrderList
 OrderList::OrderList()
