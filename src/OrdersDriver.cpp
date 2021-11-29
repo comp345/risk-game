@@ -768,9 +768,44 @@ void testOrdersExec()
      }
 
 
+
+     // Testing another negotiation order to see if the vector of negotiatee works
+     // (valid for now .... player 3 has no territories or orderlist)
+     std::cout << "\n\n--- NEGOTIATE: Player 1 negotiates with Player 3 ---\n";
+     Order * negotiate1 = new Negotiate(p1, p3);
+     cout << negotiate1->getDetails() << endl;
+     negotiate1->execute();
+
+     cout << endl << "POST-Negotiate: p1 and p3 should be negotiating with the other" << endl;
+     cout << "Player " << p1->getName() << " negotiates with ";
+     if (!p1->getNegotiatingWith().empty())
+     {
+          for (Player * negotiatee : p1->getNegotiatingWith())
+          {
+               cout << negotiatee->getName() << ", ";
+          }
+          cout << endl;
+     }
+     cout << "Player " << p3->getName() << " negotiates with ";
+     if (!p3->getNegotiatingWith().empty())
+     {
+          for (Player * negotiatee : p3->getNegotiatingWith())
+          {
+               cout << negotiatee->getName() << ", ";
+          }
+          cout << endl;
+     }
+
+
+
+     cout << endl << endl;
      /** TODO: Testing that advance orders will not result in attack by source or target players on each other */
-     Order *o9 = new Advance(1, p1, t1, t2);
-     cout << o9->getDetails() << endl;
+     // This advance order: Hoax tries to advance to adjacent territory belonging to Toast. This would normally end in attack
+     // But since Hoax and Toast are negotiating, this will become invalid
+     Order *o9 = new Advance(1, p1, t2, t4);
+     cout << o9->getDetails() << endl; // Note that England and N Ireland are adjacent, the advance would normally be valid
+     cout << "The source territory is owned by " << t2->getOwner()->getName() << endl;
+     cout << "The target territory is owned by " << t4->getOwner()->getName() << endl;
      o9->execute();
 
      std::cout << "\n";
@@ -778,4 +813,24 @@ void testOrdersExec()
      Order *o10 = new Negotiate(p1, p1);
      cout << o10->getDetails() << endl;
      o10->execute();
+
+
+     // Simulate the deletion of all negotiation at the end of phase
+     cout << endl << endl << "All negotiations in process." << endl;
+     for (auto n : p1->getNegotiatingWith()) cout << p1->getName() << " negotiates with " << n->getName() << endl;
+     for (auto n : p2->getNegotiatingWith()) cout << p2->getName() << " negotiates with " << n->getName() << endl;
+     for (auto n : p3->getNegotiatingWith()) cout << p3->getName() << " negotiates with " << n->getName() << endl;
+     for (auto n : p4->getNegotiatingWith()) cout << p4->getName() << " negotiates with " << n->getName() << endl;
+
+     cout << endl << endl << "Flush all negotations in process." << endl;
+     p1->removeAllNegotiation();
+     p2->removeAllNegotiation();
+     p3->removeAllNegotiation();
+     p4->removeAllNegotiation();
+
+     // Should print nothing if flush is correctly running
+     for (auto n : p1->getNegotiatingWith()) cout << p1->getName() << " negotiates with " << n->getName() << endl;
+     for (auto n : p2->getNegotiatingWith()) cout << p2->getName() << " negotiates with " << n->getName() << endl;
+     for (auto n : p3->getNegotiatingWith()) cout << p3->getName() << " negotiates with " << n->getName() << endl;
+     for (auto n : p4->getNegotiatingWith()) cout << p4->getName() << " negotiates with " << n->getName() << endl;
 }

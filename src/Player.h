@@ -104,6 +104,7 @@ public:
     void setNegotiatingWith(Player * p);
     void removeNegotiatingWith(Player * p);
     vector<Player *> getNegotiatingWith() const;
+    void removeAllNegotiation();
 
 
 private:

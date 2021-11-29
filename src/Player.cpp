@@ -402,3 +402,9 @@ vector<Player *> Player::getNegotiatingWith() const
 {
     return negotiatingWith;
 }
+// Flush all negotation at the end of ExecuteOrders phase
+void Player::removeAllNegotiation()
+{
+    // empty vector of pointers, don't deallocate the players!
+    negotiatingWith.clear(); 
+}

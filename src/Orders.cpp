@@ -320,6 +320,16 @@ bool Advance::validate()
     cout << "Debug: Validate Advance order." << endl;
     if (this->getTerritorySource()->getOwner() != playerAdvancing)
         return false;
+    for (auto negotiatee : playerAdvancing->getNegotiatingWith())
+    {
+        if (negotiatee == territoryTarget->getOwner())
+        {
+            cout << "Debug: Advance::validate() Negotiation is happening between advancing player "
+                 << playerAdvancing->getName() << " and target territory owner, " 
+                 << territoryTarget->getOwner()->getName() << endl;
+            return false;
+        }
+    }
 
     return getTerritorySource()->isNeighbor(territoryTarget);
 }
@@ -853,29 +863,25 @@ bool Negotiate::execute()
 {
     if (validate())
     {
-        //TODO: not sure how to implement
+        //TODO: in ExecuteOrder phase, flush all players' negotiateWith vector with helper method
         /*
             Source player and Target player cannot attack each other during a turn
             
-            Definition of "one turn" : one sequence of execution during which every player 
-            executes exactly one order.
+            Definition of "one turn" : ~one sequence of execution during which every player 
+            executes exactly one order.~ OR a whole execution turn (every player finished executing all orders from their list)
             
-            When sourcePlayer negotiates with targetPlayer, the effect of the next order 
-            execution of targetPlayer, if it is an advance order, is DROPPED 
-            automatically if it results in an attack. (DROPPED ONCE). Same for 
-            sourcePlayer (DROPPED ONCE).
+            When sourcePlayer negotiates with targetPlayer, during this turn (aka one whole OrdersExecution phase),
+            any advance orders of one of these player on the other enemy ARE DROPPED.
 
-            => add this implementation by adding Player * isNegotiating  to Player class.
-            => add implementation inside Advance/simulatedAttack method: Check if player is negotiating...
+            => add this implementation by adding Player * isNegotiating (and other helpers)  to Player class. DONE.
+            => add implementation inside Advance: Check if territory is not owed by advancing player + check if
+            player and enemy are negotiating... DONE.
             
-            => add impl. to Order execute: when the turn of both player has pass, 
-            remove the negotiating flag on both players.
-            What if player is negotiating with multiple players? Player should maintain
-            a vector of negotiate...
+            => TODO Remove negotiatees from vector (FLUSH negotiatingWith vector) at the end of turn/OrderExecutionPhase.
+            (logic to implement in GameEngine?? using Player::removeAllNegotiation)
         */
-       this->getSource()->setNegotiatingWith(this->getTarget());
-       this->getTarget()->setNegotiatingWith(this->getSource());
-
+        this->getSource()->setNegotiatingWith(this->getTarget());
+        this->getTarget()->setNegotiatingWith(this->getSource());
 
         notify(this);
         return true;
@@ -883,11 +889,19 @@ bool Negotiate::execute()
     return false;
 };
 
-Player* Negotiate::getSource() const { return source; }
-Player* Negotiate::getTarget() const { return target; }
-void Negotiate::setSource(Player *p) { source = p; updateDetails(); }
-void Negotiate::setTarget(Player *p) { target = p; updateDetails(); }
-void Negotiate::updateDetails() 
+Player *Negotiate::getSource() const { return source; }
+Player *Negotiate::getTarget() const { return target; }
+void Negotiate::setSource(Player *p)
+{
+    source = p;
+    updateDetails();
+}
+void Negotiate::setTarget(Player *p)
+{
+    target = p;
+    updateDetails();
+}
+void Negotiate::updateDetails()
 {
     string _details = "Player " + source->getName() + " negotiates with " + target->getName();
     string desc = getCommand() + " = {" + _details + "}";
