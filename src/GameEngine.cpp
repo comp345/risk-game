@@ -393,6 +393,8 @@ void GameEngine::preStartup() {
     cout << "Initiating map loading stage: \n" << endl;
     getMapList();
 
+    commandProcessor->getCommand(currentState);
+
     //to grab command manually!
     cout << "insert command: \n" << endl;
 
@@ -465,19 +467,21 @@ void GameEngine::preStartup() {
             setNumOfPlayers(numberOfPlayers);
 
             Player *p = new Player();
-            Deck *cardDeck = new Deck();
-            Hand *plCard = new Hand(cardDeck);
+            //Deck *cardDeck = new Deck();
+            //Hand *plCard = new Hand(cardDeck);
             p->setPlName(cmdPlName);
-            p->setCards(plCard);
+            //p->setCards(plCard);
             p->setPlArmies(5);
             cout << *p << "Number of Armies: " << p->getPlArmies() << endl;
             cout << "Cards in players hand: " << p->getHand() << endl;
             plVec.push_back(p);
 
             cout << "total number of players so far is: " << getNumOfPlayers() << endl;
+
             cmdInput2.clear();
             if (getNumOfPlayers() == 1) {
-                continue;
+                cout<<"have 1 player so far"<<endl;
+                //continue; // w/the continue, it keeps looping "Thats the wrong order".
             }
             if (getNumOfPlayers() < 7) {
                 cout << "continue adding players? (Y/n)" << endl;
@@ -582,6 +586,9 @@ void StartupPhase::startup() {
                     territories.push_back(map->territoryNodeList.back());
                     p->addTerritories(territories);
                     map->territoryNodeList.pop_back();
+                    for(Territory *t: territories){
+                        t->setOwner(p);
+                    }
                 }
             }
 
