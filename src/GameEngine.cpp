@@ -167,8 +167,7 @@ GameEngine::GameEngine() {
     isFile = false;
 }
 
-GameEngine::GameEngine(std::string newFile)
-{
+GameEngine::GameEngine(std::string newFile) {
     // Create the states and add to states collection
     State *startState = new State("start");
     State *maploadedState = new State("maploaded");
@@ -268,12 +267,9 @@ string GameEngine::getNextStateName(string command) {
 
 // Check if command is valid. If it is, updates the state. Return true if command was valid, false if else.
 // The success and error messages are not implemented, to allow flexible implementation in differents parts of A2.
-bool GameEngine::doTransition(string command)
-{
-    for (int i = 0; i < currentState->transitions.size(); ++i)
-    {
-        if (currentState->transitions.at(i)->nameTransition == command)
-        {
+bool GameEngine::doTransition(string command) {
+    for (int i = 0; i < currentState->transitions.size(); ++i) {
+        if (currentState->transitions.at(i)->nameTransition == command) {
             *currentState = *currentState->transitions.at(i)->nextState;
             notify(this);
             return true;
@@ -284,50 +280,38 @@ bool GameEngine::doTransition(string command)
 
 // Game play implementation for A1.
 // TODO: Will need to divide game flow into StartUpPhase(), GameLoopPhase(), etc. for A2
-void GameEngine::testGameEngine()
-{
+void GameEngine::testGameEngine() {
     //GameEngine engine{fileName};
-    Command* output;
+    Command *output;
     cout << "Welcome to WarZone!" << endl;
 
     //Different execution depending if -f arg is passed
-    if(!isFile)
-    {
-        while(true)
-        {
+    if (!isFile) {
+        while (true) {
             //To handle replay case, getCommand has to be called at a later execution
             output = commandProcessor->getCommand(currentState);
             doTransition(output->getCommandName());
             //StartupPhase s1;
-            if(output->getCommandName() == "gamestart")
-            {
+            if (output->getCommandName() == "gamestart") {
                 break;
-            }
-            else if(output->getCommandName() == "replay")
-            {
+            } else if (output->getCommandName() == "replay") {
                 //Call me later
                 cout << "\n";
-            }
-            else if(output->getCommandName() == "quit")
+            } else if (output->getCommandName() == "quit")
                 exit(0);
             cout << "\n";
         }
         cout << "\n";
         cout << "Voila tous les commands: " << endl;
         commandProcessor->printCommands();
-    }
-    else
-    {
-        while(true)
-        {
+    } else {
+        while (true) {
             output = fileAdapter->getCommand(currentState);
             doTransition(output->getCommandName());
-            if(output->getCommandName() == "gamestart")
-            {
+            if (output->getCommandName() == "gamestart") {
                 //Start the gameloop
                 break;
-            }
-            else if(output->getCommandName() == "quit")
+            } else if (output->getCommandName() == "quit")
                 exit(0);
             cout << "\n";
         }
@@ -401,7 +385,7 @@ void GameEngine::preStartup() {
     string mName;
     string fpath;
     vector<string> cmdInput, cmdInput2;
-    string keyIn,keyIn2;
+    string keyIn, keyIn2;
     string temp;
     string commandName, mapName;
 
@@ -409,141 +393,102 @@ void GameEngine::preStartup() {
     cout << "Initiating map loading stage: \n" << endl;
     getMapList();
 
-    //commandProcessor->getCommand()
+    //to grab command manually!
+    cout << "insert command: \n" << endl;
+
+    getline(cin, keyIn);
+    //cout<<keyIn<<endl;
+    for (int i = 0; i < keyIn.length(); ++i) {
+        if (keyIn[i] == ' ') {
+            cmdInput.push_back(temp);
+            temp = "";
+        } else {
+            temp.push_back(keyIn[i]);
+        }
+    }
+    cmdInput.push_back(temp);
+    //storing command name and mapfile name
+
+    commandName = cmdInput[0];
+    mapName = cmdInput[1];
+
+    cout << "current command: " << commandName << "\n" << endl;
+    cout << "current mapfile requested: " << mapName << "\n" << endl;//returns filename.map
+
+    fpath = path.append(mapName);
+    Map x1 = *mapLoader->loadMap(fpath);
+    Map *map1 = new Map(x1);
+    cout << "Map " << mapName << " has been loaded. \n" << endl;
+    doTransition("validatemap");
+    cin >> keyIn2;
     while (true) {
-        //must do loadmap filename -> doTransition(next)
-//        cout << "\n Enter the number of the desired map: \n" << endl;
-//        cin >> mapNum;
-//        while (mapNum > listOfFile.size() || !(cin >> mapNum)) {
-//            cin.clear();
-//            cin.ignore(1000, '\n');
-//            if (!isdigit(mapNum)) {
-//                cout << "Wrong input. Try with a valid number! \n" << endl;
-//                continue;//breaking here if we input wrong number on the first try, doesnt work as intended even when entering correct number on 2nd try
-//            } else
-//                break;
-//        }
-//        mName = listOfFile[mapNum - 1];
-
-        //to grab command manually!
-        cout<< "insert command: \n"<<endl;
-
-        getline(cin, keyIn);
-        //cout<<keyIn<<endl;
-        for(int i=0; i<keyIn.length(); ++i){
-            if(keyIn[i]==' '){
-                cmdInput.push_back(temp);
-                temp="";
-            }else{
-                temp.push_back(keyIn[i]);
-            }
+        if (keyIn2 == "validatemap") {
+            map1->validate();// validates map
+            map1->showLoadedMap();
+            setMap(map1);
+            break;
+        } else {
+            cout << "wrong command dummy! Try again!" << endl;
         }
-        cmdInput.push_back(temp);
-        //storing command name and mapfile name
-
-        commandName=cmdInput[0];
-        mapName=cmdInput[1];
-
-        cout<<"current command: "<<commandName<<"\n"<<endl;
-        cout<<"current mapfile requested: "<<mapName<<"\n"<<endl;//returns filename.map
-
-        fpath = path.append(mapName);
-        Map x1 = *mapLoader->loadMap(fpath);
-        Map *map1 = new Map(x1);
-        cout<<"Map "<<mapName<<" has been loaded. \n"<<endl;
-        doTransition("validatemap");
-        cin>>keyIn2;
-        while(true){
-            if(keyIn2=="validatemap"){
-                map1->validate();// validates map
-                map1->showLoadedMap();
-                setMap(map1);
-                break;
-            }else{
-                cout<<"wrong command dummy! Try again!"<<endl;
-            }
-        }
-        break;
     }
     doTransition("addplayer");
 
     // addplayer loop
-    //if(command==addplayer)-> do this
     string keyIn3;
-    string temp2="";
+    string temp2 = "";
     string keyIn4;
-    //vector<string>cmdInput2;
 
-    while(true){
-        cout<<"start adding players here! \n"<<endl;
+    while (true) {
+        cout << "start adding players here! \n" << endl;
         cin.clear();
         cin.ignore();
-        getline(cin,keyIn3);
-        for(int i=0; i<keyIn3.length(); ++i){
-            if(keyIn3[i]==' '){
+        cmdInput2.clear();
+        temp2 = "";
+        getline(cin, keyIn3);
+        for (int i = 0; i < keyIn3.length(); i++) {
+            if (keyIn3[i] == ' ') {
+                //cout << temp2;
                 cmdInput2.push_back(temp2);
-                temp2="";
-            }else{
+                temp2 = "";
+            } else {
                 temp2.push_back(keyIn3[i]);
             }
         }
         cmdInput2.push_back(temp2);
-        string cmdName2= cmdInput2[0];
-        string cmdPlName= cmdInput2[1];
-//end of input split
-        if(cmdName2=="addplayer"){
-            cout<<"the current command is :" <<cmdName2<<"\n"<<endl;
-            cout<<"current player name is "<<cmdPlName<<"\n"<<endl;
+        string cmdName2 = cmdInput2[0];
+        string cmdPlName = cmdInput2[1];
+        //end of input split
+        if (cmdName2 == "addplayer") {
+            cout << "the current command is :" << cmdName2 << "\n" << endl;
+            cout << "current player name is " << cmdPlName << "\n" << endl;
             numberOfPlayers++;
             setNumOfPlayers(numberOfPlayers);
-            cout<<"total number of players so far is: "<<getNumOfPlayers()<<endl;
+
+            Player *p = new Player();
+            Deck *cardDeck = new Deck();
+            Hand *plCard = new Hand(cardDeck);
+            p->setPlName(cmdPlName);
+            p->setCards(plCard);
+            p->setPlArmies(5);
+            cout << *p << "Number of Armies: " << p->getPlArmies() << endl;
+            cout << "Cards in players hand: " << p->getHand() << endl;
+            plVec.push_back(p);
+
+            cout << "total number of players so far is: " << getNumOfPlayers() << endl;
             cmdInput2.clear();
-            if(getNumOfPlayers()<7){
-                cout<<"continue adding players? (Y/n)"<<endl;
-                cin>>keyIn4;
-                if(keyIn4=="y"){
-                    continue;//breaking here
-                }else if(keyIn4=="n"){
+            if (getNumOfPlayers() < 7) {
+                cout << "continue adding players? (Y/n)" << endl;
+                cin >> keyIn4;
+                if (keyIn4 == "y") {
+                    continue;
+                } else {
                     break;
                 }
             }
-        }
-        else{
-            cout<<"THATS THE WRONG ORDER!"<<endl;
-        }
-       // break;
-    }
-
-    while (true) {
-        cout << "Enter the number of players (between 2-6): \n" << endl;
-        cin >> numberOfPlayers;
-        setNumOfPlayers(numberOfPlayers);
-        if (getNumOfPlayers() < 2 || getNumOfPlayers() > 6) {
-            cin.clear();
-            cin.ignore(1000, '\n');
-            std::cout << "Invalid number of players. Please enter between 2-6 players. \n" << endl;
         } else {
-            cout << "you have entered: " << getNumOfPlayers() << " players. Proceeding to next step....\n" << endl;
-            break;
+            cout << "THAT'S THE WRONG ORDER!" << endl;
         }
     }
-    //creating players based on given input (assigns army, hand, etc) and pushes the info into the player vector
-    string playerName;
-    for (int i = 0; i < getNumOfPlayers(); i++) {
-        Player *p = new Player();
-        Deck *cardDeck = new Deck();
-        Hand *plCard = new Hand(cardDeck);
-        cout << "enter name for player " << i + 1 << "....\n" << endl;
-        cin >> playerName;
-        p->setPlName(playerName);
-        p->setCards(plCard);
-        p->setPlArmies(5);
-        cout << *p << "Number of Armies: " << p->getPlArmies() << endl;
-        cout << "Cards in players hand: " << p->getHand() << endl;
-        plVec.push_back(p);
-        cout << "-------------------\n" << endl;
-    }
-    // gamestart ->
     /**
          * - distribute territories of map between players
          * - determine order of play of players
@@ -565,7 +510,7 @@ StartupPhase::StartupPhase(const StartupPhase &sp) {
 
 StartupPhase::~StartupPhase() {
 //missing destructor
-cout<<"destroyed startup object!"<<endl;
+    cout << "destroyed startup object!" << endl;
 }
 
 void StartupPhase::operator=(const StartupPhase &sp) {
@@ -651,8 +596,7 @@ void StartupPhase::startup() {
 
 // Game play implementation for A1.
 // TODO: Will need to divide game flow into StartUpPhase(), GameLoopPhase(), etc. for A2
-void GameEngine::testPart3()
-{
+void GameEngine::testPart3() {
 
     GameEngine engine;
     cout << "Welcome to WarZone!" << endl;
@@ -660,8 +604,7 @@ void GameEngine::testPart3()
     cout << "Printing deck: " << endl;
     engine.deck->showDeck();
 
-    while (true)
-    {
+    while (true) {
         string keyinput;
 
         cout << "\nEnter a valid command to progress in the game."
@@ -670,8 +613,7 @@ void GameEngine::testPart3()
         cin >> keyinput;
         if (keyinput == "x" or engine.getCurrentStateName() == "final")
             break;
-        else
-        {
+        else {
             cout << "\n***\n"
                  << endl;
 
@@ -680,36 +622,28 @@ void GameEngine::testPart3()
             // TODO: switch statement to have different message for each state
             bool isCommandValid = engine.doTransition(keyinput);
 
-            if (isCommandValid)
-            {
+            if (isCommandValid) {
                 cout << "Valid command. Current state is: " << engine.getCurrentStateName() << endl;
-            }
-            else
-            {
+            } else {
 
                 cout << "Invalid command. Replay current state: " << engine.getCurrentStateName() << endl;
             }
 
 
-            if (engine.currentState->nameState == "mapvalidated")
-            {
+            if (engine.currentState->nameState == "mapvalidated") {
                 MapLoader *mapLoader = new MapLoader();
                 Map x5 = *mapLoader->loadMap("../maps/france.map");
                 Map *map5 = new Map(x5);
                 map5->validate();
                 engine.map = map5;
-            }
-
-            else if (engine.currentState->nameState == "playersadded")
-            {
+            } else if (engine.currentState->nameState == "playersadded") {
                 Player *p = new Player("Alexander");
                 p->setReinforcementPool(0);
 
                 //Get the latest continent from the maps
                 Continent *mapsContinent = engine.map->continentList.at(0);
                 vector<Territory *> p1Territories;
-                for (Territory *t : mapsContinent->territories)
-                {
+                for (Territory *t: mapsContinent->territories) {
                     p1Territories.push_back(t);
                 }
                 p->setTerritories(p1Territories);
@@ -717,15 +651,15 @@ void GameEngine::testPart3()
                 //Show what we created
                 cout << "\n\n"
                      << p->getName() << " was created!\n";
-                for (Territory *t : p->getTerritories())
-                {
+                for (Territory *t: p->getTerritories()) {
                     cout << t->getName() << "\n";
                     t->setNumberOfArmies(2);
                     t->setOwner(p);
                 }
                 p->getTerritories().front()->setNumberOfArmies(4); //Offset to see if soarting is working.
                 engine.currentPlayers.push_back(p);
-                cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
+                cout << "For this continent there are " << mapsContinent->numOfTerritories
+                     << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
 
                 //Do the same for another player
                 Player *p2 = new Player("Andrew");
@@ -733,22 +667,21 @@ void GameEngine::testPart3()
 
                 mapsContinent = engine.map->continentList.at(1);
                 vector<Territory *> p2Territories;
-                for (Territory *t : mapsContinent->territories)
-                {
+                for (Territory *t: mapsContinent->territories) {
                     p2Territories.push_back(t);
                 }
                 p2->setTerritories(p2Territories);
 
                 cout << "\n\n"
                      << p2->getName() << " was created! \n";
-                for (Territory *t : p2->getTerritories())
-                {
+                for (Territory *t: p2->getTerritories()) {
                     cout << t->getName() << "\n";
                     t->setNumberOfArmies(5);
                     t->setOwner(p2);
                 }
                 engine.currentPlayers.push_back(p2);
-                cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
+                cout << "For this continent there are " << mapsContinent->numOfTerritories
+                     << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
 
                 //Empty player
                 Player *p3 = new Player("noob");
@@ -779,19 +712,16 @@ void GameEngine::testPart3()
     }
 }
 
-void GameEngine::mainGameLoop()
-{
-    if (getCurrentStateName() == "assignreinforcement")
-    {
-        for (Player *p : currentPlayers)
-        {
+void GameEngine::mainGameLoop() {
+    if (getCurrentStateName() == "assignreinforcement") {
+        for (Player *p: currentPlayers) {
             reinforcementPhase(p);
-            cout << "\nPlayer: " << p->getName() << " has " << p->getReinforcementPool() << " in his reinforcement pool.\n";
+            cout << "\nPlayer: " << p->getName() << " has " << p->getReinforcementPool()
+                 << " in his reinforcement pool.\n";
         }
     }
 
-    if (currentState->nameState == "issueorder")
-    {
+    if (currentState->nameState == "issueorder") {
         // Testing cards (Noah and Laila)
         // Create 5 dummy cards for each player
         deck->draw(*currentPlayers.at(0));
@@ -813,23 +743,21 @@ void GameEngine::mainGameLoop()
         issueOrdersPhase();
     }
 
-    if (currentState->nameState == "executeorders")
-    {
+    if (currentState->nameState == "executeorders") {
         executeOrdersPhase();
     }
 
     // loop shall continue until only one of the players owns all the territories
     Player *winner = hasWinner();
-    if (winner != NULL)
-    {
+    if (winner != NULL) {
         currentState = new State("win");
         cout << "\nPlayer " << winner->getName() << " won the game! Do you wish to replay? (y/n)\n";
         string input;
         cin >> input;
         //If the user says yes then start at the first transition
-        if(input == "y"){
+        if (input == "y") {
             doTransition(transitions.at(0)->nameTransition);
-        }else if(input == "n"){
+        } else if (input == "n") {
             //Else break out the game.
             doTransition(transitions.back()->nameTransition);
         }
@@ -840,13 +768,11 @@ void GameEngine::mainGameLoop()
     auditPlayers();
 }
 
-void GameEngine::auditPlayers()
-{
-    for (Player *p : currentPlayers)
-    {
-        if (p->getTerritories().size() == 0)
-        {
-            cout << "\nPlayer " << p->getName() << " no longer has any territories left and will be removed from the game \n";
+void GameEngine::auditPlayers() {
+    for (Player *p: currentPlayers) {
+        if (p->getTerritories().size() == 0) {
+            cout << "\nPlayer " << p->getName()
+                 << " no longer has any territories left and will be removed from the game \n";
 
             currentPlayers.erase(remove(currentPlayers.begin(), currentPlayers.end(), p));
 
@@ -856,14 +782,11 @@ void GameEngine::auditPlayers()
     }
 }
 
-Player *GameEngine::hasWinner()
-{
+Player *GameEngine::hasWinner() {
     //Get the players territories
-    for (Player *p : currentPlayers)
-    {
+    for (Player *p: currentPlayers) {
 
-        if (map->getTerritories().size() == p->getTerritories().size())
-        {
+        if (map->getTerritories().size() == p->getTerritories().size()) {
             return p;
         }
     }
@@ -871,8 +794,7 @@ Player *GameEngine::hasWinner()
     return NULL;
 }
 
-void GameEngine::reinforcementPhase(Player *p)
-{
+void GameEngine::reinforcementPhase(Player *p) {
     // Check if player won territories in the last round. If yes, draw one card max
     int numConqueredTerritories = p->getTerritorySize() - p->getPrevTerritorySize();
     if (numConqueredTerritories > 0)
@@ -890,19 +812,17 @@ void GameEngine::reinforcementPhase(Player *p)
     bool ownsContinent = false;
 
     //Get all the continents then their territories:
-    for (Continent *c : map->continentList)
-    {
+    for (Continent *c: map->continentList) {
         int territoryCount = 0;
         controlBonus = c->controlBonus;
         vector<Territory *> listOfContentsTerritories = c->territories;
 
         //Loop through what the player has to check if the owns the full continent
-        for (Territory *t : p->getTerritories())
-        {
+        for (Territory *t: p->getTerritories()) {
 
             //Count of how many of the players Territories we find of the continent
-            if (find(listOfContentsTerritories.begin(), listOfContentsTerritories.end(), t) != listOfContentsTerritories.end())
-            {
+            if (find(listOfContentsTerritories.begin(), listOfContentsTerritories.end(), t) !=
+                listOfContentsTerritories.end()) {
                 territoryCount++;
             }
         }
@@ -911,8 +831,7 @@ void GameEngine::reinforcementPhase(Player *p)
         if (territoryCount == listOfContentsTerritories.size())
             ownsContinent = true;
 
-        if (ownsContinent == true)
-        {
+        if (ownsContinent == true) {
             cout << "continent bonus has been applied! adding an additional " << controlBonus << " units";
             numberOfArmies += controlBonus;
             ownsContinent = false;
@@ -928,10 +847,8 @@ void GameEngine::reinforcementPhase(Player *p)
 }
 
 // returns false if someone is still issuing orders
-bool GameEngine::allPlayersDone()
-{
-    for (Player *p : currentPlayers)
-    {
+bool GameEngine::allPlayersDone() {
+    for (Player *p: currentPlayers) {
         if (!p->isDoneIssuing())
             return false;
     }
@@ -939,53 +856,40 @@ bool GameEngine::allPlayersDone()
     return true;
 }
 
-void GameEngine::issueOrdersPhase()
-{
+void GameEngine::issueOrdersPhase() {
     // Updating each players' toAttack and toDefend queues
-    for (Player *p : currentPlayers)
-    {
+    for (Player *p: currentPlayers) {
         // territories are to be attacked in priority
-        for (Territory *toAttack : p->toAttack())
-        {
+        for (Territory *toAttack: p->toAttack()) {
             p->addToPriorityAttack(toAttack);
         }
         // Defend
-        for (Territory *toDefend : p->toDefend())
-        {
+        for (Territory *toDefend: p->toDefend()) {
             p->addToPriorityDefend(toDefend);
         }
     }
-    while (!allPlayersDone())
-    {
-        for (int i = 0; i < currentPlayers.size(); i++)
-        {
-            cout << "\nGameEngine:: Player: " << currentPlayers.at(i)->getName() << " is currently in the issue order phase.\n";
+    while (!allPlayersDone()) {
+        for (int i = 0; i < currentPlayers.size(); i++) {
+            cout << "\nGameEngine:: Player: " << currentPlayers.at(i)->getName()
+                 << " is currently in the issue order phase.\n";
 
-            if (currentPlayers.at(i)->isDoneIssuing())
-            {
+            if (currentPlayers.at(i)->isDoneIssuing()) {
 
                 // When done issuing orders, start issuing 1 card order per turn until both player are done...
                 // flawed but will work
                 Player *player = currentPlayers.at(i);
                 cout << "DEBUG: Player " << player->getName() << " wants to play card..." << endl;
-                if (player->getHand()->getCards().size() > 0)
-                {
+                if (player->getHand()->getCards().size() > 0) {
                     Territory *territorySrc = new Territory;
                     Territory *territoryTarget = new Territory;
-                    if (player->getPriorityDefending().size() > 0)
-                    {
+                    if (player->getPriorityDefending().size() > 0) {
                         territorySrc = player->popPriorityDefend();
-                    }
-                    else
-                    {
+                    } else {
                         territorySrc = nullptr;
                     }
-                    if (player->getPriorityAttacking().size() > 0)
-                    {
+                    if (player->getPriorityAttacking().size() > 0) {
                         territoryTarget = player->popPriorityAttack();
-                    }
-                    else
-                    {
+                    } else {
                         territoryTarget = nullptr;
                     }
                     Card *lastCard = player->getHand()->useLast();
@@ -993,14 +897,12 @@ void GameEngine::issueOrdersPhase()
                     Deck &deckRef = *deck;
                     lastCard->play(playerRef, deckRef); // return card to deck
 
-                    try
-                    {
+                    try {
                         // Method throws exception to handle
                         createOrderFromCard(lastCard, player, territorySrc, territoryTarget);
                         cout << " ... played a card... " << endl;
                     }
-                    catch (std::exception e)
-                    {
+                    catch (std::exception e) {
                         cout << "Cannot create special order from card (not enough resources)" << endl;
                     }
                 }
@@ -1009,8 +911,7 @@ void GameEngine::issueOrdersPhase()
             }
 
             // (1) Deploy: until reinforc pool == 0
-            if (currentPlayers.at(i)->getReinforcementPool() > 0)
-            {
+            if (currentPlayers.at(i)->getReinforcementPool() > 0) {
                 Territory *territoryTarget = currentPlayers.at(i)->getPriorityDefending().top();
                 // Create Deploy -> decrease reinforcement)
                 Deploy *deploy = new Deploy(1, currentPlayers.at(i), territoryTarget);
@@ -1018,9 +919,8 @@ void GameEngine::issueOrdersPhase()
                 currentPlayers.at(i)->issueOrder(deploy);
                 /* To do for A3: Able to use same territory in deploy order for advance (add stack to store popped defending territory?) */
                 currentPlayers.at(i)->popPriorityDefend();
-            }
-            else if (currentPlayers.at(i)->getPriorityDefending().size() > 0 and currentPlayers.at(i)->getPriorityAttacking().size() > 0)
-            {
+            } else if (currentPlayers.at(i)->getPriorityDefending().size() > 0 and
+                       currentPlayers.at(i)->getPriorityAttacking().size() > 0) {
                 // (3) Advance
                 Player *currentPlayer = currentPlayers.at(i);
                 Territory *territorySource = currentPlayer->getPriorityDefending().top();
@@ -1033,18 +933,18 @@ void GameEngine::issueOrdersPhase()
             }
 
             // After a player issue one order, check if reinforcementPool 0 or queues empty
-            if (currentPlayers.at(i)->getPriorityDefending().size() == 0 or currentPlayers.at(i)->getPriorityAttacking().size() == 0)
+            if (currentPlayers.at(i)->getPriorityDefending().size() == 0 or
+                currentPlayers.at(i)->getPriorityAttacking().size() == 0)
                 currentPlayers.at(i)->toggleDoneIssuing();
         }
     }
 }
 
-Order *GameEngine::createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget)
-{
+Order *
+GameEngine::createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget) {
     string checkTypeCard = card->getCommand();
 
-    if (checkTypeCard == "Airlift type")
-    {
+    if (checkTypeCard == "Airlift type") {
         cout << "... player desires to create an AirLift order by using a valid card!..." << endl;
         if (!territoryTarget or !territorySrc)
             throw std::exception();
@@ -1053,59 +953,50 @@ Order *GameEngine::createOrderFromCard(Card *card, Player *player, Territory *te
         return a;
     }
 
-    if (checkTypeCard == "Bomb type")
-    {
+    if (checkTypeCard == "Bomb type") {
         cout << "... player desires to create a Bomb order by using a valid card!..." << endl;
 
         if (!territoryTarget)
             throw std::exception();
-        Bomb * b = new Bomb(player, territoryTarget);
+        Bomb *b = new Bomb(player, territoryTarget);
         cout << b->getDetails() << endl;
         return b;
     }
-    if (checkTypeCard == "Blockade type")
-    {
+    if (checkTypeCard == "Blockade type") {
         Blockade *b = new Blockade();
         b->setDetails("Debugging creating Blockade order from card!");
         cout << b->getDetails() << endl;
         return b;
     }
-    if (checkTypeCard == "Negotiate type")
-    {
+    if (checkTypeCard == "Negotiate type") {
         Negotiate *n = new Negotiate();
         n->setDetails("Debugging creating Negotiate order from card!");
         cout << n->getDetails() << endl;
         return n;
-    }
-
-    else
+    } else
         return NULL;
 }
 
-bool hasOrders(vector<Player *> currentPlayers)
-{
-    for (Player *player : currentPlayers)
-    {
+bool hasOrders(vector<Player *> currentPlayers) {
+    for (Player *player: currentPlayers) {
         if (player->getOrderList()->getList().size() != 0)
             return false;
     }
     return true;
 }
 
-void GameEngine::executeOrdersPhase()
-{
+void GameEngine::executeOrdersPhase() {
     //players have signified that they are not issuing one more order
     bool hasDeploy = false;
 
-    while (!hasOrders(currentPlayers))
-    {
+    while (!hasOrders(currentPlayers)) {
         //Iterate over each player
-        for (int i = 0; i < currentPlayers.size(); i++)
-        {
+        for (int i = 0; i < currentPlayers.size(); i++) {
             Player *currentPlayer = currentPlayers.at(i);
             bool played = false;
 
-            cout << "GameEngine:: Player: " << currentPlayer->getName() << " is currently in the execute order phase.\n";
+            cout << "GameEngine:: Player: " << currentPlayer->getName()
+                 << " is currently in the execute order phase.\n";
             //Check to see if that player has a deploy order
             // for (Order *order : currentPlayer->getOrderList()->getList())
             // {
@@ -1118,14 +1009,11 @@ void GameEngine::executeOrdersPhase()
             // }
 
             //if (hasDeploy = true)
-            if (currentPlayer->getOrderList()->getList().at(0)->getCommand() == "Deploy type")
-            {
+            if (currentPlayer->getOrderList()->getList().at(0)->getCommand() == "Deploy type") {
                 //Go through all the order
-                for (Order *order : currentPlayers.at(i)->getOrderList()->getList())
-                {
+                for (Order *order: currentPlayers.at(i)->getOrderList()->getList()) {
                     //Play the deploy order first
-                    if (order->getCommand() == "Deploy type")
-                    {
+                    if (order->getCommand() == "Deploy type") {
                         cout << "GameEngine:: Player: " << currentPlayer->getName() << " is issuing a deploy order.\n";
                         cout << "==>" << order->getDetails() << endl;
                         order->execute();
@@ -1137,15 +1025,12 @@ void GameEngine::executeOrdersPhase()
                 // continue to let other players deploy their armies after 1 occurrence
                 // if(played == true)
                 //     continue;
-            }
-
-            else
-            {
+            } else {
                 //Go through all the order
-                for (Order *order : currentPlayers.at(i)->getOrderList()->getList())
-                {
+                for (Order *order: currentPlayers.at(i)->getOrderList()->getList()) {
                     //Play the other orders
-                    cout << "GameEngine:: Player: " << currentPlayer->getName() << " is issuing a " << order->getCommand() << " order.\n";
+                    cout << "GameEngine:: Player: " << currentPlayer->getName() << " is issuing a "
+                         << order->getCommand() << " order.\n";
                     cout << "==>" << order->getDetails() << endl;
                     order->execute();
                     played = true;
