@@ -301,10 +301,6 @@ void GameEngine::testGameEngine()
             //StartupPhase s1;
             if(output->getCommandName() == "gamestart")
             {
-                //Start the gameloop
-//                preStartup();
-//                s1.setGameEng(this);
-//                s1.startup();
                 break;
             }
             else if(output->getCommandName() == "replay")
@@ -455,7 +451,7 @@ void GameEngine::preStartup() {
         Map x1 = *mapLoader->loadMap(fpath);
         Map *map1 = new Map(x1);
         cout<<"Map "<<mapName<<" has been loaded. \n"<<endl;
-
+        doTransition("validatemap");
         cin>>keyIn2;
         while(true){
             if(keyIn2=="validatemap"){
@@ -469,38 +465,54 @@ void GameEngine::preStartup() {
         }
         break;
     }
+    doTransition("addplayer");
+
     // addplayer loop
     //if(command==addplayer)-> do this
     string keyIn3;
     string temp2="";
+    string keyIn4;
     //vector<string>cmdInput2;
-    cout<<"start adding players here! \n"<<endl;
-    cin.ignore();
-    getline(cin,keyIn3);
-    for(int i=0; i<keyIn3.length(); ++i){
-        if(keyIn3[i]==' '){
-            cmdInput2.push_back(temp2);
-            temp2="";
-        }else{
-            temp2.push_back(keyIn3[i]);
+
+    while(true){
+        cout<<"start adding players here! \n"<<endl;
+        cin.clear();
+        cin.ignore();
+        getline(cin,keyIn3);
+        for(int i=0; i<keyIn3.length(); ++i){
+            if(keyIn3[i]==' '){
+                cmdInput2.push_back(temp2);
+                temp2="";
+            }else{
+                temp2.push_back(keyIn3[i]);
+            }
         }
+        cmdInput2.push_back(temp2);
+        string cmdName2= cmdInput2[0];
+        string cmdPlName= cmdInput2[1];
+//end of input split
+        if(cmdName2=="addplayer"){
+            cout<<"the current command is :" <<cmdName2<<"\n"<<endl;
+            cout<<"current player name is "<<cmdPlName<<"\n"<<endl;
+            numberOfPlayers++;
+            setNumOfPlayers(numberOfPlayers);
+            cout<<"total number of players so far is: "<<getNumOfPlayers()<<endl;
+            cmdInput2.clear();
+            if(getNumOfPlayers()<7){
+                cout<<"continue adding players? (Y/n)"<<endl;
+                cin>>keyIn4;
+                if(keyIn4=="y"){
+                    continue;//breaking here
+                }else if(keyIn4=="n"){
+                    break;
+                }
+            }
+        }
+        else{
+            cout<<"THATS THE WRONG ORDER!"<<endl;
+        }
+       // break;
     }
-    cmdInput2.push_back(temp2);
-    string cmdName2= cmdInput2[0];
-    string cmdPlName= cmdInput2[1];
-//    while(true){
-//        if(cmdName2=="addplayer"){
-//            cout<<"the current command is :" <<cmdName2<<"\n"<<endl;
-//            cout<<"current player name is "<<cmdPlName<<"\n"<<endl;
-//            numberOfPlayers++;
-//            setNumOfPlayers(numberOfPlayers);
-//            cout<<"total number of players so far is: "<<getNumOfPlayers()<<endl;
-//            break;
-//        }
-//        else{
-//            cout<<"SIKE, THATS THE WRONG ORDER!"<<endl;
-//        }
-//    }
 
     while (true) {
         cout << "Enter the number of players (between 2-6): \n" << endl;
