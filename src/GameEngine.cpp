@@ -439,7 +439,7 @@ void GameEngine::preStartup() {
     string keyIn4;
 
     while (true) {
-        cout << "start adding players here! \n" << endl;
+        cout << "add player here! \n" << endl;
         cin.clear();
         cin.ignore();
         cmdInput2.clear();
@@ -476,6 +476,9 @@ void GameEngine::preStartup() {
 
             cout << "total number of players so far is: " << getNumOfPlayers() << endl;
             cmdInput2.clear();
+            if (getNumOfPlayers() == 1) {
+                continue;
+            }
             if (getNumOfPlayers() < 7) {
                 cout << "continue adding players? (Y/n)" << endl;
                 cin >> keyIn4;
@@ -496,7 +499,6 @@ void GameEngine::preStartup() {
          * - each player draw 2 cards with deck.draw(2)
          * - go to play phase
          */
-
 }
 
 //startupPhase methods
