@@ -15,7 +15,7 @@ using namespace std;
 void initializedRand();
 
 // Original declarations from A1
-
+// Rewrite Card not as a derived class of Order for A3
 class Card : virtual public Order
 {
 public:
@@ -34,9 +34,10 @@ public:
 
     // Methods
     // A3: play is made virtual
-    virtual void play(Player &player, Deck &deck) = 0;
+    virtual void play(Player &player, Deck &deck);
 
     Effect *getEffect();
+
 
     bool validate ();
     bool execute ();
@@ -56,7 +57,10 @@ protected:
 };
 
 
-class CardBomb : virtual public Card {
+// Diamond problem: Order needs to be declared as virtual
+// Need to explicitely call Order constructor 
+// (if using Order parametized constructor in Card, Bomb)
+class CardBomb: public Card {
 private:
 
 public:
