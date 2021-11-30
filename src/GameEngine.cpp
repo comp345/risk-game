@@ -674,8 +674,6 @@ void StartupPhase::startup()
     }
 }
 
-
-
 void GameEngine::auditPlayers()
 {
     for (Player *p : currentPlayers)
@@ -776,111 +774,11 @@ bool GameEngine::allPlayersDone()
 }
 
 
-// code for player::issueorder as a free function
-void playerIssueOrder(Deck *deck, Player *currentPlayer)
-{}
-
-void GameEngine::issueOrdersPhase()
-{
-    // Updating each players' toAttack and toDefend queues
-    for (Player *p : currentPlayers)
-    {
-        // territories are to be attacked in priority
-        for (Territory *toAttack : p->toAttack())
-        {
-            p->addToPriorityAttack(toAttack);
-        }
-        // Defend
-        for (Territory *toDefend : p->toDefend())
-        {
-            p->addToPriorityDefend(toDefend);
-        }
-    }
-    while (!allPlayersDone())
-    {
-        for (int i = 0; i < currentPlayers.size(); i++)
-        {
-            cout << "\nGameEngine:: Player: " << currentPlayers.at(i)->getName() << " is currently in the issue order phase.\n";
-
-            if (currentPlayers.at(i)->isDoneIssuing())
-            {
-
-                // When done issuing orders, start issuing 1 card order per turn until both player are done...
-                // flawed but will work
-                Player *player = currentPlayers.at(i);
-                cout << "DEBUG: Player " << player->getName() << " wants to play card..." << endl;
-                if (player->getHand()->getCards().size() > 0)
-                {
-                    Territory *territorySrc = new Territory;
-                    Territory *territoryTarget = new Territory;
-                    if (player->getPriorityDefending().size() > 0)
-                    {
-                        territorySrc = player->popPriorityDefend();
-                    }
-                    else
-                    {
-                        territorySrc = nullptr;
-                    }
-                    if (player->getPriorityAttacking().size() > 0)
-                    {
-                        territoryTarget = player->popPriorityAttack();
-                    }
-                    else
-                    {
-                        territoryTarget = nullptr;
-                    }
-                    Card *lastCard = player->getHand()->useLast();
-                    Player &playerRef = *player;
-                    Deck &deckRef = *deck;
-                    lastCard->play(playerRef, deckRef); // return card to deck
-
-                    try
-                    {
-                        // Method throws exception to handle
-                        createOrderFromCard(lastCard, player, territorySrc, territoryTarget);
-                        cout << " ... played a card... " << endl;
-                    }
-                    catch (std::exception e)
-                    {
-                        cout << "Cannot create special order from card (not enough resources)" << endl;
-                    }
-                }
-
-                continue;
-            }
-
-            // (1) Deploy: until reinforc pool == 0
-            if (currentPlayers.at(i)->getReinforcementPool() > 0)
-            {
-                Territory *territoryTarget = currentPlayers.at(i)->getPriorityDefending().top();
-                // Create Deploy -> decrease reinforcement)
-                Deploy *deploy = new Deploy(1, currentPlayers.at(i), territoryTarget);
-                cout << "Issueing: " << deploy->getDetails() << endl;
-                currentPlayers.at(i)->issueOrder(deploy);
-                /* To do for A3: Able to use same territory in deploy order for advance (add stack to store popped defending territory?) */
-                currentPlayers.at(i)->popPriorityDefend();
-            }
-            else if (currentPlayers.at(i)->getPriorityDefending().size() > 0 and currentPlayers.at(i)->getPriorityAttacking().size() > 0)
-            {
-                // (3) Advance
-                Player *currentPlayer = currentPlayers.at(i);
-                Territory *territorySource = currentPlayer->getPriorityDefending().top();
-                Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
-                Advance *advance = new Advance(1, currentPlayer, territorySource, territoryTarget);
-                cout << "Issueing! " << advance->getDetails() << endl;
-                currentPlayer->issueOrder(advance);
-                currentPlayer->popPriorityAttack();
-                currentPlayer->popPriorityDefend();
-            }
-
-            // After a player issue one order, check if reinforcementPool 0 or queues empty
-            if (currentPlayers.at(i)->getPriorityDefending().size() == 0 or currentPlayers.at(i)->getPriorityAttacking().size() == 0)
-                currentPlayers.at(i)->toggleDoneIssuing();
-        }
-    }
-}
-
-Order *GameEngine::createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget)
+/* 
+   TODO: Implement this free function as Player:: 
+   Logic of a player creating an order as a free function
+*/
+Order * createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget)
 {
     string checkTypeCard = card->getCommand();
 
@@ -922,6 +820,114 @@ Order *GameEngine::createOrderFromCard(Card *card, Player *player, Territory *te
     else
         return NULL;
 }
+
+void playerIssueOrder(Deck *deck, Player *issuingPlayer)
+{
+    // when done issueing deploy and advance, issue cards
+    if (issuingPlayer->isDoneIssuing())
+    {
+
+        // When done issuing orders, start issuing 1 card order per turn until both player are done...
+        // flawed but will work
+        Player *player = issuingPlayer;
+        cout << "DEBUG: Player " << player->getName() << " wants to play card..." << endl;
+        if (player->getHand()->getCards().size() > 0)
+        {
+            Territory *territorySrc = new Territory;
+            Territory *territoryTarget = new Territory;
+            if (player->getPriorityDefending().size() > 0)
+            {
+                territorySrc = player->popPriorityDefend();
+            }
+            else
+            {
+                territorySrc = nullptr;
+            }
+            if (player->getPriorityAttacking().size() > 0)
+            {
+                territoryTarget = player->popPriorityAttack();
+            }
+            else
+            {
+                territoryTarget = nullptr;
+            }
+            Card *lastCard = player->getHand()->useLast();
+            Player &playerRef = *player;
+            Deck &deckRef = *deck;
+            lastCard->play(playerRef, deckRef); // return card to deck
+
+            try
+            {
+                // Method throws exception to handle
+                createOrderFromCard(lastCard, player, territorySrc, territoryTarget);
+                cout << " ... played a card... " << endl;
+            }
+            catch (std::exception e)
+            {
+                cout << "Cannot create special order from card (not enough resources)" << endl;
+            }
+        }
+
+        return void();
+    }
+
+    // (1) Deploy: until reinforc pool == 0
+    if (issuingPlayer->getReinforcementPool() > 0)
+    {
+        Territory *territoryTarget = issuingPlayer->getPriorityDefending().top();
+        // Create Deploy -> decrease reinforcement)
+        Deploy *deploy = new Deploy(1, issuingPlayer, territoryTarget);
+        cout << "Issueing: " << deploy->getDetails() << endl;
+        issuingPlayer->issueOrder(deploy);
+        /* To do for A3: Able to use same territory in deploy order for advance (add stack to store popped defending territory?) */
+        issuingPlayer->popPriorityDefend();
+    }
+    else if (issuingPlayer->getPriorityDefending().size() > 0 and issuingPlayer->getPriorityAttacking().size() > 0)
+    {
+        // (3) Advance
+        Player *currentPlayer = issuingPlayer;
+        Territory *territorySource = currentPlayer->getPriorityDefending().top();
+        Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
+        Advance *advance = new Advance(1, currentPlayer, territorySource, territoryTarget);
+        cout << "Issueing! " << advance->getDetails() << endl;
+        currentPlayer->issueOrder(advance);
+        currentPlayer->popPriorityAttack();
+        currentPlayer->popPriorityDefend();
+    }
+
+    // After a player issue one order, check if reinforcementPool 0 or queues empty
+    if (issuingPlayer->getPriorityDefending().size() == 0 or issuingPlayer->getPriorityAttacking().size() == 0)
+        issuingPlayer->toggleDoneIssuing();
+}
+
+void GameEngine::issueOrdersPhase()
+{
+    // Updating each players' toAttack and toDefend queues
+    for (Player *p : currentPlayers)
+    {
+        // territories are to be attacked in priority
+        for (Territory *toAttack : p->toAttack())
+        {
+            p->addToPriorityAttack(toAttack);
+        }
+        // Defend
+        for (Territory *toDefend : p->toDefend())
+        {
+            p->addToPriorityDefend(toDefend);
+        }
+    }
+    while (!allPlayersDone())
+    {
+        for (int i = 0; i < currentPlayers.size(); i++)
+        {
+            cout << "\nGameEngine:: Player: " << currentPlayers.at(i)->getName() << " is currently in the issue order phase.\n";
+
+            // Free function to implement as Player::issueOrder
+            playerIssueOrder(deck, currentPlayers.at(i));
+        }
+    }
+}
+
 
 bool hasOrders(vector<Player *> currentPlayers)
 {
@@ -994,16 +1000,6 @@ void GameEngine::executeOrdersPhase()
 
     // ! Do not transition to assignreinforcement state yet: need to check for winners (done in the driver function)
 }
-
-
-
-
-
-
-
-
-
-
 
 /*
     The gamePlay method is broken : The following methods are duplicate to test them
@@ -1167,29 +1163,34 @@ void GameEngine::mainGameLoop()
     /* ****************************** */
     /* PHASE 1: Reinforcement Phase   */
     /* ****************************** */
-    // this->doTransition("gamestart"); 
+    // this->doTransition("gamestart");
     for (Player *p : currentPlayers)
     {
         reinforcementPhase(p);
         cout << "\nPlayer: " << p->getName() << " has " << p->getReinforcementPool() << " in his reinforcement pool.\n";
     }
 
-    /* ***************************** */ 
+    /* ***************************** */
     /* PHASE 2: Issue Orders Phase   */
-    /* ***************************** */ 
+    /* ***************************** */
 
-    {this->doTransition("issueorder"); issueOrdersPhase(); this->doTransition("endissueorders");}
+    {
+        this->doTransition("issueorder");
+        issueOrdersPhase();
+        this->doTransition("endissueorders");
+    }
 
     /* ****************************** */
     /* PHASE 3: Execute Orders Phase  */
     /* ****************************** */
-    {this->doTransition("execorder"); executeOrdersPhase();}
-
-
+    {
+        this->doTransition("execorder");
+        executeOrdersPhase();
+    }
 
     Player *winner = hasWinner();
 
-    // Forcing a win 
+    // Forcing a win
     winner = new Player("TESTING WIN");
     if (winner != NULL)
     {

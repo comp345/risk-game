@@ -154,7 +154,9 @@ public:
     void reinforcementPhase(Player *p);
     void issueOrdersPhase();
     void executeOrdersPhase();
-    Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget);
+
+    // createOrderFromCard to be deleted 
+    // Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget);
 
     // Noah: Data members should be private and only accessed with public methods
     vector<Player *> currentPlayers;
