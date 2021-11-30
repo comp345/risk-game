@@ -13,7 +13,6 @@
 #include <exception>
 #include "CommandProcessor.h"
 
-
 #include "PlayerStrategies.h"
 
 namespace fs = filesystem;
@@ -377,22 +376,22 @@ void GameEngine::testGameEngine()
     //GameEngine engine{fileName};
     Command *output;
     cout << "Welcome to WarZone!" << endl;
-    while(true)
+    while (true)
     {
         //To handle replay case, getCommand has to be called at a later execution
         output = commandProcessor->getCommand(currentState);
         doTransition(output->getCommandName());
-        if(output->getCommandName() == "gamestart")
+        if (output->getCommandName() == "gamestart")
         {
             //Start the gameloop
             break;
         }
-        else if(output->getCommandName() == "replay")
+        else if (output->getCommandName() == "replay")
         {
             //Call me later
             cout << "\n";
         }
-        else if(output->getCommandName() == "quit")
+        else if (output->getCommandName() == "quit")
             exit(0);
         cout << "\n";
     }
@@ -806,7 +805,7 @@ void GameEngine::testPart3()
 
 void GameEngine::mainGameLoop()
 {
-    
+
     if (getCurrentStateName() == "assignreinforcement")
     {
         for (Player *p : currentPlayers)
@@ -966,126 +965,56 @@ bool GameEngine::allPlayersDone()
     return true;
 }
 
+// NOTE: I removed the addition Alexander made to test the strategies
+// Do not test the strategies inside the GameEngine -> WRITE TEST EXCLUSIVELY IN THE STRATEGY DRIVER
 void GameEngine::issueOrdersPhase()
 {
-
 
     // Updating each players' toAttack and toDefend queues
     for (Player *p : currentPlayers)
     {
-        cout << endl << "Player " << p->getName() << " is now building his attack priority based on the " << p->getPlayerStrategy()->strategyName() << endl;
-
         // territories are to be attacked in priority
-        for (Territory *toAttack : p->getPlayerStrategy()->toAttack())
+        for (Territory *toAttack : p->toAttack())
         {
-            cout << toAttack->getName() << endl;
             p->addToPriorityAttack(toAttack);
         }
-
-        cout << "----- DEBUG: Pre-building defensive priority ... -----" << endl;
-         for (Territory *toDefend : p->getPlayerStrategy()->toDefend())
+        // Defend
+        for (Territory *toDefend : p->toDefend())
         {
-            cout << toDefend->getName() << endl;
+            p->addToPriorityDefend(toDefend);
+        }
+        // DEBUG: print the content of toDefend and toAttack
+        cout << "toAttack content of " << p->getName() << endl;
+        for (auto x : p->toAttack())
+        {
+            cout << x->getName() << endl;
+        }
+        cout << "toDefend content of " << p->getName() << endl;
+        for (auto x : p->toDefend())
+        {
+            cout << x->getName() << endl;
         }
 
-        cout << "... Building his defensive priority ..." << endl;
-
-        // Defend
-        // Note
-        for (Territory *toDefend : p->getPlayerStrategy()->toDefend())
+        cout << "getTerritories content of " << p->getName() << endl;
+        for (auto x : p->getTerritories())
         {
-            cout << toDefend->getName() << endl;
-            p->addToPriorityDefend(toDefend);
+            cout << x->getName() << endl;
         }
     }
 
-    
     while (!allPlayersDone())
     {
         for (int i = 0; i < currentPlayers.size(); i++)
         {
-            if(currentPlayers.at(i)->getPlayerStrategy()->strategyName() == "Neutral strategy"){
-            currentPlayers.at(i)->toggleDoneIssuing();
-            continue;
+            if (currentPlayers.at(i)->getPlayerStrategy()->strategyName() == "Neutral strategy")
+            {
+                currentPlayers.at(i)->toggleDoneIssuing();
+                continue;
             }
 
             cout << "\nGameEngine:: Player: " << currentPlayers.at(i)->getName() << " is currently in the issue order phase.\n";
 
-            if (currentPlayers.at(i)->isDoneIssuing())
-            {
-                // When done issuing orders, start issuing 1 card order per turn until both player are done...
-                // flawed but will work
-                Player *player = currentPlayers.at(i);
-                cout << "DEBUG: Player " << player->getName() << " wants to play card..." << endl;
-                if (player->getHand()->getCards().size() > 0)
-                {
-                    Territory *territorySrc = new Territory;
-                    Territory *territoryTarget = new Territory;
-                    if (player->getPriorityDefending().size() > 0)
-                    {
-                        territorySrc = player->popPriorityDefend();
-                    }
-                    else
-                    {
-                        territorySrc = nullptr;
-                    }
-                    if (player->getPriorityAttacking().size() > 0)
-                    {
-                        territoryTarget = player->popPriorityAttack();
-                    }
-                    else
-                    {
-                        territoryTarget = nullptr;
-                    }
-                    Card *lastCard = player->getHand()->useLast();
-                    Player &playerRef = *player;
-                    Deck &deckRef = *deck;
-                    lastCard->play(playerRef, deckRef); // return card to deck
-
-                    try
-                    {
-                        // Method throws exception to handle
-                        createOrderFromCard(lastCard, player, territorySrc, territoryTarget);
-                        cout << " ... played a card... " << endl;
-                    }
-                    catch (std::exception e)
-                    {
-                        cout << "Cannot create special order from card (not enough resources)" << endl;
-                    }
-                }
-
-                continue;
-            }
-
-            // (1) Deploy: until reinforc pool == 0
-            if (currentPlayers.at(i)->getReinforcementPool() > 0)
-            {
-                 Territory *territoryTarget = currentPlayers.at(i)->getPriorityDefending().top();
-                // Create Deploy -> decrease reinforcement)
-                Deploy *deploy = new Deploy(1, currentPlayers.at(i), territoryTarget);
-                cout << "Issueing: " << deploy->getDetails() << endl;
-                currentPlayers.at(i)->issueOrder(deploy);
-                /* To do for A3: Able to use same territory in deploy order for advance (add stack to store popped defending territory?) */
-                currentPlayers.at(i)->popPriorityDefend();
-            }
-            else if (currentPlayers.at(i)->getPriorityDefending().size() > 0 and currentPlayers.at(i)->getPriorityAttacking().size() > 0)
-            {
-                // (3) Advance
-                Player *currentPlayer = currentPlayers.at(i);
-                Territory *territorySource = currentPlayer->getPriorityDefending().top();
-                Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
-                Advance *advance = new Advance(1, currentPlayer, territorySource, territoryTarget);
-                cout << "Issueing! " << advance->getDetails() << endl;
-                currentPlayer->issueOrder(advance);
-                currentPlayer->popPriorityAttack();
-                currentPlayer->popPriorityDefend();
-            }
-
-            // After a player issue one order, check if reinforcementPool 0 or queues empty
-            if (currentPlayers.at(i)->getPriorityDefending().size() == 0 or currentPlayers.at(i)->getPriorityAttacking().size() == 0) {
-                currentPlayers.at(i)->toggleDoneIssuing();
-
-            }
+            currentPlayers.at(i)->issueOrder();
         }
     }
 }
@@ -1156,9 +1085,12 @@ void GameEngine::executeOrdersPhase()
             Player *currentPlayer = currentPlayers.at(i);
             bool played;
 
-            if(currentPlayer->getPlayerStrategy()->strategyName() != "Neutral strategy"){
+            if (currentPlayer->getPlayerStrategy()->strategyName() != "Neutral strategy")
+            {
                 played = false;
-            }else{
+            }
+            else
+            {
                 played = true;
                 continue;
             }
@@ -1339,6 +1271,109 @@ void fakeStartup(GameEngine *engine)
     engine->doTransition("gamestart");
 }
 
+// Don't touch this or it will mess my test
+void startUpForNoahTest(GameEngine *engine)
+{
+    cout << "Welcome to WarZone!" << endl;
+    cout << "Current State: " << engine->getCurrentStateName() << endl;
+
+    /** Stand-in Startup Phase (Automatic) 
+     * */
+    // loadmap (now in mapvalidated state)
+    engine->doTransition("loadmap");
+    cout << "________ Command LOADMAP ________" << endl;
+    MapLoader *mapLoader = new MapLoader();
+    Map x5 = *mapLoader->loadMap("../maps/france.map");
+    Map *map5 = new Map(x5);
+
+    // validatemap (now in state)
+    engine->doTransition("validatemap");
+    cout << "_________ Command VALIDATEMAP _________" << endl;
+    map5->validate();
+    engine->setMap(map5);
+
+    // addplayer (now in state playersadded)
+    engine->doTransition("addplayer");
+    cout << "_________ Command ADDPLAYER _________" << endl;
+
+    {
+        Player *p = new Player("Alexander");
+        p->setReinforcementPool(0);
+
+        //Get the latest continent from the maps
+        Continent *mapsContinent = engine->getMap()->continentList.at(0);
+        vector<Territory *> p1Territories;
+        for (Territory *t : mapsContinent->territories)
+        {
+            p1Territories.push_back(t);
+        }
+        p->setTerritories(p1Territories);
+
+        //Show what we created
+        cout << "\n\n"
+             << p->getName() << " was created!\n";
+        for (Territory *t : p->getTerritories())
+        {
+            cout << t->getName() << "\n";
+            t->setNumberOfArmies(2);
+            t->setOwner(p);
+        }
+        p->getTerritories().front()->setNumberOfArmies(4); //Offset to see if soarting is working.
+        engine->currentPlayers.push_back(p);
+        cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
+
+        //Do the same for another player
+        Player *p2 = new Player("Andrew");
+        p2->setReinforcementPool(0);
+
+        mapsContinent = engine->getMap()->continentList.at(1);
+        vector<Territory *> p2Territories;
+        for (Territory *t : mapsContinent->territories)
+        {
+            p2Territories.push_back(t);
+        }
+        p2->setTerritories(p2Territories);
+
+        cout << "\n\n"
+             << p2->getName() << " was created! \n";
+        for (Territory *t : p2->getTerritories())
+        {
+            cout << t->getName() << "\n";
+            t->setNumberOfArmies(5);
+            t->setOwner(p2);
+        }
+        engine->currentPlayers.push_back(p2);
+        cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
+
+        //Empty player
+        Player *p3 = new Player("noob");
+        p3->setReinforcementPool(0);
+        vector<Territory *> p3Territories = vector<Territory *>();
+        p3->setTerritories(p3Territories);
+        cout << "\nNumber of territories: " << p3->getTerritories().size() << "\n";
+        engine->currentPlayers.push_back(p3);
+    }
+
+    engine->auditPlayers(); // remove players with zero territories
+
+    // Drawing some extra cards
+    for (auto p : engine->currentPlayers)
+    {
+        // cout << *p << endl;
+        engine->deck->draw(*p);
+        engine->deck->draw(*p);
+        engine->deck->draw(*p);
+        engine->deck->draw(*p);
+        engine->deck->draw(*p);
+    }
+
+    // Note: this while loop keeps request input from the console
+    // Stand-in CommandProcessor
+    // MainGameLoop transitions between phases using user input (not automatic)
+
+    engine->doTransition("gamestart");
+}
+
 // Rewriting the mainLoop test as a free function
 void refactoringA2P3()
 {
@@ -1347,10 +1382,10 @@ void refactoringA2P3()
 
     while (stillPlaying)
     {
-        GameEngine * engine = new GameEngine(); // need to re-instantiate engine after each game (else, segmentation fault error... badly defined GameEngine Constructors?)
+        GameEngine *engine = new GameEngine(); // need to re-instantiate engine after each game (else, segmentation fault error... badly defined GameEngine Constructors?)
 
         cout << "Debug: Entering fakeStartup phase" << endl;
-        fakeStartup(engine);
+        startUpForNoahTest(engine);
 
         cout << "Debug: Entering mainGamePlay phase" << endl;
         engine->refactoring_mainGameLoop();
@@ -1385,7 +1420,7 @@ void GameEngine::refactoring_mainGameLoop()
         reinforcementPhase(p);
         cout << "\nPlayer: " << p->getName() << " has " << p->getReinforcementPool() << " in his reinforcement pool.\n";
     }
-    
+
     // PHASE 2: Issue Orders Phase
 
     this->doTransition("issueorder");
@@ -1405,7 +1440,6 @@ void GameEngine::refactoring_mainGameLoop()
     {
         this->doTransition("win");
         cout << "\nPlayer " << winner->getName() << " won the game! Do you wish to replay? (y/n)\n";
-
 
         string input;
         cin >> input;

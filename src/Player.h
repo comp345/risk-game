@@ -17,13 +17,14 @@ class PlayerStrategy;
 
 using namespace std;
 
-struct compareArmySize {
+struct compareArmySize
+{
     bool operator()(Territory const *t1, Territory const *t2);
 };
 
-class Player {
+class Player
+{
 public:
-
     Player();
 
     Player(const Player &); //copy constructor
@@ -38,9 +39,11 @@ public:
 
     virtual vector<Territory *> toDefend();
 
+    void issueOrder(); // A3 
+
     void issueOrder(string, string);
 
-    void issueOrder(Order *o);
+    void issueOrder(Order *o); // A2
 
     void printOrders();
 
@@ -78,7 +81,6 @@ public:
 
     void setPrevTerritorySize();
 
-
     void addToPriorityAttack(Territory *toAdd);
 
     void addToPriorityDefend(Territory *toAdd);
@@ -102,14 +104,13 @@ public:
     void addTerritories(vector<Territory *> t1);
 
     // implementation of Negotiate order
-    bool isNegotiating(Player * p);
-    void addNegotiatingWith(Player * p);
-    void removeNegotiatingWith(Player * p);
+    bool isNegotiating(Player *p);
+    void addNegotiatingWith(Player *p);
+    void removeNegotiatingWith(Player *p);
     vector<Player *> getNegotiatingWith() const;
     void removeAllNegotiation();
-    PlayerStrategy* getPlayerStrategy();
-    void setPlayerStrategy(PlayerStrategy* ps);
-
+    PlayerStrategy *getPlayerStrategy();
+    void setPlayerStrategy(PlayerStrategy *ps);
 
 private:
     int reinforcementPool;
@@ -121,12 +122,11 @@ private:
     vector<Territory *> territories;
     Hand *hand;
     OrderList *orderList;
-    PlayerStrategy* ps;
+    PlayerStrategy *ps;
 
     bool doneIssuing;
     int plArmies;
 
     // implementation of Negotiate order
-    vector<Player*> negotiatingWith; 
-
+    vector<Player *> negotiatingWith;
 };
