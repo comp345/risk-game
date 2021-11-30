@@ -390,7 +390,7 @@ void GameEngine::preStartup() {
     } while (command->getArgs().empty() || !doTransition(command->getCommandName()));
     string mapName = command->getArgs()[0];
     cout << "current command: " << command->getCommandName() << "\n" << endl;
-    cout << "current mapfile requested: " << command->getArgs()[0] << "\n" << endl;
+    cout << "current mapfile requested: " << mapName << "\n" << endl;
 
     string fpath = path.append(mapName);
     Map x1 = *mapLoader->loadMap(fpath);
@@ -415,12 +415,9 @@ void GameEngine::preStartup() {
         numberOfPlayers++;
         setNumOfPlayers(numberOfPlayers);
         Player *p = new Player();
-        //Deck *cardDeck = new Deck();
-        //Hand *plCard = new Hand(cardDeck);
         p->setPlName(cmdPlName);
-        //p->setCards(plCard);
-        p->setPlArmies(5);
-        cout << *p << "Number of Armies: " << p->getPlArmies() << endl;
+        p->setReinforcementPool(5);
+        cout << *p << "Number of Armies: " << p->getReinforcementPool() << endl;
         cout << "Cards in players hand: " << p->getHand() << endl;
         plVec.push_back(p);
 
@@ -440,6 +437,13 @@ void GameEngine::preStartup() {
             }
         }
     }
+    do {
+        command = commandProcessor->getCommand(currentState);
+    } while (!doTransition(command->getCommandName()));
+
+    StartupPhase sp;
+    sp.setGameEng(this);
+    sp.startup();
 }
 
 //startupPhase methods
@@ -452,8 +456,7 @@ StartupPhase::StartupPhase(const StartupPhase &sp) {
 }
 
 StartupPhase::~StartupPhase() {
-//missing destructor
-    cout << "destroyed startup object!" << endl;
+    //TODO: missing destructor
 }
 
 void StartupPhase::operator=(const StartupPhase &sp) {
@@ -475,7 +478,6 @@ void StartupPhase::setGameEng(GameEngine *en) {
 }
 
 void StartupPhase::startup() {
-    int b = 0;
     //randomizing players order
     vector<Player *> a = eng->getPlayersVect();
     cout << "Randomize player order: \n" << endl;
@@ -488,14 +490,14 @@ void StartupPhase::startup() {
     //giving armies to players:
     cout << "Starting Army distribution for players: \n" << endl;
     for (int i = 0; i < eng->getNumOfPlayers(); i++) {
-        eng->getPlayersVect()[i]->setPlArmies(50);
+        eng->getPlayersVect()[i]->setReinforcementPool(50);
     }
     cout << "Players have received 50 army each! \n" << endl;
     for (Player *p1: a) {
-        cout << "player " << p1->getName() << ": " << p1->getPlArmies() << endl;
-
+        cout << "player " << p1->getName() << ": " << p1->getReinforcementPool() << endl;
     }
 
+    //TODO: fix
     //letting players draw 2 cards
 //    for (int i = 0; i < a.size(); i++) {
 //        Deck *d = new Deck();
@@ -535,8 +537,9 @@ void StartupPhase::startup() {
             cout << *p << endl;
         }
     } else {
-        cout << "The map has loading problems" << endl;
+        cout << "The map has loading problems. Map territory list is empty." << endl;
     }
+
 
 }
 

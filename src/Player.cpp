@@ -15,7 +15,7 @@ bool compareArmySize::operator()(Territory const *t1, Territory const *t2) {
 }
 
 Player::Player() {
-    plArmies = 0;
+    reinforcementPool = 0;
     territories = vector<Territory *>();
     hand = new Hand();
     orderList = new OrderList();
@@ -27,7 +27,7 @@ Player::Player() {
 
 Player::Player(string n) {
     this->name = n;
-    this->plArmies;
+    this->reinforcementPool = 0;
     this->hand = new Hand();
     this->orderList = new OrderList();
     this->doneIssuing = false;
@@ -49,7 +49,7 @@ Player::Player(string plName, vector<Territory *> t, Hand *h, OrderList *o) {
 
 //parametrized constructor
 Player::Player(int armies, string plName, vector<Territory *> t, Hand *h, OrderList *o) {
-    this->plArmies = armies;
+    this->reinforcementPool = armies;
     this->name = plName;
     this->territories = t;
     this->hand = h;
@@ -105,7 +105,7 @@ Player &Player::operator=(const Player &p) {
         delete orderList;
     hand = new Hand(*(p.hand));
     orderList = new OrderList(*(p.orderList));
-    plArmies = p.plArmies;
+    reinforcementPool = p.reinforcementPool;
     name = p.name;
     return *this;
 }
@@ -113,7 +113,7 @@ Player &Player::operator=(const Player &p) {
 //stream insertion operator overloading
 ostream &operator<<(ostream &out, const Player &p) {
     out << "\nName of player: " << p.name << endl;
-    out << "Army of player: " << p.plArmies << endl;
+    out << "Army of player: " << p.reinforcementPool << endl;
     out << "Territories: " << endl;
     for (Territory *t: p.territories) {
         out << *t << endl;
@@ -206,9 +206,7 @@ void Player::setTerritories(vector<Territory *> t1) {
     prevTerritorySize = territories.size();
 }
 
-//TODO: add to .h, and change in GameEngine
 void Player::addTerritories(vector<Territory *> t1) {
-    //territories = terr;
     for (Territory *t: t1) {
         this->territories.push_back(t);
     }
@@ -228,14 +226,6 @@ void Player::printOrders() {
     for (Order *o: orderList->getList()) {
         cout << *o << "\n";
     }
-}
-
-int Player::getPlArmies() {
-    return plArmies;
-}
-
-void Player::setPlArmies(int armies) {
-    plArmies = armies;
 }
 
 int Player::getTerritorySize() {
