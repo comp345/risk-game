@@ -338,7 +338,6 @@ bool checkWinCondition() {
 
 //helper methods
 Map *GameEngine::getMap() {
-    cout << "got map!\n" << endl;
     return map;
 }
 
@@ -502,7 +501,6 @@ void StartupPhase::startup() {
         Hand *h = new Hand();
         p->setCards(h);
         Deck* deck = eng->deck;
-        deck->showDeck();
         for (int i = 0; i <= 2; i++) {
             deck->draw(*p);
         }

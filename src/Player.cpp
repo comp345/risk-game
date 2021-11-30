@@ -123,7 +123,6 @@ ostream &operator<<(ostream &out, const Player &p) {
         for (Order *o: p.orderList->getList()) {
             out << "Orders: " << *o << endl;
         }
-        out << "Orders should be printing here\n";
     } else {
         out << "\nOrders not initialized";
     }
