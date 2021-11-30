@@ -213,9 +213,7 @@ Deploy &Deploy::operator=(const Deploy &d)
 
 bool Deploy::validate()
 {
-    cout << "Validate Deploy order." << endl;
-    // cout << "this->getTerritory()->getOwner(): " << this->getTerritory()->getOwner() << endl
-    // << "playerDeploying: " << playerDeploying << endl;
+    // cout << "Validate Deploy order." << endl;
     if (this->getTerritory()->getOwner() != playerDeploying)
         return false;
     return true;
@@ -224,12 +222,11 @@ bool Deploy::execute()
 {
     if (!validate()) // if invalid order
     {
-        cout << "Invalid Deploy order. Exit of Deploy::execute" << endl;
-        // Note about the Logger: do we notify if the order is invalid?
+        // cout << "Invalid Deploy order. Exit of Deploy::execute" << endl;
         return false;
     }
 
-    cout << "Execute Deploy order." << endl;
+    // cout << "Execute Deploy order." << endl;
     /** TODO: Check num of armies to deploy and Remove army units from reinforcement pool
      *      if (getPlayer()->getReinforcementPool() < getArmies()) { cout <<  << endl ;return false; }
      *      getPlayer()->setReinforcementPool(getPlayer()->getReinforcementPool() - getArmies());
@@ -318,16 +315,16 @@ Advance &Advance::operator=(const Advance &a)
 
 bool Advance::validate()
 {
-    cout << "Debug: Validate Advance order." << endl;
+    // cout << "Debug: Validate Advance order." << endl;
     if (this->getTerritorySource()->getOwner() != playerAdvancing)
         return false;
     for (auto negotiatee : playerAdvancing->getNegotiatingWith())
     {
         if (negotiatee == territoryTarget->getOwner())
         {
-            cout << "Debug: Advance::validate() Negotiation is happening between advancing player "
-                 << playerAdvancing->getName() << " and target territory owner, " 
-                 << territoryTarget->getOwner()->getName() << endl;
+            // cout << "Debug: Advance::validate() Negotiation is happening between advancing player "
+                //  << playerAdvancing->getName() << " and target territory owner, " 
+                //  << territoryTarget->getOwner()->getName() << endl;
             return false;
         }
     }
@@ -340,15 +337,14 @@ bool Advance::execute()
     bool bonus = false; // bonus is true if advance execution leads to enemy territory conquest
     if (!validate())
     {
-        cout << "Debug: Invalid Advance order." << endl;
+        // cout << "Debug: Invalid Advance order." << endl;
         return false;
     }
-    cout << "Debug: Execute Advance order.";
+    // cout << "Debug: Execute Advance order.";
 
-    // Case 1
+    // Case 1 if target belong to player, basically deploy src -> target
     if (getTerritoryTarget()->getOwner() == playerAdvancing)
     {
-        // if target belong to player, basically deploy src -> target
 
         /** check that num of armies ordered to advance is not greater than armies on territory source
          */
@@ -361,7 +357,7 @@ bool Advance::execute()
         }
         else
         {
-            cout << "Debug: Invalid number of army units to advance (greater than the number of units available on territory source." << endl;
+            // cout << "Debug: Invalid number of army units to advance (greater than the number of units available on territory source." << endl;
             return false;
         }
     }
@@ -387,7 +383,7 @@ bool Advance::execute()
         }
         else
         {
-            cout << "Debug: Invalid number of army units to advance (greater than the number of units available on territory source." << endl;
+            // cout << "Debug: Invalid number of army units to advance (greater than the number of units available on territory source." << endl;
             return false;
         }
     }
@@ -400,11 +396,6 @@ bool Advance::execute()
 bool Advance::simulateAttack()
 {
     cout << "Attacking enemy!" << endl;
-    /** DONE: Implement randomized battle result
-     * Attacking army and Defending alternate their attack on each other
-     * Attacking army -> Defending army: each unit has 60% chance to kill
-     * Defending army -> Attacking army: each unit has 70% chance to kill
-     */
     int attackUnit = getArmies(), defendUnit = territoryTarget->getNumberOfArmies(); // Number of attacker and defender units alive
     int deadAttacker = 0, deadDefender = 0;                                          // body count
     bool isAttackingTurn = true;
@@ -418,7 +409,7 @@ bool Advance::simulateAttack()
             if (resultAttack <= 5) // Advancing player kills one defending army
             {
                 territoryTarget->setNumberOfArmies(territoryTarget->getNumberOfArmies() - 1);
-                cout << "Debug: Attacker kills Defender #" << to_string(++deadDefender) << endl;
+                // cout << "Debug: Attacker kills Defender #" << to_string(++deadDefender) << endl;
                 --defendUnit; // 1 defender killed
             }
         }
@@ -429,7 +420,7 @@ bool Advance::simulateAttack()
             if (resultAttack <= 6) // Defending player kills one attacking army
             {
                 this->setArmies(this->getArmies() - 1);
-                cout << "Debug: Defender kills Attacker #" << to_string(++deadAttacker) << endl;
+                // cout << "Debug: Defender kills Attacker #" << to_string(++deadAttacker) << endl;
                 --attackUnit; // 1 attacker killed
             }
         }
@@ -446,8 +437,9 @@ bool Advance::simulateAttack()
     {
         // set target armies number as remaining attacking armies
         territoryTarget->setNumberOfArmies(this->getArmies());
-        // change ownership of territory
+        // change ownership of territory and add territory to player::territories
         territoryTarget->setOwner(this->getPlayer());
+        this->getPlayer()->addTerritory(territoryTarget);
     }
 
     updateDetails(); // Advance order is modified
@@ -543,9 +535,9 @@ bool Bomb::validate()
     {
         if (negotiatee == territoryTarget->getOwner())
         {
-            cout << "Debug: Bomb::validate() Negotiation is happening between bombing player "
-                 << playerBombing->getName() << " and target territory owner, "
-                 << territoryTarget->getOwner()->getName() << endl;
+            // cout << "Debug: Bomb::validate() Negotiation is happening between bombing player "
+            //      << playerBombing->getName() << " and target territory owner, "
+            //      << territoryTarget->getOwner()->getName() << endl;
             return false;
         }
     }
@@ -555,11 +547,10 @@ bool Bomb::execute()
 {
     if (!validate())
     {
-        cout << "Invalid Bomb order." << endl;
+        // cout << "Invalid Bomb order." << endl;
         return false;
     }
-    cout << "Execute Bomb order." << endl;
-    ;
+    // cout << "Execute Bomb order." << endl;
     getTerritory()->setNumberOfArmies(
         getTerritory()->getNumberOfArmies() / 2);
 
@@ -647,7 +638,7 @@ bool Blockade::validate()
 {
     if ((target->getOwner() == player))
     {
-        std::cout << "\nThe Blockade Order is valid.";
+        // std::cout << "\nThe Blockade Order is valid.";
         return true;
     }
     std::cout << "\nThe Blockade Order is invalid.";
@@ -659,6 +650,8 @@ bool Blockade::execute()
     {
         target->setNumberOfArmies(target->getNumberOfArmies() * 2);
         target->setOwner(neutral);
+        neutral->addTerritory(target);
+        
         int count = 0;
 
         //removing the target from player territory list
@@ -674,7 +667,6 @@ bool Blockade::execute()
 
         playerTerr.erase(playerTerr.begin() + count);
 
-        neutral->getTerritories().push_back(target);
 
         return true;
     }
@@ -757,7 +749,7 @@ AirLift &AirLift::operator=(const AirLift &a)
 
 bool AirLift::validate()
 {
-    cout << "Validate AirLift order." << endl;
+    // cout << "Validate AirLift order." << endl;
     if (getTerritorySource()->getOwner() != playerAirlifting ||
         getTerritoryTarget()->getOwner() != playerAirlifting)
         return false; // Only airlift from and to own territories
@@ -766,16 +758,16 @@ bool AirLift::validate()
 
 bool AirLift::execute()
 {
-    cout << "Execute AirLift order.";
+    // cout << "Execute AirLift order.";
     if (!validate())
     {
-        cout << "Debug: Invalid AirLift order." << endl;
+        // cout << "Debug: Invalid AirLift order." << endl;
         return false;
     }
     // Check if armiesToMove ≤ number of armies on territory source
     if (getArmies() > getTerritorySource()->getNumberOfArmies())
     {
-        cout << "Debug: Invalid number of armies to AirLift" << endl;
+        // cout << "Debug: Invalid number of armies to AirLift" << endl;
         return false;
     }
     // Remove army units from source and AirLift army units to target
@@ -871,10 +863,10 @@ bool Negotiate::validate()
 {
     if (source != target)
     {
-        std::cout << "The Negotiate Order is valid.\n";
+        // std::cout << "The Negotiate Order is valid.\n";
         return true;
     };
-    std::cout << "The Negotiate Order is invalid.\n";
+    // std::cout << "The Negotiate Order is invalid.\n";
     return false;
 };
 bool Negotiate::execute()

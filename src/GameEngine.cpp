@@ -374,22 +374,22 @@ void GameEngine::testGameEngine()
     //GameEngine engine{fileName};
     Command *output;
     cout << "Welcome to WarZone!" << endl;
-    while(true)
+    while (true)
     {
         //To handle replay case, getCommand has to be called at a later execution
         output = commandProcessor->getCommand(currentState);
         doTransition(output->getCommandName());
-        if(output->getCommandName() == "gamestart")
+        if (output->getCommandName() == "gamestart")
         {
             //Start the gameloop
             break;
         }
-        else if(output->getCommandName() == "replay")
+        else if (output->getCommandName() == "replay")
         {
             //Call me later
             cout << "\n";
         }
-        else if(output->getCommandName() == "quit")
+        else if (output->getCommandName() == "quit")
             exit(0);
         cout << "\n";
     }
@@ -657,7 +657,7 @@ void StartupPhase::startup()
                 {
                     vector<Territory *> territories;
                     territories.push_back(map->territoryNodeList.back());
-                    p->addTerritories(territories);
+                    p->setTerritories(territories);
                     map->territoryNodeList.pop_back();
                 }
             }
@@ -674,195 +674,7 @@ void StartupPhase::startup()
     }
 }
 
-// A2 Part 3 : Main Gameplay
-void GameEngine::testPart3()
-{
 
-    GameEngine engine;
-    cout << "Welcome to WarZone!" << endl;
-    cout << "Current State: " << engine.getCurrentStateName() << endl;
-    cout << "Printing deck: " << endl;
-    engine.deck->showDeck();
-
-    while (true)
-    {
-        string keyinput;
-
-        cout << "\nEnter a valid command to progress in the game."
-             << "(Enter x to quit or press any key when at final State)" << endl;
-
-        cin >> keyinput;
-        if (keyinput == "x" or engine.getCurrentStateName() == "final")
-            break;
-        else
-        {
-            cout << "\n***\n"
-                 << endl;
-
-            // Acting on the command. The function doTransition internally validates the command.
-            // Returns true if command was valid, in order to display correct message.
-            // TODO: switch statement to have different message for each state
-            bool isCommandValid = engine.doTransition(keyinput);
-
-            if (isCommandValid)
-            {
-                cout << "Valid command. Current state is: " << engine.getCurrentStateName() << endl;
-            }
-            else
-            {
-
-                cout << "Invalid command. Replay current state: " << engine.getCurrentStateName() << endl;
-            }
-
-            if (engine.currentState->nameState == "mapvalidated")
-            {
-                MapLoader *mapLoader = new MapLoader();
-                Map x5 = *mapLoader->loadMap("../maps/france.map");
-                Map *map5 = new Map(x5);
-                map5->validate();
-                engine.map = map5;
-            }
-
-            else if (engine.currentState->nameState == "playersadded")
-            {
-                Player *p = new Player("Alexander");
-                p->setReinforcementPool(0);
-
-                //Get the latest continent from the maps
-                Continent *mapsContinent = engine.map->continentList.at(0);
-                vector<Territory *> p1Territories;
-                for (Territory *t : mapsContinent->territories)
-                {
-                    p1Territories.push_back(t);
-                }
-                p->setTerritories(p1Territories);
-
-                //Show what we created
-                cout << "\n\n"
-                     << p->getName() << " was created!\n";
-                for (Territory *t : p->getTerritories())
-                {
-                    cout << t->getName() << "\n";
-                    t->setNumberOfArmies(2);
-                    t->setOwner(p);
-                }
-                p->getTerritories().front()->setNumberOfArmies(4); //Offset to see if soarting is working.
-                engine.currentPlayers.push_back(p);
-                cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
-
-                //Do the same for another player
-                Player *p2 = new Player("Andrew");
-                p2->setReinforcementPool(0);
-
-                mapsContinent = engine.map->continentList.at(1);
-                vector<Territory *> p2Territories;
-                for (Territory *t : mapsContinent->territories)
-                {
-                    p2Territories.push_back(t);
-                }
-                p2->setTerritories(p2Territories);
-
-                cout << "\n\n"
-                     << p2->getName() << " was created! \n";
-                for (Territory *t : p2->getTerritories())
-                {
-                    cout << t->getName() << "\n";
-                    t->setNumberOfArmies(5);
-                    t->setOwner(p2);
-                }
-                engine.currentPlayers.push_back(p2);
-                cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
-
-                //Empty player
-                Player *p3 = new Player("noob");
-                p3->setReinforcementPool(0);
-                vector<Territory *> p3Territories = vector<Territory *>();
-                p3->setTerritories(p3Territories);
-                cout << "\nNumber of territories: " << p3->getTerritories().size() << "\n";
-                engine.currentPlayers.push_back(p3);
-
-                //Add a unit in a neighbouring territory to see if priortiy works
-                // for(Territory* t : engine.map->getTerritories())
-                // {
-                //     if(t->getName() == "Cher"){
-                //         t->setNumberOfArmies(10);
-                //         t->setOwner(p3);    //P3 is the noob player, he isnt supposed to have territories
-                //     }
-                // }
-
-                // Player* winner = new Player("Pro");
-                // vector<Territory*> allTerritories = engine.map->getTerritories();
-                // winner->setTerritories(allTerritories);
-                // engine.currentPlayers.push_back(winner);
-            }
-        }
-        // Noah debug line A2
-        cout << "Debug: Entering mainGameLoop" << endl;
-        engine.mainGameLoop();
-    }
-}
-
-void GameEngine::mainGameLoop()
-{
-    if (getCurrentStateName() == "assignreinforcement")
-    {
-        for (Player *p : currentPlayers)
-        {
-            reinforcementPhase(p);
-            cout << "\nPlayer: " << p->getName() << " has " << p->getReinforcementPool() << " in his reinforcement pool.\n";
-        }
-    }
-
-    if (currentState->nameState == "issueorder")
-    {
-        // Testing cards (Noah and Laila)
-        // Create 5 dummy cards for each player
-        deck->draw(*currentPlayers.at(0));
-        deck->draw(*currentPlayers.at(0));
-        deck->draw(*currentPlayers.at(0));
-        deck->draw(*currentPlayers.at(0));
-        deck->draw(*currentPlayers.at(0));
-        deck->draw(*currentPlayers.at(1));
-        deck->draw(*currentPlayers.at(1));
-        deck->draw(*currentPlayers.at(1));
-        deck->draw(*currentPlayers.at(1));
-        deck->draw(*currentPlayers.at(1));
-
-        // Territory *currentPlayerTerritory = currentPlayers.front()->getTerritories().front();
-        // Advance *advanceOrder = new Advance(1, currentPlayers.front(), currentPlayers.front()->getTerritories().front(), currentPlayers.front()->getTerritories().back());
-        // currentPlayers.front()->getOrderList()->add(advanceOrder);
-
-        issueOrdersPhase();
-    }
-
-    if (currentState->nameState == "executeorders")
-    {
-        executeOrdersPhase();
-    }
-
-    // loop shall continue until only one of the players owns all the territories
-    Player *winner = hasWinner();
-    if (winner != NULL)
-    {
-        // currentState = new State("win");
-        cout << "\nPlayer " << winner->getName() << " won the game! Do you wish to replay? (y/n)\n";
-        string input;
-        cin >> input;
-        //If the user says yes then start at the first transition
-        if (input == "y")
-        {
-            doTransition(transitions.at(0)->nameTransition);
-        }
-        else if (input == "n")
-        {
-            //Else break out the game.
-            doTransition(transitions.back()->nameTransition);
-        }
-    }
-
-    // loop to check if a player should be removed from the game
-    auditPlayers();
-}
 
 void GameEngine::auditPlayers()
 {
@@ -962,6 +774,11 @@ bool GameEngine::allPlayersDone()
 
     return true;
 }
+
+
+// code for player::issueorder as a free function
+void playerIssueOrder(Deck *deck, Player *currentPlayer)
+{}
 
 void GameEngine::issueOrdersPhase()
 {
@@ -1129,55 +946,44 @@ void GameEngine::executeOrdersPhase()
             Player *currentPlayer = currentPlayers.at(i);
             bool played = false;
 
-            cout << "GameEngine:: Player: " << currentPlayer->getName() << " is currently in the execute order phase.\n";
-            //Check to see if that player has a deploy order
-            // for (Order *order : currentPlayer->getOrderList()->getList())
-            // {
-            //     // cout << order->getCommand() << "\n";
-            //     if (order->getCommand() == "Deploy type")
-            //     {
-            //         hasDeploy = true;
-            //         break;
-            //     }
-            // }
+            // Debug flag
+            cout << endl
+                 << "\tGameEngine:: Player: " << currentPlayer->getName()
+                 << " has " << currentPlayer->getOrderList()->getList().size() << " left orders to execute. " << endl;
 
-            //if (hasDeploy = true)
+            // Check if player still has order to execute, if not, skip iteration
+            if (currentPlayer->getOrderList()->getList().size() == 0)
+            {
+                cout << endl
+                     << currentPlayer->getName() << " is done executing. Skip." << endl;
+                continue;
+            }
+
             if (currentPlayer->getOrderList()->getList().at(0)->getCommand() == "Deploy type")
             {
-                //Go through all the order
                 for (Order *order : currentPlayers.at(i)->getOrderList()->getList())
                 {
-                    //Play the deploy order first
                     if (order->getCommand() == "Deploy type")
                     {
-                        cout << "GameEngine:: Player: " << currentPlayer->getName() << " is issuing a deploy order.\n";
-                        cout << "==>" << order->getDetails() << endl;
+                        cout << "\t" << currentPlayer->getName() << " will be issueing an order:";
+                        cout << "\t==>" << order->getDetails() << endl;
                         order->execute();
                         played = true;
                         break;
                     }
                 }
-
-                // continue to let other players deploy their armies after 1 occurrence
-                // if(played == true)
-                //     continue;
             }
 
             else
             {
-                //Go through all the order
                 for (Order *order : currentPlayers.at(i)->getOrderList()->getList())
                 {
-                    //Play the other orders
-                    cout << "GameEngine:: Player: " << currentPlayer->getName() << " is issuing a " << order->getCommand() << " order.\n";
+                    cout << "\t" << currentPlayer->getName() << " will be issueing an order:";
                     cout << "==>" << order->getDetails() << endl;
                     order->execute();
                     played = true;
                     break;
                 }
-                // continue to let other players execute orders before continuing.
-                // if(played == true)
-                //     continue;
             }
 
             //Remove it from the list of orders
@@ -1186,21 +992,23 @@ void GameEngine::executeOrdersPhase()
         }
     }
 
-    // for(Player* players : currentPlayers)
-    // {
-    //     for(Order* order : players->getOrderList()->getList())
-    //     {
-    //         order->execute();
-    //     }
-    // }
-
     // ! Do not transition to assignreinforcement state yet: need to check for winners (done in the driver function)
 }
 
-// A3: Noah tests  to refactor A2 part 3
 
-// Fake startup method to test the game play of A2 part 3
-// Need to be replaced by A2 part 2
+
+
+
+
+
+
+
+
+
+/*
+    The gamePlay method is broken : The following methods are duplicate to test them
+*/
+
 void fakeStartup(GameEngine *engine)
 {
     cout << "Welcome to WarZone!" << endl;
@@ -1224,8 +1032,8 @@ void fakeStartup(GameEngine *engine)
     // addplayer (now in state playersadded)
     engine->doTransition("addplayer");
     cout << "_________ Command ADDPLAYER _________" << endl;
-
     {
+        /* Hard coded creating Player 1 */
         Player *p = new Player("Alexander");
         p->setReinforcementPool(0);
 
@@ -1241,17 +1049,27 @@ void fakeStartup(GameEngine *engine)
         //Show what we created
         cout << "\n\n"
              << p->getName() << " was created!\n";
+
+        /* DEBUG TO DO: The Player::Territories is being duplicated inside this loop */
         for (Territory *t : p->getTerritories())
         {
             cout << t->getName() << "\n";
             t->setNumberOfArmies(2);
             t->setOwner(p);
         }
+        /* DEBUGGING getTerritories */
+        cout << endl;
+        for (auto t : p->getTerritories())
+        {
+            cout << " DEBUGGING Player::getTerritories => " << t->getName() << endl;
+        }
+        cout << endl;
+
         p->getTerritories().front()->setNumberOfArmies(4); //Offset to see if soarting is working.
         engine->currentPlayers.push_back(p);
         cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
 
-        //Do the same for another player
+        /* Hard coded creating Player 2 */
         Player *p2 = new Player("Andrew");
         p2->setReinforcementPool(0);
 
@@ -1271,6 +1089,13 @@ void fakeStartup(GameEngine *engine)
             t->setNumberOfArmies(5);
             t->setOwner(p2);
         }
+        cout << endl;
+        for (auto t : p2->getTerritories())
+        {
+            cout << " DEBUGGING Player::getTerritories => " << t->getName() << endl;
+        }
+        cout << endl;
+
         engine->currentPlayers.push_back(p2);
         cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
 
@@ -1304,20 +1129,19 @@ void fakeStartup(GameEngine *engine)
 }
 
 // Rewriting the mainLoop test as a free function
-void refactoringA2P3()
+void riskGameDriver()
 {
-
     bool stillPlaying = true;
 
     while (stillPlaying)
     {
-        GameEngine * engine = new GameEngine(); // need to re-instantiate engine after each game (else, segmentation fault error... badly defined GameEngine Constructors?)
+        GameEngine *engine = new GameEngine(); // need to re-instantiate engine after each game (else, segmentation fault error... badly defined GameEngine Constructors?)
 
         cout << "Debug: Entering fakeStartup phase" << endl;
         fakeStartup(engine);
 
         cout << "Debug: Entering mainGamePlay phase" << endl;
-        engine->refactoring_mainGameLoop();
+        engine->mainGameLoop();
         cout << "Debug: Exiting mainGamePlay phase" << endl;
 
         if (engine->getCurrentStateName() == "start")
@@ -1338,37 +1162,39 @@ void refactoringA2P3()
     cout << "Debug: Exiting the program. Thanks for playing!" << endl;
 }
 
-// TODO: Fixing the invalid transition bug (when invalid command enters, we should freeze in the flow, and NOT replay the current state)
-// Keep in memory bool validTransition
-void GameEngine::refactoring_mainGameLoop()
+void GameEngine::mainGameLoop()
 {
-    // PHASE 1: Reinforcement Phase
-    // this->doTransition("gamestart");
+    /* ****************************** */
+    /* PHASE 1: Reinforcement Phase   */
+    /* ****************************** */
+    // this->doTransition("gamestart"); 
     for (Player *p : currentPlayers)
     {
         reinforcementPhase(p);
         cout << "\nPlayer: " << p->getName() << " has " << p->getReinforcementPool() << " in his reinforcement pool.\n";
     }
 
-    // PHASE 2: Issue Orders Phase
+    /* ***************************** */ 
+    /* PHASE 2: Issue Orders Phase   */
+    /* ***************************** */ 
 
-    this->doTransition("issueorder");
-    issueOrdersPhase();
-    this->doTransition("endissueorders");
+    {this->doTransition("issueorder"); issueOrdersPhase(); this->doTransition("endissueorders");}
 
-    // PHASE 3: Execute Orders Phase
-    this->doTransition("execorder");
-    executeOrdersPhase();
+    /* ****************************** */
+    /* PHASE 3: Execute Orders Phase  */
+    /* ****************************** */
+    {this->doTransition("execorder"); executeOrdersPhase();}
+
+
 
     Player *winner = hasWinner();
 
-    // Test a forced win
+    // Forcing a win 
     winner = new Player("TESTING WIN");
     if (winner != NULL)
     {
         this->doTransition("win");
         cout << "\nPlayer " << winner->getName() << " won the game! Do you wish to replay? (y/n)\n";
-
 
         string input;
         cin >> input;

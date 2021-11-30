@@ -5,7 +5,7 @@
 
 using namespace std;
 
-extern void refactoringA2P3();
+extern void riskGameDriver();
 
 void debuggingStateMachine(GameEngine * e);
 
@@ -18,7 +18,7 @@ int main()
 
 
     // Noah refactoring a2 part 3
-    refactoringA2P3();
+    riskGameDriver();
 
 
 

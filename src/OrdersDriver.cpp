@@ -8,8 +8,12 @@
 
 using namespace std;
 
-// int main() {
-//     testOrdersExec();
+// int main()
+// {
+//      // testOrdersExec();
+//      // testDeployExec();
+//      // testAdvanceExec();
+//      // testAirliftExec();
 // }
 
 void testOrdersDriver()
@@ -368,6 +372,7 @@ void testDeployExec()
      // To create a valid territory, need to specify owner and number of armies (if territory is conquered)
      t1->setNumberOfArmies(5);
      t1->setOwner(p1);
+     p1->addTerritory(t1);
 
      // ************************* //
      // Creating a Deploy order   //
@@ -416,12 +421,16 @@ void testAdvanceExec()
      // To create a valid territory, need to specify owner and number of armies (if territory is conquered)
      t1->setNumberOfArmies(5);
      t1->setOwner(p1);
+     p1->addTerritory(t1);
      t2->setNumberOfArmies(9);
      t2->setOwner(p1);
+     p1->addTerritory(t2);
      t3->setNumberOfArmies(11);
      t3->setOwner(p2);
+     p2->addTerritory(t3);
      t4->setNumberOfArmies(3);
      t4->setOwner(p2);
+     p2->addTerritory(t4);
 
      // Player Hoax owns England, which has 5 armies
      // Player Hoax owns Scotland, which has 9 armies
@@ -549,12 +558,16 @@ void testAirliftExec()
      // To create a valid territory, need to specify owner and number of armies (if territory is conquered)
      t1->setNumberOfArmies(5);
      t1->setOwner(p1);
+     p1->addTerritory(t1);
      t2->setNumberOfArmies(9);
      t2->setOwner(p1);
+     p1->addTerritory(t2);
      t3->setNumberOfArmies(11);
      t3->setOwner(p2);
+     p2->addTerritory(t3);
      t4->setNumberOfArmies(3);
      t4->setOwner(p2);
+     p2->addTerritory(t4);
 
      // Player Hoax owns England, which has 5 armies
      // Player Hoax owns Scotland, which has 9 armies
@@ -665,12 +678,16 @@ void testOrdersExec()
      // To create a valid territory, need to specify owner and number of armies (if territory is conquered)
      t1->setNumberOfArmies(5);
      t1->setOwner(p1);
+     p1->addTerritory(t1);
      t2->setNumberOfArmies(9);
      t2->setOwner(p1);
+     p1->addTerritory(t2);
      t3->setNumberOfArmies(11);
      t3->setOwner(p2);
+     p2->addTerritory(t3);
      t4->setNumberOfArmies(3);
      t4->setOwner(p2);
+     p2->addTerritory(t4);
 
      // Player Hoax owns England, which has 5 armies
      // Player Hoax owns Scotland, which has 9 armies
@@ -728,19 +745,19 @@ void testOrdersExec()
      std::cout << "\nAFTER: " << t4->getName() << " armies: " << t4->getNumberOfArmies();
      std::cout << "\nAFTER: " << t4->getName() << " owner: Player " << t4->getOwner()->getName();
 
-     cout << endl << endl;
+     cout << endl
+          << endl;
      /****		Showing Negotiate		****/
      cout << endl
           << "Pre negotiation : Check if Players are negotiating with someone" << endl;
-     string isNegotiating = p1->getNegotiatingWith().empty()? "No negotiation": "Negotiation in process...";
+     string isNegotiating = p1->getNegotiatingWith().empty() ? "No negotiation" : "Negotiation in process...";
      cout << isNegotiating << endl;
      if (!p1->getNegotiatingWith().empty())
      {
-          for (Player * negotiatee : p1->getNegotiatingWith())
+          for (Player *negotiatee : p1->getNegotiatingWith())
           {
                cout << negotiatee->getName() << endl;
           }
-          
      }
 
      std::cout << "\n\n--- NEGOTIATE: Player 1 negotiates with Player 2 ---\n";
@@ -748,11 +765,12 @@ void testOrdersExec()
      cout << o7->getDetails() << endl;
      o7->execute();
 
-     cout << endl << "POST-Negotiate: p1 and p2 should be negotiating with the other" << endl;
+     cout << endl
+          << "POST-Negotiate: p1 and p2 should be negotiating with the other" << endl;
      cout << "Player " << p1->getName() << " negotiates with ";
      if (!p1->getNegotiatingWith().empty())
      {
-          for (Player * negotiatee : p1->getNegotiatingWith())
+          for (Player *negotiatee : p1->getNegotiatingWith())
           {
                cout << negotiatee->getName() << endl;
           }
@@ -760,26 +778,25 @@ void testOrdersExec()
      cout << "Player " << p2->getName() << " negotiates with ";
      if (!p2->getNegotiatingWith().empty())
      {
-          for (Player * negotiatee : p2->getNegotiatingWith())
+          for (Player *negotiatee : p2->getNegotiatingWith())
           {
                cout << negotiatee->getName() << endl;
           }
      }
 
-
-
      // Testing another negotiation order to see if the vector of negotiatee works
      // (valid for now .... player 3 has no territories or orderlist)
      std::cout << "\n\n--- NEGOTIATE: Player 1 negotiates with Player 3 ---\n";
-     Order * negotiate1 = new Negotiate(p1, p3);
+     Order *negotiate1 = new Negotiate(p1, p3);
      cout << negotiate1->getDetails() << endl;
      negotiate1->execute();
 
-     cout << endl << "POST-Negotiate: p1 and p3 should be negotiating with the other" << endl;
+     cout << endl
+          << "POST-Negotiate: p1 and p3 should be negotiating with the other" << endl;
      cout << "Player " << p1->getName() << " negotiates with ";
      if (!p1->getNegotiatingWith().empty())
      {
-          for (Player * negotiatee : p1->getNegotiatingWith())
+          for (Player *negotiatee : p1->getNegotiatingWith())
           {
                cout << negotiatee->getName() << ", ";
           }
@@ -788,16 +805,15 @@ void testOrdersExec()
      cout << "Player " << p3->getName() << " negotiates with ";
      if (!p3->getNegotiatingWith().empty())
      {
-          for (Player * negotiatee : p3->getNegotiatingWith())
+          for (Player *negotiatee : p3->getNegotiatingWith())
           {
                cout << negotiatee->getName() << ", ";
           }
           cout << endl;
      }
 
-
-
-     cout << endl << endl;
+     cout << endl
+          << endl;
      /** Testing that advance orders will not result in attack by source or target players on each other */
      // This advance order: Hoax tries to advance to adjacent territory belonging to Toast. This would normally end in attack
      // But since Hoax and Toast are negotiating, this will become invalid
@@ -813,23 +829,34 @@ void testOrdersExec()
      cout << o10->getDetails() << endl;
      o10->execute();
 
-
      // Simulate the deletion of all negotiation at the end of phase
-     cout << endl << endl << "All negotiations in process." << endl;
-     for (auto n : p1->getNegotiatingWith()) cout << p1->getName() << " negotiates with " << n->getName() << endl;
-     for (auto n : p2->getNegotiatingWith()) cout << p2->getName() << " negotiates with " << n->getName() << endl;
-     for (auto n : p3->getNegotiatingWith()) cout << p3->getName() << " negotiates with " << n->getName() << endl;
-     for (auto n : p4->getNegotiatingWith()) cout << p4->getName() << " negotiates with " << n->getName() << endl;
+     cout << endl
+          << endl
+          << "All negotiations in process." << endl;
+     for (auto n : p1->getNegotiatingWith())
+          cout << p1->getName() << " negotiates with " << n->getName() << endl;
+     for (auto n : p2->getNegotiatingWith())
+          cout << p2->getName() << " negotiates with " << n->getName() << endl;
+     for (auto n : p3->getNegotiatingWith())
+          cout << p3->getName() << " negotiates with " << n->getName() << endl;
+     for (auto n : p4->getNegotiatingWith())
+          cout << p4->getName() << " negotiates with " << n->getName() << endl;
 
-     cout << endl << endl << "Flush all negotations in process." << endl;
+     cout << endl
+          << endl
+          << "Flush all negotations in process." << endl;
      p1->removeAllNegotiation();
      p2->removeAllNegotiation();
      p3->removeAllNegotiation();
      p4->removeAllNegotiation();
 
      // Should print nothing if flush is correctly running
-     for (auto n : p1->getNegotiatingWith()) cout << p1->getName() << " negotiates with " << n->getName() << endl;
-     for (auto n : p2->getNegotiatingWith()) cout << p2->getName() << " negotiates with " << n->getName() << endl;
-     for (auto n : p3->getNegotiatingWith()) cout << p3->getName() << " negotiates with " << n->getName() << endl;
-     for (auto n : p4->getNegotiatingWith()) cout << p4->getName() << " negotiates with " << n->getName() << endl;
+     for (auto n : p1->getNegotiatingWith())
+          cout << p1->getName() << " negotiates with " << n->getName() << endl;
+     for (auto n : p2->getNegotiatingWith())
+          cout << p2->getName() << " negotiates with " << n->getName() << endl;
+     for (auto n : p3->getNegotiatingWith())
+          cout << p3->getName() << " negotiates with " << n->getName() << endl;
+     for (auto n : p4->getNegotiatingWith())
+          cout << p4->getName() << " negotiates with " << n->getName() << endl;
 }

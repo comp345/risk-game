@@ -28,7 +28,7 @@ public:
     Player();
 
     Player(const Player &); //copy constructor
-    Player(string);
+    Player(string); // Used
 
     Player(int, string, vector<Territory *>, Hand *, OrderList *);
 
@@ -56,13 +56,14 @@ public:
 
     OrderList *getOrderList();
 
+    // Assign new vector of territories
     void setTerritories(vector<Territory *> vector1);
 
     void setCards(Hand *pHand);
 
-    int getPlArmies();
+    int getPlArmies(); // To delete
 
-    void setPlArmies(int armies);
+    void setPlArmies(int armies); // To delete
 
     void setPlName(string plName);
 
@@ -101,7 +102,8 @@ public:
 
     void setReinforcementPool(int val);
 
-    void addTerritories(vector<Territory *> t1);
+    // TODO: Reimplement to add one territory at a time
+    void addTerritory(Territory * t1);
 
     // implementation of Negotiate order
     bool isNegotiating(Player *p);
@@ -125,7 +127,7 @@ private:
     PlayerStrategy *ps;
 
     bool doneIssuing;
-    int plArmies;
+    int plArmies; // Redundant data member -> reinforcementPool
 
     // implementation of Negotiate order
     vector<Player *> negotiatingWith;

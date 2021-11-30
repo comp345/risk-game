@@ -332,13 +332,9 @@ void Player::setTerritories(vector<Territory *> t1)
     prevTerritorySize = territories.size();
 }
 
-void Player::addTerritories(vector<Territory *> t1)
+void Player::addTerritory(Territory * t1)
 {
-    //territories = terr;
-    for (Territory *t : t1)
-    {
-        this->territories.push_back(t);
-    }
+    territories.push_back(t1);
 }
 
 void Player::setCards(Hand *pHand)
