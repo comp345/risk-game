@@ -464,12 +464,12 @@ void StartupPhase::operator=(const StartupPhase &sp) {
 }
 
 ostream &operator<<(ostream &out, const StartupPhase &sp) {
-    //out<<"\nGame Engine: "<<sp.eng<< endl;//to fix
+    //out<<"\nGame Engine: "<<sp.eng<< endl;//TODO: fix
     return out;
 }
 
 std::istream &operator>>(std::istream &in, const StartupPhase &sp) {
-    //in>>sp.eng;
+    //in>>sp.eng; //TODO: fix
     return in;
 }
 
@@ -479,37 +479,35 @@ void StartupPhase::setGameEng(GameEngine *en) {
 
 void StartupPhase::startup() {
     //randomizing players order
-    vector<Player *> a = eng->getPlayersVect();
+    vector<Player *> players = eng->getPlayersVect();
     cout << "Randomize player order: \n" << endl;
     eng->randPlVec();
     cout << "Current order of players after randomize: \n" << endl;
-    for (Player *p: eng->getPlayersVect()) {
+    for (Player *p: players) {
         cout << *p << "----" << endl;
     }
 
     //giving armies to players:
     cout << "Starting Army distribution for players: \n" << endl;
     for (int i = 0; i < eng->getNumOfPlayers(); i++) {
-        eng->getPlayersVect()[i]->setReinforcementPool(50);
+        players[i]->setReinforcementPool(50);
     }
     cout << "Players have received 50 army each! \n" << endl;
-    for (Player *p1: a) {
-        cout << "player " << p1->getName() << ": " << p1->getReinforcementPool() << endl;
+    for (Player *p: players) {
+        cout << "player " << p->getName() << ": " << p->getReinforcementPool() << endl;
     }
 
-    //TODO: fix
     //letting players draw 2 cards
-//    for (int i = 0; i < a.size(); i++) {
-//        Deck *d = new Deck();
-//        Hand *h = new Hand();
-//        a[i]->setCards(h);
-//        Player *p2 = a[i];
-//        cout << "Player " << p2->getName() << " :\n" << endl;
-//        d->showDeck();
-//        d->draw(*p2);
-//        d->draw(*p2);
-//        cout << "Player drew 2 cards!" << endl;//needs fix
-//    }
+    for (Player *p: players) {
+        Hand *h = new Hand();
+        p->setCards(h);
+        Deck* deck = eng->deck;
+        deck->showDeck();
+        for (int i = 0; i <= 2; i++) {
+            deck->draw(*p);
+        }
+        cout << p->getName() << " drew 2 cards!" << endl;
+    }
 
     //territory assignment
     cout << "Distributing territories to the players: \n" << endl;
