@@ -16,6 +16,8 @@
 namespace fs = filesystem;
 using namespace std;
 
+
+
 State::State()
 {
     nameState = "";
@@ -100,9 +102,7 @@ Transition &Transition::operator=(const Transition &t)
     return *this;
 }
 
-// Creates the finite state machine that contains states and transitions
-// The GameEngine object has access to the current state with getCurrentState(), as well
-// as the valid transitions from that state with getCurrentPossibleTransitions()
+
 GameEngine::GameEngine()
 {
     // Create the states and add to states collection
@@ -183,8 +183,7 @@ GameEngine::GameEngine()
     commandProcessor = new CommandProcessor();
 }
 
-// TODO: instead of overloading GameEngine constructor, use default arguments
-// If no file entered, use if statement to create CommandProcessor
+
 GameEngine::GameEngine(std::string newFile)
 {
     // Create the states and add to states collection
@@ -274,8 +273,10 @@ GameEngine::GameEngine(const GameEngine &e)
     plVec = vector<Player *>(e.plVec);
 }
 
+/* TODO */
 GameEngine::~GameEngine()
 {
+
 }
 
 GameEngine &GameEngine::operator=(const GameEngine &e)
@@ -350,8 +351,7 @@ string GameEngine::getNextStateName(string command)
     return ""; //TODO: throw exception
 }
 
-// Check if command is valid. If it is, updates the state. Return true if command was valid, false if else.
-// The success and error messages are not implemented, to allow flexible implementation in differents parts of A2.
+// Makes the engine transitions to the next state if command is valid. Returns boolean to help debugging or more validation
 bool GameEngine::doTransition(string command)
 {
     for (int i = 0; i < currentState->transitions.size(); ++i)
@@ -368,54 +368,11 @@ bool GameEngine::doTransition(string command)
     return false;
 }
 
-// A2 Part 1: Command Processor
-void GameEngine::testGameEngine()
-{
-    //GameEngine engine{fileName};
-    Command *output;
-    cout << "Welcome to WarZone!" << endl;
-    while (true)
-    {
-        //To handle replay case, getCommand has to be called at a later execution
-        output = commandProcessor->getCommand(currentState);
-        doTransition(output->getCommandName());
-        if (output->getCommandName() == "gamestart")
-        {
-            //Start the gameloop
-            break;
-        }
-        else if (output->getCommandName() == "replay")
-        {
-            //Call me later
-            cout << "\n";
-        }
-        else if (output->getCommandName() == "quit")
-            exit(0);
-        cout << "\n";
-    }
-    cout << "\n";
-    cout << "Voila tous les commands: " << endl;
-    commandProcessor->printCommands();
-}
-
 string GameEngine::stringToLog()
 {
     return "GameEngine transitioned to a new state: " + getCurrentStateName();
 }
 
-/**
- * @A2 Part 2
- *
- */
-
-// Helper functions
-bool checkWinCondition()
-{
-    // Check if there is a player who wons every territory in map
-    return false;
-}
-
-//helper methods
 Map *GameEngine::getMap()
 {
     // cout << "got map!\n"
@@ -464,6 +421,45 @@ void GameEngine::setMap(Map *m)
 {
     map = m;
 }
+
+/* ****************************************************************** */
+/* ***************  Command Processor Driver for A2  **************** */
+/* ****************************************************************** */
+// A2 Part 1: Command Processor
+void GameEngine::testGameEngine()
+{
+    //GameEngine engine{fileName};
+    Command *output;
+    cout << "Welcome to WarZone!" << endl;
+    while (true)
+    {
+        //To handle replay case, getCommand has to be called at a later execution
+        output = commandProcessor->getCommand(currentState);
+        doTransition(output->getCommandName());
+        if (output->getCommandName() == "gamestart")
+        {
+            //Start the gameloop
+            break;
+        }
+        else if (output->getCommandName() == "replay")
+        {
+            //Call me later
+            cout << "\n";
+        }
+        else if (output->getCommandName() == "quit")
+            exit(0);
+        cout << "\n";
+    }
+    cout << "\n";
+    cout << "Voila tous les commands: " << endl;
+    commandProcessor->printCommands();
+}
+
+
+
+/* **************************************************************************** */
+/* ***************  Startup Phase Driver and helper functions  **************** */
+/* **************************************************************************** */
 
 // Two main phases
 void GameEngine::preStartup()
@@ -674,6 +670,16 @@ void StartupPhase::startup()
     }
 }
 
+
+/* ********************************************************************** */
+/* ***************  Helper functions for Main Game Loop  **************** */
+/* ********************************************************************** */
+bool checkWinCondition()
+{
+    // Check if there is a player who wons every territory in map
+    return false;
+}
+
 void GameEngine::auditPlayers()
 {
     for (Player *p : currentPlayers)
@@ -772,7 +778,6 @@ bool GameEngine::allPlayersDone()
 
     return true;
 }
-
 
 /* 
    TODO: Implement this free function as Player:: 
@@ -1001,9 +1006,10 @@ void GameEngine::executeOrdersPhase()
     // ! Do not transition to assignreinforcement state yet: need to check for winners (done in the driver function)
 }
 
-/*
-    The gamePlay method is broken : The following methods are duplicate to test them
-*/
+
+/* ***************************************************************************************************************************** */
+/*                                                   Main Game Loop : Driver 
+/* ***************************************************************************************************************************** */
 
 void fakeStartup(GameEngine *engine)
 {
