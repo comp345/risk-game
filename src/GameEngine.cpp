@@ -377,132 +377,71 @@ void GameEngine::setMap(Map *m) {
 
 // Two main phases
 void GameEngine::preStartup() {
-    // loadmap <filename> to select map from list of map loaded
-    //if (command=='loadmap') -> do this
-    //GameEngine engine;
-    int mapNum;
-    string path = "../maps/";
-    string mName;
-    string fpath;
-    vector<string> cmdInput, cmdInput2;
-    string keyIn, keyIn2;
-    string temp;
-    string commandName, mapName;
+    Command *command;
 
+    // starting with loadmap
+    string path = "../maps/";
     MapLoader *mapLoader = new MapLoader();
     cout << "Initiating map loading stage: \n" << endl;
     getMapList();
 
-    commandProcessor->getCommand(currentState);
+    do {
+        command = commandProcessor->getCommand(currentState);
+    } while (!doTransition(command->getCommandName()));
 
-    //to grab command manually!
-    cout << "insert command: \n" << endl;
+    string mapName = command->getArgs()[0];
+    cout << "current command: " << command->getCommandName() << "\n" << endl;
+    cout << "current mapfile requested: " << command->getArgs()[0] << "\n" << endl;
 
-    getline(cin, keyIn);
-    //cout<<keyIn<<endl;
-    for (int i = 0; i < keyIn.length(); ++i) {
-        if (keyIn[i] == ' ') {
-            cmdInput.push_back(temp);
-            temp = "";
-        } else {
-            temp.push_back(keyIn[i]);
-        }
-    }
-    cmdInput.push_back(temp);
-    //storing command name and mapfile name
-
-    commandName = cmdInput[0];
-    mapName = cmdInput[1];
-
-    cout << "current command: " << commandName << "\n" << endl;
-    cout << "current mapfile requested: " << mapName << "\n" << endl;//returns filename.map
-
-    fpath = path.append(mapName);
+    string fpath = path.append(mapName);
     Map x1 = *mapLoader->loadMap(fpath);
     Map *map1 = new Map(x1);
     cout << "Map " << mapName << " has been loaded. \n" << endl;
-    doTransition("validatemap");
-    cin >> keyIn2;
-    while (true) {
-        if (keyIn2 == "validatemap") {
-            map1->validate();// validates map
-            map1->showLoadedMap();
-            setMap(map1);
-            break;
-        } else {
-            cout << "wrong command dummy! Try again!" << endl;
-        }
-    }
-    doTransition("addplayer");
+
+    do {
+        command = commandProcessor->getCommand(currentState);
+    } while (!doTransition(command->getCommandName()));
+
+    map1->validate();// validates map
+    map1->showLoadedMap();
+    setMap(map1);
 
     // addplayer loop
-    string keyIn3;
-    string temp2 = "";
-    string keyIn4;
-
     while (true) {
-        cout << "add player here! \n" << endl;
-        cin.clear();
-        cin.ignore();
-        cmdInput2.clear();
-        temp2 = "";
-        getline(cin, keyIn3);
-        for (int i = 0; i < keyIn3.length(); i++) {
-            if (keyIn3[i] == ' ') {
-                //cout << temp2;
-                cmdInput2.push_back(temp2);
-                temp2 = "";
-            } else {
-                temp2.push_back(keyIn3[i]);
-            }
+        do {
+            command = commandProcessor->getCommand(currentState);
+        } while (!doTransition(command->getCommandName()));
+        string cmdPlName = command->getArgs()[0];
+
+        numberOfPlayers++;
+        setNumOfPlayers(numberOfPlayers);
+        Player *p = new Player();
+        //Deck *cardDeck = new Deck();
+        //Hand *plCard = new Hand(cardDeck);
+        p->setPlName(cmdPlName);
+        //p->setCards(plCard);
+        p->setPlArmies(5);
+        cout << *p << "Number of Armies: " << p->getPlArmies() << endl;
+        cout << "Cards in players hand: " << p->getHand() << endl;
+        plVec.push_back(p);
+
+        cout << "total number of players so far is: " << getNumOfPlayers() << endl;
+        if (getNumOfPlayers() == 1) {
+            cout << "have 1 player so far" << endl;
+            continue; // w/the continue, it keeps looping "Thats the wrong order".
         }
-        cmdInput2.push_back(temp2);
-        string cmdName2 = cmdInput2[0];
-        string cmdPlName = cmdInput2[1];
-        //end of input split
-        if (cmdName2 == "addplayer") {
-            cout << "the current command is :" << cmdName2 << "\n" << endl;
-            cout << "current player name is " << cmdPlName << "\n" << endl;
-            numberOfPlayers++;
-            setNumOfPlayers(numberOfPlayers);
-
-            Player *p = new Player();
-            //Deck *cardDeck = new Deck();
-            //Hand *plCard = new Hand(cardDeck);
-            p->setPlName(cmdPlName);
-            //p->setCards(plCard);
-            p->setPlArmies(5);
-            cout << *p << "Number of Armies: " << p->getPlArmies() << endl;
-            cout << "Cards in players hand: " << p->getHand() << endl;
-            plVec.push_back(p);
-
-            cout << "total number of players so far is: " << getNumOfPlayers() << endl;
-
-            cmdInput2.clear();
-            if (getNumOfPlayers() == 1) {
-                cout<<"have 1 player so far"<<endl;
-                //continue; // w/the continue, it keeps looping "Thats the wrong order".
+        if (getNumOfPlayers() < 7) {
+            cout << "continue adding players? (y/n)" << endl;
+            string keyInY;
+            cin >> keyInY;
+            if (keyInY == "y") {
+                continue;
+            } else {
+                break;
             }
-            if (getNumOfPlayers() < 7) {
-                cout << "continue adding players? (Y/n)" << endl;
-                cin >> keyIn4;
-                if (keyIn4 == "y") {
-                    continue;
-                } else {
-                    break;
-                }
-            }
-        } else {
-            cout << "THAT'S THE WRONG ORDER!" << endl;
         }
     }
-    /**
-         * - distribute territories of map between players
-         * - determine order of play of players
-         * - initially: give 50 armies to the players (50 between them? or 50 each?)
-         * - each player draw 2 cards with deck.draw(2)
-         * - go to play phase
-         */
+
 }
 
 //startupPhase methods
@@ -586,7 +525,7 @@ void StartupPhase::startup() {
                     territories.push_back(map->territoryNodeList.back());
                     p->addTerritories(territories);
                     map->territoryNodeList.pop_back();
-                    for(Territory *t: territories){
+                    for (Territory *t: territories) {
                         t->setOwner(p);
                     }
                 }
