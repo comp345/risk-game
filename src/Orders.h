@@ -115,7 +115,7 @@ public:
     bool simulateAttack();
 };
 
-class Bomb : public Order
+class Bomb: virtual public Order
 {
 private:
     Player *playerBombing;

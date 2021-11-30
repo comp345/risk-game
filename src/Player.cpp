@@ -217,6 +217,17 @@ vector<Territory *> Player::toDefend() {
 void Player::issueOrder(Order *o) {
     getPlayerStrategy()->issueOrder(o);
 }
+/* Player::issueOrder should be rewritten: The logic of which order to create and save in orderlist
+needs to be INSIDE issueOrder(), and not in issueOrdersPhase of GameEngine
+
+void Player::issueOrder() {
+
+    
+    getPlayerStrategy()->issueOrder(o);
+}
+
+
+*/
 
 Hand *Player::getHand()
 {

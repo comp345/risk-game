@@ -968,6 +968,8 @@ bool GameEngine::allPlayersDone()
 
 void GameEngine::issueOrdersPhase()
 {
+
+
     // Updating each players' toAttack and toDefend queues
     for (Player *p : currentPlayers)
     {
@@ -1011,7 +1013,6 @@ void GameEngine::issueOrdersPhase()
 
             if (currentPlayers.at(i)->isDoneIssuing())
             {
-
                 // When done issuing orders, start issuing 1 card order per turn until both player are done...
                 // flawed but will work
                 Player *player = currentPlayers.at(i);
