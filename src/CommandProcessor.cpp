@@ -170,18 +170,6 @@ vector<string> CommandProcessor::readCommand(State*& currentState)
     else
     {
         cout << "\n***\n" << endl;
-        // Validates the command.
-        // Returns true if command was valid, in order to display correct message.
-        bool isCommandValid = this->validateCommand(currentState, commandName);
-
-        if (isCommandValid)
-        {
-            cout << "Valid command. Current state is: " << this->getCurrentStateName(currentState) << endl;
-        }
-        else
-        {
-            cout << "Invalid command. Replay current state: " << this->getCurrentStateName(currentState) << endl;
-        }
         return cmdInput;
     }
 }
@@ -203,7 +191,15 @@ Command* CommandProcessor::getCommand(State*& currentState)
     }
     newCommand->setCommandName(newCommandName);
     newCommand->saveEffect(newCommandName);
-    saveCommand(newCommand);
+
+    bool isCommandValid = this->validateCommand(currentState, newCommandName);
+    if (isCommandValid) {
+        cout << "Valid command. Current state is: " << this->getCurrentStateName(currentState) << endl;
+        saveCommand(newCommand);
+    } else {
+        cout << "Invalid command. Replay current state: " << this->getCurrentStateName(currentState) << endl;
+    }
+
     return newCommand;
 }
 

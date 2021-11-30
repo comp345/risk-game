@@ -387,8 +387,7 @@ void GameEngine::preStartup() {
 
     do {
         command = commandProcessor->getCommand(currentState);
-    } while (!doTransition(command->getCommandName()));
-
+    } while (command->getArgs().empty() || !doTransition(command->getCommandName()));
     string mapName = command->getArgs()[0];
     cout << "current command: " << command->getCommandName() << "\n" << endl;
     cout << "current mapfile requested: " << command->getArgs()[0] << "\n" << endl;
@@ -410,7 +409,7 @@ void GameEngine::preStartup() {
     while (true) {
         do {
             command = commandProcessor->getCommand(currentState);
-        } while (!doTransition(command->getCommandName()));
+        } while (command->getArgs().empty() || !doTransition(command->getCommandName()));
         string cmdPlName = command->getArgs()[0];
 
         numberOfPlayers++;
@@ -428,7 +427,7 @@ void GameEngine::preStartup() {
         cout << "total number of players so far is: " << getNumOfPlayers() << endl;
         if (getNumOfPlayers() == 1) {
             cout << "have 1 player so far" << endl;
-            continue; // w/the continue, it keeps looping "Thats the wrong order".
+            continue;
         }
         if (getNumOfPlayers() < 7) {
             cout << "continue adding players? (y/n)" << endl;
@@ -441,7 +440,6 @@ void GameEngine::preStartup() {
             }
         }
     }
-
 }
 
 //startupPhase methods
@@ -779,7 +777,7 @@ void GameEngine::reinforcementPhase(Player *p) {
         if (territoryCount == listOfContentsTerritories.size())
             ownsContinent = true;
 
-        if (ownsContinent == true) {
+        if (ownsContinent) {
             cout << "continent bonus has been applied! adding an additional " << controlBonus << " units";
             numberOfArmies += controlBonus;
             ownsContinent = false;
