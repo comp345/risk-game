@@ -616,7 +616,7 @@ void StartupPhase::startup() {
                 {
                     vector<Territory *> territories;
                     territories.push_back(map->territoryNodeList.back());
-                    p->setTerritories(territories);
+                    p->addTerritories(territories);
                     map->territoryNodeList.pop_back();
                     for (Territory *t: territories) { // Bug: only one territory is assigned to each player...
                         t->setOwner(p);
@@ -1087,7 +1087,7 @@ void GameEngine::mainGameLoop()
 
     bool noWinner = true;
     // Keeping track of turns for tournament mode
-    int maximumNumberOfTurns = 100;
+    int maximumNumberOfTurns = 5;
     int numOfTurns = 0;
     while (noWinner && (numOfTurns < maximumNumberOfTurns))
     {
