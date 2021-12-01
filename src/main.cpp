@@ -7,9 +7,9 @@ extern void riskGameDriver(); // driver for A2 P3
 
 int main(int, char **)
 {
-    /* ******************************* */
-    /*          A2 P2 : Startup        */
-    /* ******************************* */
+    /* *************************************** */
+    /*              A2 P2 : Startup            */
+    /* *************************************** */
     // GameEngine *engine= new GameEngine();
     // engine->preStartup();
 
