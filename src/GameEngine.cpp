@@ -990,8 +990,7 @@ void riskGameDriver()
     {
         GameEngine *engine = new GameEngine(); // need to re-instantiate engine after each game (else, segmentation fault error... badly defined GameEngine Constructors?)
 
-        cout << "Debug: Entering fakeStartup phase" << endl;
-        // fakeStartup(engine);
+        cout << "Debug: Entering StartUp phase" << endl;
         engine->preStartup();
 
         cout << "Debug: Entering mainGamePlay phase" << endl;
