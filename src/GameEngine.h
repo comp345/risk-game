@@ -162,8 +162,6 @@ public:
     Player *hasWinner();
     void auditPlayers();
 
-    // Noah additions for refacting A2 part 3
-    void refactoring_mainGameLoop();
 };
 
 class StartupPhase

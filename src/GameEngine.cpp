@@ -927,18 +927,28 @@ void GameEngine::issueOrdersPhase()
     // Updating each players' toAttack and toDefend queues
     for (Player *p : currentPlayers)
     {
-        // set the isDone flag to false
+        // set isDone flag to false
         p->setDoneIssuing(false);
-        // territories are to be attacked in priority
+
+        // set isDoneDeploying flag to false
+        p->setDoneDeploying(false);
+
+        // Debugging: why no Advance Orders are created
+        cout << endl << "= Start of issueOrderPhase : player " << p->getName() << "'s toAttack = ";
         for (Territory *toAttack : p->toAttack())
         {
             p->addToPriorityAttack(toAttack);
+            cout << toAttack->getName() << ", ";
         }
-        // Defend
+
+        //Debugging
+        cout << endl << "= Start of issueOrderPhase : player " << p->getName() << "'s toDefend = ";
         for (Territory *toDefend : p->toDefend())
         {
             p->addToPriorityDefend(toDefend);
+            cout << toDefend->getName() << ", ";
         }
+        cout << endl << endl;
     }
     while (!allPlayersDone())
     {
@@ -1153,7 +1163,8 @@ void riskGameDriver()
         GameEngine *engine = new GameEngine(); // need to re-instantiate engine after each game (else, segmentation fault error... badly defined GameEngine Constructors?)
 
         cout << "Debug: Entering fakeStartup phase" << endl;
-        fakeStartup(engine);
+        // fakeStartup(engine);
+        engine->preStartup();
 
         cout << "Debug: Entering mainGamePlay phase" << endl;
         engine->mainGameLoop();
