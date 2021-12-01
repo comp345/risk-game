@@ -210,7 +210,6 @@ vector<Territory *> Player::toAttack() {
 
 //returns a list of territories to defend
 vector<Territory *> Player::toDefend() {
-    cout << "DEBUGGING Player::toDefend" << endl;
     return getPlayerStrategy()->toDefend();
 }
 
@@ -221,7 +220,7 @@ void Player::issueOrder(Order *o) {
     getPlayerStrategy()->issueOrder(o);
 }
 
-
+// A3: calls the strategy's 
 void Player::issueOrder() {
     if (this->isDoneIssuing())
             {
