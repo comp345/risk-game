@@ -97,6 +97,8 @@ private:
     std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
     CommandProcessor *commandProcessor;
     std::vector<std::string> listOfFile;
+
+    Deck *deck;
     std::vector<Player *> plVec;
     Map *map;
 
@@ -109,7 +111,7 @@ public:
 
     ~GameEngine();
 
-    GameEngine& operator=(const GameEngine& e);
+    GameEngine &operator=(const GameEngine &e);
 
     // return name of current state
     std::string getCurrentStateName();
@@ -148,19 +150,18 @@ public:
     Map *getMap();
 
     void setMap(Map *m);
+    
+    Deck *getDeck();
 
-    //Alexanders additions:
+    // Alexanders additions:
     void mainGameLoop();
     void reinforcementPhase(Player *p);
     void issueOrdersPhase();
     void executeOrdersPhase();
 
-    // createOrderFromCard to be deleted 
-    // Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget);
-
     // Noah: Data members should be private and only accessed with public methods
     vector<Player *> currentPlayers;
-    Deck *deck;
+
     bool allPlayersDone();
     Player *hasWinner();
     void auditPlayers();

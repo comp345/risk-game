@@ -419,6 +419,11 @@ void GameEngine::setMap(Map *m)
     map = m;
 }
 
+Deck * GameEngine::getDeck()
+{
+    return deck;
+}
+
 /* ****************************************************************** */
 /* ***************  Command Processor Driver for A2  **************** */
 /* ****************************************************************** */
@@ -587,7 +592,7 @@ void StartupPhase::startup() {
     for (Player *p: players) {
         Hand *h = new Hand();
         p->setCards(h);
-        Deck* deck = eng->deck;
+        Deck* deck = eng->getDeck();
         for (int i = 0; i <= 2; i++) {
             deck->draw(*p);
         }
@@ -942,7 +947,7 @@ void GameEngine::issueOrdersPhase()
             cout << "\nGameEngine:: Player: " << currentPlayers.at(i)->getName() << " is currently in the issue order phase.\n";
 
             // Free function to implement as Player::issueOrder
-            playerIssueOrder(deck, currentPlayers.at(i));
+            playerIssueOrder(this->deck, currentPlayers.at(i));
         }
     }
 }
@@ -1124,11 +1129,11 @@ void fakeStartup(GameEngine *engine)
     for (auto p : engine->currentPlayers)
     {
         // cout << *p << endl;
-        engine->deck->draw(*p);
-        engine->deck->draw(*p);
-        engine->deck->draw(*p);
-        engine->deck->draw(*p);
-        engine->deck->draw(*p);
+        engine->getDeck()->draw(*p);
+        engine->getDeck()->draw(*p);
+        engine->getDeck()->draw(*p);
+        engine->getDeck()->draw(*p);
+        engine->getDeck()->draw(*p);
     }
 
     // Note: this while loop keeps request input from the console
