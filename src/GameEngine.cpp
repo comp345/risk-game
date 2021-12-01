@@ -387,7 +387,7 @@ void GameEngine::setNumOfPlayers(int plNumb)
     numberOfPlayers = plNumb;
 }
 
-void GameEngine::randPlVec()
+void GameEngine::randomizePlayersTurn()
 { //for randomizing players order of appearance on gamestart
     shuffle(begin(plVec), end(plVec), default_random_engine{});
     cout << "players shuffled...\n"
@@ -576,7 +576,7 @@ void StartupPhase::startup() {
     //randomizing players order
     vector<Player *> players = eng->getPlayersVect();
     cout << "Randomize player order: \n" << endl;
-    eng->randPlVec();
+    eng->randomizePlayersTurn();
     cout << "Current order of players after randomize: \n" << endl;
     for (Player *p: players) {
         cout << *p << "----" << endl;

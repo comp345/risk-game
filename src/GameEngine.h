@@ -86,7 +86,6 @@ class GameEngine : public ILoggable, public Subject
 {
     friend class State;
     friend class Transition;
-    
 
 private:
     int numberOfPlayers;
@@ -138,15 +137,15 @@ public:
     // A2 Part 2
     int getNumOfPlayers();
 
+    // To refactor
     vector<Player *> getPlayersVect();
-    vector<Player *>& getPlayers();
+    void randomizePlayersTurn();
+    vector<Player *> &getPlayers();
+    
 
-    void setNumOfPlayers(int plNumb); 
-
+    void setNumOfPlayers(int plNumb);
 
     void getMapList();
-
-    void randPlVec();
 
     void preStartup();
 
@@ -161,7 +160,6 @@ public:
     void reinforcementPhase(Player *p);
     void issueOrdersPhase();
     void executeOrdersPhase();
-
 
     bool allPlayersDone();
     Player *hasWinner();
