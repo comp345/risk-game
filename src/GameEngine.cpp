@@ -1042,116 +1042,116 @@ void GameEngine::executeOrdersPhase() {
 /*                                                   Main Game Loop : Driver 
 /* ***************************************************************************************************************************** */
 
-void fakeStartup(GameEngine *engine)
-{
-    cout << "Welcome to WarZone!" << endl;
-    cout << "Current State: " << engine->getCurrentStateName() << endl;
+// void fakeStartup(GameEngine *engine)
+// {
+//     cout << "Welcome to WarZone!" << endl;
+//     cout << "Current State: " << engine->getCurrentStateName() << endl;
 
-    /** Stand-in Startup Phase (Automatic) 
-     * */
-    // loadmap (now in mapvalidated state)
-    engine->doTransition("loadmap");
-    cout << "________ Command LOADMAP ________" << endl;
-    MapLoader *mapLoader = new MapLoader();
-    Map x5 = *mapLoader->loadMap("../maps/france.map");
-    Map *map5 = new Map(x5);
+//     /** Stand-in Startup Phase (Automatic) 
+//      * */
+//     // loadmap (now in mapvalidated state)
+//     engine->doTransition("loadmap");
+//     cout << "________ Command LOADMAP ________" << endl;
+//     MapLoader *mapLoader = new MapLoader();
+//     Map x5 = *mapLoader->loadMap("../maps/france.map");
+//     Map *map5 = new Map(x5);
 
-    // validatemap (now in state)
-    engine->doTransition("validatemap");
-    cout << "_________ Command VALIDATEMAP _________" << endl;
-    map5->validate();
-    engine->setMap(map5);
+//     // validatemap (now in state)
+//     engine->doTransition("validatemap");
+//     cout << "_________ Command VALIDATEMAP _________" << endl;
+//     map5->validate();
+//     engine->setMap(map5);
 
-    // addplayer (now in state playersadded)
-    engine->doTransition("addplayer");
-    cout << "_________ Command ADDPLAYER _________" << endl;
-    {
-        /* Hard coded creating Player 1 */
-        Player *p = new Player("Alexander");
-        p->setReinforcementPool(0);
+//     // addplayer (now in state playersadded)
+//     engine->doTransition("addplayer");
+//     cout << "_________ Command ADDPLAYER _________" << endl;
+//     {
+//         /* Hard coded creating Player 1 */
+//         Player *p = new Player("Alexander");
+//         p->setReinforcementPool(0);
 
-        //Get the latest continent from the maps
-        Continent *mapsContinent = engine->getMap()->continentList.at(0);
-        vector<Territory *> p1Territories;
-        for (Territory *t : mapsContinent->territories)
-        {
-            p1Territories.push_back(t);
-        }
-        p->setTerritories(p1Territories);
+//         //Get the latest continent from the maps
+//         Continent *mapsContinent = engine->getMap()->continentList.at(0);
+//         vector<Territory *> p1Territories;
+//         for (Territory *t : mapsContinent->territories)
+//         {
+//             p1Territories.push_back(t);
+//         }
+//         p->setTerritories(p1Territories);
 
-        //Show what we created
-        cout << "\n\n"
-             << p->getName() << " was created!\n";
+//         //Show what we created
+//         cout << "\n\n"
+//              << p->getName() << " was created!\n";
 
-        for (Territory *t : p->getTerritories())
-        {
-            cout << t->getName() << "\n";
-            t->setNumberOfArmies(2);
-            t->setOwner(p);
-        }
+//         for (Territory *t : p->getTerritories())
+//         {
+//             cout << t->getName() << "\n";
+//             t->setNumberOfArmies(2);
+//             t->setOwner(p);
+//         }
 
-        p->getTerritories().front()->setNumberOfArmies(4); //Offset to see if soarting is working.
-        engine->getPlayers().push_back(p);
-        cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
+//         p->getTerritories().front()->setNumberOfArmies(4); //Offset to see if soarting is working.
+//         engine->getPlayers().push_back(p);
+//         cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
 
-        /* Hard coded creating Player 2 */
-        Player *p2 = new Player("Andrew");
-        p2->setReinforcementPool(0);
+//         /* Hard coded creating Player 2 */
+//         Player *p2 = new Player("Andrew");
+//         p2->setReinforcementPool(0);
 
-        mapsContinent = engine->getMap()->continentList.at(1);
-        vector<Territory *> p2Territories;
-        for (Territory *t : mapsContinent->territories)
-        {
-            p2Territories.push_back(t);
-        }
-        p2->setTerritories(p2Territories);
+//         mapsContinent = engine->getMap()->continentList.at(1);
+//         vector<Territory *> p2Territories;
+//         for (Territory *t : mapsContinent->territories)
+//         {
+//             p2Territories.push_back(t);
+//         }
+//         p2->setTerritories(p2Territories);
 
-        cout << "\n\n"
-             << p2->getName() << " was created! \n";
-        for (Territory *t : p2->getTerritories())
-        {
-            cout << t->getName() << "\n";
-            t->setNumberOfArmies(5);
-            t->setOwner(p2);
-        }
-        cout << endl;
-        for (auto t : p2->getTerritories())
-        {
-            cout << " DEBUGGING Player::getTerritories => " << t->getName() << endl;
-        }
-        cout << endl;
+//         cout << "\n\n"
+//              << p2->getName() << " was created! \n";
+//         for (Territory *t : p2->getTerritories())
+//         {
+//             cout << t->getName() << "\n";
+//             t->setNumberOfArmies(5);
+//             t->setOwner(p2);
+//         }
+//         cout << endl;
+//         for (auto t : p2->getTerritories())
+//         {
+//             cout << " DEBUGGING Player::getTerritories => " << t->getName() << endl;
+//         }
+//         cout << endl;
 
-        engine->getPlayers().push_back(p2);
-        cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
+//         engine->getPlayers().push_back(p2);
+//         cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
 
-        //Empty player
-        Player *p3 = new Player("noob");
-        p3->setReinforcementPool(0);
-        vector<Territory *> p3Territories = vector<Territory *>();
-        p3->setTerritories(p3Territories);
-        cout << "\nNumber of territories: " << p3->getTerritories().size() << "\n";
-        engine->getPlayers().push_back(p3);
-    }
+//         //Empty player
+//         Player *p3 = new Player("noob");
+//         p3->setReinforcementPool(0);
+//         vector<Territory *> p3Territories = vector<Territory *>();
+//         p3->setTerritories(p3Territories);
+//         cout << "\nNumber of territories: " << p3->getTerritories().size() << "\n";
+//         engine->getPlayers().push_back(p3);
+//     }
 
-    engine->auditPlayers(); // remove players with zero territories
+//     engine->auditPlayers(); // remove players with zero territories
 
-    // Drawing some extra cards
-    for (auto p : engine->getPlayers())
-    {
-        // cout << *p << endl;
-        engine->getDeck()->draw(*p);
-        engine->getDeck()->draw(*p);
-        engine->getDeck()->draw(*p);
-        engine->getDeck()->draw(*p);
-        engine->getDeck()->draw(*p);
-    }
+//     // Drawing some extra cards
+//     for (auto p : engine->getPlayers())
+//     {
+//         // cout << *p << endl;
+//         engine->getDeck()->draw(*p);
+//         engine->getDeck()->draw(*p);
+//         engine->getDeck()->draw(*p);
+//         engine->getDeck()->draw(*p);
+//         engine->getDeck()->draw(*p);
+//     }
 
-    // Note: this while loop keeps request input from the console
-    // Stand-in CommandProcessor
-    // MainGameLoop transitions between phases using user input (not automatic)
+//     // Note: this while loop keeps request input from the console
+//     // Stand-in CommandProcessor
+//     // MainGameLoop transitions between phases using user input (not automatic)
 
-    engine->doTransition("gamestart");
-}
+//     engine->doTransition("gamestart");
+// }
 
 // Rewriting the mainLoop test as a free function
 void riskGameDriver()
