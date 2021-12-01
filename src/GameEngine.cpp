@@ -398,6 +398,10 @@ vector<Player *> GameEngine::getPlayersVect()
 {
     return plVec; //returns the vector containing player objects
 }
+vector<Player *>& GameEngine::getPlayers()
+{
+    return currentPlayers;
+}
 
 void GameEngine::getMapList()
 { //helper method for loading list of maps from the directory in an ordered list
@@ -1081,7 +1085,7 @@ void fakeStartup(GameEngine *engine)
         }
 
         p->getTerritories().front()->setNumberOfArmies(4); //Offset to see if soarting is working.
-        engine->currentPlayers.push_back(p);
+        engine->getPlayers().push_back(p);
         cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
 
         /* Hard coded creating Player 2 */
@@ -1111,7 +1115,7 @@ void fakeStartup(GameEngine *engine)
         }
         cout << endl;
 
-        engine->currentPlayers.push_back(p2);
+        engine->getPlayers().push_back(p2);
         cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
 
         //Empty player
@@ -1120,13 +1124,13 @@ void fakeStartup(GameEngine *engine)
         vector<Territory *> p3Territories = vector<Territory *>();
         p3->setTerritories(p3Territories);
         cout << "\nNumber of territories: " << p3->getTerritories().size() << "\n";
-        engine->currentPlayers.push_back(p3);
+        engine->getPlayers().push_back(p3);
     }
 
     engine->auditPlayers(); // remove players with zero territories
 
     // Drawing some extra cards
-    for (auto p : engine->currentPlayers)
+    for (auto p : engine->getPlayers())
     {
         // cout << *p << endl;
         engine->getDeck()->draw(*p);

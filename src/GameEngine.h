@@ -85,8 +85,8 @@ public:
 class GameEngine : public ILoggable, public Subject
 {
     friend class State;
-
     friend class Transition;
+    
 
 private:
     int numberOfPlayers;
@@ -99,6 +99,7 @@ private:
     std::vector<std::string> listOfFile;
 
     Deck *deck;
+    vector<Player *> currentPlayers;
     std::vector<Player *> plVec;
     Map *map;
 
@@ -138,8 +139,10 @@ public:
     int getNumOfPlayers();
 
     vector<Player *> getPlayersVect();
+    vector<Player *>& getPlayers();
 
-    void setNumOfPlayers(int plNumb);
+    void setNumOfPlayers(int plNumb); 
+
 
     void getMapList();
 
@@ -150,7 +153,7 @@ public:
     Map *getMap();
 
     void setMap(Map *m);
-    
+
     Deck *getDeck();
 
     // Alexanders additions:
@@ -159,8 +162,6 @@ public:
     void issueOrdersPhase();
     void executeOrdersPhase();
 
-    // Noah: Data members should be private and only accessed with public methods
-    vector<Player *> currentPlayers;
 
     bool allPlayersDone();
     Player *hasWinner();
