@@ -96,12 +96,6 @@ vector<Territory *> AggressivePlayerStrategy::toAttack()
 
 vector<Territory *> AggressivePlayerStrategy::toDefend()
 {
-    cout << "DEBUGGING AggressivePlayerStrategy::toDefend. Printing the content of getTerritories = ";
-    for (auto t : getPlayer()->getTerritories())
-    {
-        cout << t->getName() << ", ";
-    }
-    cout << endl;
     return getPlayer()->getTerritories();
 };
 
