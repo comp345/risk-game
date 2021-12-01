@@ -1,8 +1,0 @@
-loadmap
-validatemap 
-addplayer 
-gamestart 
-issueorder
-endissueorders
-execorder // command doesnt work?
-endexecorders

@@ -1,0 +1,4 @@
+loadmap france.map
+validatemap 
+addplayer laila
+x
