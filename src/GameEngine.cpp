@@ -709,6 +709,10 @@ Player *GameEngine::hasWinner()
 
 void GameEngine::reinforcementPhase(Player *p)
 {
+     
+    /* ******************* */
+    /*      Card Bonus     */
+    /* ******************* */
     // Check if player won territories in the last round. If yes, draw one card max
     int numConqueredTerritories = p->getTerritorySize() - p->getPrevTerritorySize();
     if (numConqueredTerritories > 0)
@@ -717,8 +721,11 @@ void GameEngine::reinforcementPhase(Player *p)
     // update prevTerritorySize
     p->setPrevTerritorySize();
 
-    //Get players number of territories
 
+    /* ************************* */
+    /*      Continent Bonus      */
+    /* ************************* */
+    //Get players number of territories
     int numberOfArmies = floor(p->getTerritorySize() / 3);
 
     //Find if the player owns all the territories of an entire contenent:
@@ -755,6 +762,9 @@ void GameEngine::reinforcementPhase(Player *p)
         }
     }
 
+    /* ************************************* */
+    /*      Minimal Reinforcement to add     */
+    /* ************************************* */
     //the minimal number of reinforcement armies per turn for any player is 3
     if (numberOfArmies < 3)
         numberOfArmies = 3;
@@ -796,12 +806,11 @@ Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, 
     {
         cout << "... player desires to create a Bomb order by using a valid card!..." << endl;
 
-        // if (!territoryTarget)
-        //     throw std::exception();
-        // Bomb *b = new Bomb(player, territoryTarget);
-        // cout << b->getDetails() << endl;
-        // return b;
-        return nullptr;
+        if (!territoryTarget)
+            throw std::exception();
+        Bomb *b = new Bomb(player, territoryTarget);
+        cout << b->getDetails() << endl;
+        return b;
     }
     if (checkTypeCard == "Blockade type")
     {
@@ -833,50 +842,50 @@ Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, 
 void playerIssueOrder(Deck *deck, Player *issuingPlayer)
 {
     // when done issueing deploy and advance, issue cards
-    // Bugs: commented out to fix
+    // Bugs: commented out the creation of Orders from Cards
 
     if (issuingPlayer->isDoneIssuing())
     {
-        // When done issuing orders, start issuing 1 card order per turn until both player are done...
-        // flawed but will work
-        Player *player = issuingPlayer;
-        cout << "DEBUG: Player " << player->getName() << " wants to play card..." << endl;
-        if (player->getHand()->getCards().size() > 0)
-        {
-            Territory *territorySrc = new Territory;
-            Territory *territoryTarget = new Territory;
-            if (player->getPriorityDefending().size() > 0)
-            {
-                territorySrc = player->popPriorityDefend();
-            }
-            else
-            {
-                territorySrc = nullptr;
-            }
-            if (player->getPriorityAttacking().size() > 0)
-            {
-                territoryTarget = player->popPriorityAttack();
-            }
-            else
-            {
-                territoryTarget = nullptr;
-            }
-            // Card *lastCard = player->getHand()->useLast();
-            // Player &playerRef = *player;
-            // Deck &deckRef = *deck;
-            // lastCard->play(playerRef, deckRef); // return card to deck
+        // // When done issuing orders, start issuing 1 card order per turn until both player are done...
+        // // flawed but will work
+        // Player *player = issuingPlayer;
+        // cout << "DEBUG: Player " << player->getName() << " wants to play card..." << endl;
+        // if (player->getHand()->getCards().size() > 0)
+        // {
+        //     Territory *territorySrc = new Territory;
+        //     Territory *territoryTarget = new Territory;
+        //     if (player->getPriorityDefending().size() > 0)
+        //     {
+        //         territorySrc = player->popPriorityDefend();
+        //     }
+        //     else
+        //     {
+        //         territorySrc = nullptr;
+        //     }
+        //     if (player->getPriorityAttacking().size() > 0)
+        //     {
+        //         territoryTarget = player->popPriorityAttack();
+        //     }
+        //     else
+        //     {
+        //         territoryTarget = nullptr;
+        //     }
+        //     // Card *lastCard = player->getHand()->useLast();
+        //     // Player &playerRef = *player;
+        //     // Deck &deckRef = *deck;
+        //     // lastCard->play(playerRef, deckRef); // return card to deck
 
-            try
-            {
-                // Method throws exception to handle
-                // createOrderFromCard(lastCard, player, territorySrc, territoryTarget);
-                cout << " ... played a card... " << endl;
-            }
-            catch (std::exception e)
-            {
-                cout << "Cannot create special order from card (not enough resources)" << endl;
-            }
-        }
+        //     try
+        //     {
+        //         // Method throws exception to handle
+        //         // createOrderFromCard(lastCard, player, territorySrc, territoryTarget);
+        //         cout << " ... played a card... " << endl;
+        //     }
+        //     catch (std::exception e)
+        //     {
+        //         cout << "Cannot create special order from card (not enough resources)" << endl;
+        //     }
+        // }
 
         return void();
     }
@@ -910,7 +919,6 @@ void playerIssueOrder(Deck *deck, Player *issuingPlayer)
     }
     else // when no more reinforcementPool
     {
-        cout << "FINALLY CREATING ADVANCE!" << endl;
         // (3) Advance
         /*TODO: Before the first issueing of an Advance order
             - Put Player::isDoneDeploying flag to TRUE 
@@ -1062,7 +1070,6 @@ void GameEngine::executeOrdersPhase()
             if (currentPlayers.at(i)->getOrderList()->getList().size() != 0)
                 currentPlayers.at(i)->getOrderList()->remove(0);
         }
-        cout << "Reached end of execution phase" << endl;
     }
 
     // ! Do not transition to assignreinforcement state yet: need to check for winners (done in the driver function)

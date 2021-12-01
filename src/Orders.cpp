@@ -413,7 +413,9 @@ void Advance::setTerritoryTarget(Territory *t)
 void Advance::updateDetails()
 {
     string _desc = getCommand() + " = {" + getPlayer()->getName() + " advances " +
-                   to_string(getArmies()) + " army units from " + getTerritorySource()->getName() + " to " + getTerritoryTarget()->getName() + "}.";
+                   to_string(getArmies()) + " army units from " + getTerritorySource()->getName() + " to " 
+                   + getTerritoryTarget()->getName() + ", owned by " 
+                   + getTerritoryTarget()->getOwner()->getName() + "}.";
     setDetails(_desc);
 }
 
