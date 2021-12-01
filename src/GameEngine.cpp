@@ -100,90 +100,28 @@ Transition &Transition::operator=(const Transition &t)
     return *this;
 }
 
-GameEngine::GameEngine()
+//using default value
+GameEngine::GameEngine(std::string newFile)
 {
     // Create the states and add to states collection
-
-    State *startState = new State("start");
-    State *maploadedState = new State("maploaded");
-    State *mapvalidatedState = new State("mapvalidated");
-    State *playersaddedState = new State("playersadded");
-    State *assignreinforcementState = new State("assignreinforcement");
-    State *issueordersState = new State("issueorder");
-    State *executeordersState = new State("executeorders");
-    State *winState = new State("win");
-    State *finalState = new State("final");
-
-    // Adding all states in the collection of the GameEngine
-    states = vector<State *>();
-    states.push_back(startState);
-    states.push_back(maploadedState);
-    states.push_back(mapvalidatedState);
-    states.push_back(playersaddedState);
-    states.push_back(assignreinforcementState);
-    states.push_back(issueordersState);
-    states.push_back(executeordersState);
-    states.push_back(winState);
-    states.push_back(finalState);
-
-    // Setting current state to the start state
-    currentState = startState;
-
-    // Create the transitions
-    Transition *loadmapTransition = new Transition("loadmap", maploadedState);
-    Transition *validatemapTransition = new Transition("validatemap", mapvalidatedState);
-    Transition *addplayerTransition = new Transition("addplayer", playersaddedState);
-    Transition *gamestart = new Transition("gamestart", assignreinforcementState);
-    Transition *issueorderTransition = new Transition("issueorder", issueordersState);
-    Transition *endissueordersTransition = new Transition("endissueorders", executeordersState);
-    Transition *execorderTransition = new Transition("execorder", executeordersState);
-    Transition *endexecordersTransition = new Transition("endexecorders", assignreinforcementState);
-    Transition *winTransition = new Transition("win", winState);
-    Transition *playTransition = new Transition("replay", startState);
-    Transition *endTransition = new Transition("quit", finalState);
-
-    // Add transition to collection of transitions
-    transitions = vector<Transition *>();
-    transitions.push_back(loadmapTransition);
-    transitions.push_back(validatemapTransition);
-    transitions.push_back(addplayerTransition);
-    transitions.push_back(gamestart);
-    transitions.push_back(issueorderTransition);
-    transitions.push_back(endissueordersTransition);
-    transitions.push_back(execorderTransition);
-    transitions.push_back(endexecordersTransition);
-    transitions.push_back(winTransition);
-    transitions.push_back(playTransition);
-    transitions.push_back(endTransition);
-
-    // Add transitions to the states
-    startState->addTransition(loadmapTransition);
-    maploadedState->addTransition(loadmapTransition);
-    maploadedState->addTransition(validatemapTransition);
-    mapvalidatedState->addTransition(addplayerTransition);
-    playersaddedState->addTransition(addplayerTransition);
-    playersaddedState->addTransition(gamestart);
-    assignreinforcementState->addTransition(issueorderTransition);
-    issueordersState->addTransition(issueorderTransition);
-    issueordersState->addTransition(endissueordersTransition);
-    executeordersState->addTransition(execorderTransition);
-    executeordersState->addTransition(endexecordersTransition);
-    executeordersState->addTransition(winTransition);
-    winState->addTransition(playTransition);
-    winState->addTransition(endTransition);
+    initStates();
 
     //Initialization
     currentPlayers = vector<Player *>();
     initializedRand(); // randomize deck
     deck = new Deck(30);
     validTransition = false;
-
-    commandProcessor = new CommandProcessor();
+    if (newFile.empty()) {
+        commandProcessor = new CommandProcessor();
+    } else {
+        commandProcessor = new FileCommandProcessorAdapter(newFile);
+    }
 }
 
-GameEngine::GameEngine(std::string newFile) {
-    // Create the states and add to states collection
+
+void GameEngine::initStates() {
     State *startState = new State("start");
+    State *tournamentState = new State("tournament");
     State *maploadedState = new State("maploaded");
     State *mapvalidatedState = new State("mapvalidated");
     State *playersaddedState = new State("playersadded");
@@ -196,6 +134,7 @@ GameEngine::GameEngine(std::string newFile) {
     // Adding all states in the collection of the GameEngine
     states = vector<State *>();
     states.push_back(startState);
+    states.push_back(tournamentState);
     states.push_back(maploadedState);
     states.push_back(mapvalidatedState);
     states.push_back(playersaddedState);
@@ -209,6 +148,7 @@ GameEngine::GameEngine(std::string newFile) {
     currentState = startState;
 
     // Create the transitions
+    Transition *tournamentTransition = new Transition("tournament", tournamentState);
     Transition *loadmapTransition = new Transition("loadmap", maploadedState);
     Transition *validatemapTransition = new Transition("validatemap", mapvalidatedState);
     Transition *addplayerTransition = new Transition("addplayer", playersaddedState);
@@ -223,6 +163,7 @@ GameEngine::GameEngine(std::string newFile) {
 
     // Add transition to collection of transitions
     transitions = vector<Transition *>();
+    transitions.push_back(tournamentTransition);
     transitions.push_back(loadmapTransition);
     transitions.push_back(validatemapTransition);
     transitions.push_back(addplayerTransition);
@@ -237,6 +178,7 @@ GameEngine::GameEngine(std::string newFile) {
 
     // Add transitions to the states
     startState->addTransition(loadmapTransition);
+    startState->addTransition(tournamentTransition);
     maploadedState->addTransition(loadmapTransition);
     maploadedState->addTransition(validatemapTransition);
     mapvalidatedState->addTransition(addplayerTransition);
@@ -250,13 +192,6 @@ GameEngine::GameEngine(std::string newFile) {
     executeordersState->addTransition(winTransition);
     winState->addTransition(playTransition);
     winState->addTransition(endTransition);
-
-    // Create Adapter and pass file
-    fileName = newFile;
-    commandProcessor = new FileCommandProcessorAdapter(newFile);
-
-    // Initializing stuff TODO
-    initializedRand(); // randomize deck
 }
 
 GameEngine::GameEngine(const GameEngine &e)
@@ -264,7 +199,6 @@ GameEngine::GameEngine(const GameEngine &e)
     numberOfPlayers = e.numberOfPlayers;
     currentState = new State(*e.currentState);
     validTransition = e.validTransition;
-    fileName = e.fileName;
     states = vector<State *>(e.states);
     transitions = vector<Transition *>(e.transitions);
     commandProcessor = new CommandProcessor(*e.commandProcessor);
@@ -430,7 +364,6 @@ Deck * GameEngine::getDeck()
 // A2 Part 1: Command Processor
 void GameEngine::testGameEngine()
 {
-    //GameEngine engine{fileName};
     Command *output;
     cout << "Welcome to WarZone!" << endl;
     while (true)
@@ -465,6 +398,14 @@ void GameEngine::testGameEngine()
 void GameEngine::preStartup() {
     Command *command;
 
+    do {
+        command = commandProcessor->getCommand(currentState);
+    } while (command->getArgs().empty() || !doTransition(command->getCommandName()));
+
+    if (currentState->nameState == "tournament") {
+        enterTournamentMode(command);
+    }
+
     // starting with loadmap
     string path = "../maps/";
     MapLoader *mapLoader = new MapLoader();
@@ -472,9 +413,6 @@ void GameEngine::preStartup() {
          << endl;
     getMapList();
 
-    do {
-        command = commandProcessor->getCommand(currentState);
-    } while (command->getArgs().empty() || !doTransition(command->getCommandName()));
     string mapName = command->getArgs()[0];
     cout << "current command: " << command->getCommandName() << "\n" << endl;
     cout << "current mapfile requested: " << mapName << "\n" << endl;
@@ -516,7 +454,7 @@ void GameEngine::preStartup() {
         if (getNumOfPlayers() < 7) {
             cout << "continue adding players? (y/n)" << endl;
             string keyInY;
-            cin >> keyInY;
+            getline(cin, keyInY);
             if (keyInY == "y") {
                 continue;
             } else {
@@ -1160,4 +1098,50 @@ void GameEngine::mainGameLoop()
 
     // To delete
     std::exit(0);
+}
+
+// Format: tournament -M <listofmapfiles> -P <listofplayerstrategies> -G <numberofgames> -D <maxnumberofturns>
+void GameEngine::enterTournamentMode(Command *command) {
+    vector<string> args = command->getArgs();
+    vector<string> mapFileNames = {};
+    vector<string> playerTypes = {};
+    int numOfGames = 0;
+    int numOfTurns = 0;
+    try {
+        for (int i = 0; i < command->getArgs().size();) {
+            //extract args
+            if (args[i] == "-M") {
+                //while we haven't reached another -
+                i++;
+                while (args[i].find('-') == std::string::npos) {
+                    mapFileNames.push_back(args[i]);
+                    i++;
+                }
+            } else if (args[i] == "-P") {
+                //while we haven't reached another -
+                i++;
+                while (args[i].find('-') == std::string::npos) {
+                    playerTypes.push_back(args[i]);
+                    i++;
+                }
+            } else if (args[i] == "-G") {
+                numOfGames = std::stoi(args[++i]);
+            } else if (args[i] == "-D") {
+                numOfTurns = std::stoi(args[++i]);
+            } else {
+                i++;
+            }
+        }
+    } catch (exception& e) {
+        cout << e.what();
+        exit(0);
+    }
+
+    for (int i = 0; i < numOfGames; i++) {
+        StartupPhase sp;
+        sp.setGameEng(this);
+        sp.startup();
+        mainGameLoop();
+    }
+    exit(0);
 }

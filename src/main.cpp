@@ -17,7 +17,7 @@ int main(int, char **)
     /*          A2 P3 : Main Game play         */
     /* *************************************** */
 
-    riskGameDriver();
+//    riskGameDriver();
 
 
 

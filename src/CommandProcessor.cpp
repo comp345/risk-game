@@ -67,6 +67,11 @@ void Command::saveEffect(string command)
         cout << "The effect - " << commandEffect << std::endl;
 
     }
+    else if (command == "tournament")
+    {
+        commandEffect = "Starting tournament mode!";
+        cout << "The effect - " << commandEffect << std::endl;
+    }
     else if(command == "validatemap")
     {
         commandEffect = "Map has been validated!";

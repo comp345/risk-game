@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "LoggingObserver.h"
+#include "CommandProcessor.h"
 
 /* The states and transitions are stored in a linked list like structure */
 class Deck;
@@ -91,7 +92,6 @@ private:
     
     State *currentState;
     bool validTransition;
-    std::string fileName;
     std::vector<State *> states;           // GameEngine maintains collection of all states
     std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
     CommandProcessor *commandProcessor;
@@ -103,9 +103,7 @@ private:
     Map *map;
 
 public:
-    GameEngine();
-
-    GameEngine(std::string fileName);
+    GameEngine(std::string newFile = "");
 
     GameEngine(const GameEngine &e);
 
@@ -162,6 +160,9 @@ public:
     Player *hasWinner();
     void auditPlayers();
 
+    void enterTournamentMode(Command *pCommand);
+
+    void initStates();
 };
 
 class StartupPhase
