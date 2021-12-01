@@ -778,7 +778,7 @@ bool GameEngine::allPlayersDone()
 /* 
    TODO: Implement put the logic of card creation in Strategy.issueOrder
 */
-Order * createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget)
+Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget)
 {
     string checkTypeCard = card->getCommand();
 
@@ -796,11 +796,12 @@ Order * createOrderFromCard(Card *card, Player *player, Territory *territorySrc,
     {
         cout << "... player desires to create a Bomb order by using a valid card!..." << endl;
 
-        if (!territoryTarget)
-            throw std::exception();
-        Bomb *b = new Bomb(player, territoryTarget);
-        cout << b->getDetails() << endl;
-        return b;
+        // if (!territoryTarget)
+        //     throw std::exception();
+        // Bomb *b = new Bomb(player, territoryTarget);
+        // cout << b->getDetails() << endl;
+        // return b;
+        return nullptr;
     }
     if (checkTypeCard == "Blockade type")
     {
@@ -823,14 +824,15 @@ Order * createOrderFromCard(Card *card, Player *player, Territory *territorySrc,
     }
     else
     {
-        cout << "== DEBUG in: creatingOrderFromCard. Card is not valid!? ==" << endl;
+        cout << "== DEBUG in: creatingOrderFromCard. Card is not valid!? ==";
+        cout << checkTypeCard << endl;
         return nullptr;
     }
 }
 
 void playerIssueOrder(Deck *deck, Player *issuingPlayer)
 {
-// when done issueing deploy and advance, issue cards
+    // when done issueing deploy and advance, issue cards
     if (issuingPlayer->isDoneIssuing())
     {
         // When done issuing orders, start issuing 1 card order per turn until both player are done...
@@ -857,15 +859,15 @@ void playerIssueOrder(Deck *deck, Player *issuingPlayer)
             {
                 territoryTarget = nullptr;
             }
-            Card *lastCard = player->getHand()->useLast();
-            Player &playerRef = *player;
-            Deck &deckRef = *deck;
-            lastCard->play(playerRef, deckRef); // return card to deck
+            // Card *lastCard = player->getHand()->useLast();
+            // Player &playerRef = *player;
+            // Deck &deckRef = *deck;
+            // lastCard->play(playerRef, deckRef); // return card to deck
 
             try
             {
                 // Method throws exception to handle
-                createOrderFromCard(lastCard, player, territorySrc, territoryTarget);
+                // createOrderFromCard(lastCard, player, territorySrc, territoryTarget);
                 cout << " ... played a card... " << endl;
             }
             catch (std::exception e)
@@ -939,9 +941,9 @@ bool hasOrders(vector<Player *> currentPlayers)
     for (Player *player : currentPlayers)
     {
         if (player->getOrderList()->getList().size() != 0)
-            return false;
+            return true;
     }
-    return true;
+    return false;
 }
 
 void GameEngine::executeOrdersPhase()
@@ -949,7 +951,14 @@ void GameEngine::executeOrdersPhase()
     //players have signified that they are not issuing one more order
     bool hasDeploy = false;
 
-    while (!hasOrders(currentPlayers))
+    // Debugging: display all players' orders before starting execution
+    for (auto p : currentPlayers)
+    {
+        cout << "Orders issues for player " << p->getName() << " = ";
+        cout << *p->getOrderList() << endl;
+    }
+
+    while (hasOrders(currentPlayers))
     {
         //Iterate over each player
         for (int i = 0; i < currentPlayers.size(); i++)
@@ -967,7 +976,8 @@ void GameEngine::executeOrdersPhase()
             {
                 cout << endl
                      << currentPlayer->getName() << " is done executing. Skip." << endl;
-                continue;
+
+                continue; // ! bug?
             }
 
             if (currentPlayer->getOrderList()->getList().at(0)->getCommand() == "Deploy type")
@@ -1001,6 +1011,7 @@ void GameEngine::executeOrdersPhase()
             if (currentPlayers.at(i)->getOrderList()->getList().size() != 0)
                 currentPlayers.at(i)->getOrderList()->remove(0);
         }
+        cout << "Reached end of execution phase" << endl;
     }
 
     // ! Do not transition to assignreinforcement state yet: need to check for winners (done in the driver function)
@@ -1051,20 +1062,12 @@ void fakeStartup(GameEngine *engine)
         cout << "\n\n"
              << p->getName() << " was created!\n";
 
-        /* DEBUG TO DO: The Player::Territories is being duplicated inside this loop */
         for (Territory *t : p->getTerritories())
         {
             cout << t->getName() << "\n";
             t->setNumberOfArmies(2);
             t->setOwner(p);
         }
-        /* DEBUGGING getTerritories */
-        cout << endl;
-        for (auto t : p->getTerritories())
-        {
-            cout << " DEBUGGING Player::getTerritories => " << t->getName() << endl;
-        }
-        cout << endl;
 
         p->getTerritories().front()->setNumberOfArmies(4); //Offset to see if soarting is working.
         engine->currentPlayers.push_back(p);
@@ -1152,11 +1155,15 @@ void riskGameDriver()
             string x;
             cin >> x;
         }
-        else
+        else if (engine->getCurrentStateName() == "final")
         {
             cout << "Debug: End game ... " << endl;
             stillPlaying = false;
             break;
+        }
+        else
+        {
+            cout << "There is a bug... program should end or trigger the startUp, or there is no winner" << endl;
         }
     }
 
@@ -1165,60 +1172,81 @@ void riskGameDriver()
 
 void GameEngine::mainGameLoop()
 {
-    /* ****************************** */
-    /* PHASE 1: Reinforcement Phase   */
-    /* ****************************** */
-    // this->doTransition("gamestart");
-    for (Player *p : currentPlayers)
+
+    bool noWinner = true;
+    // Keeping track of turns for tournament mode
+    int maximumNumberOfTurns = 5;
+    int numOfTurns = 0; 
+    while (noWinner && (numOfTurns < maximumNumberOfTurns))
     {
-        reinforcementPhase(p);
-        cout << "\nPlayer: " << p->getName() << " has " << p->getReinforcementPool() << " in his reinforcement pool.\n";
-    }
 
-    /* ***************************** */
-    /* PHASE 2: Issue Orders Phase   */
-    /* ***************************** */
-
-    {
-        this->doTransition("issueorder");
-        issueOrdersPhase();
-        this->doTransition("endissueorders");
-    }
-
-    /* ****************************** */
-    /* PHASE 3: Execute Orders Phase  */
-    /* ****************************** */
-    {
-        this->doTransition("execorder");
-        executeOrdersPhase();
-    }
-
-    Player *winner = hasWinner();
-
-    // Forcing a win
-    // winner = new Player("TESTING WIN");
-    cout << "Debug " << winner->getName() << endl;
-    if (winner != NULL)
-    {
-        this->doTransition("win");
-        cout << "\nPlayer " << winner->getName() << " won the game! Do you wish to replay? (y/n)\n";
-
-        string input;
-        cin >> input;
-        if (input == "y")
+        /* ****************************** */
+        /* PHASE 1: Reinforcement Phase   */
+        /* ****************************** */
+        // this->doTransition("gamestart");
+        for (Player *p : currentPlayers)
         {
-            doTransition("replay");
+            reinforcementPhase(p);
+            cout << "\nPlayer: " << p->getName() << " has " << p->getReinforcementPool() << " in his reinforcement pool.\n";
         }
-        else if (input == "n")
+
+        /* ***************************** */
+        /* PHASE 2: Issue Orders Phase   */
+        /* ***************************** */
+
         {
-            doTransition("quit");
+            this->doTransition("issueorder");
+            issueOrdersPhase();
+            this->doTransition("endissueorders");
         }
-        cout << getCurrentStateName() << endl;
+
+        /* ****************************** */
+        /* PHASE 3: Execute Orders Phase  */
+        /* ****************************** */
+        {
+            this->doTransition("execorder");
+            executeOrdersPhase();
+            // cout << "reached outside execution order" << endl;
+        }
+
+        Player *winner = hasWinner();
+
+        // Forcing a win
+        // winner = new Player("TESTING WIN");
+        cout << "Debug winner = " << winner << endl;
+
+        if (winner != nullptr)
+        {
+            this->doTransition("win");
+            cout << "\nPlayer " << winner->getName() << " won the game! Do you wish to replay? (y/n)\n";
+
+            string input;
+            cin >> input;
+            if (input == "y")
+            {
+                doTransition("replay");
+            }
+            else if (input == "n")
+            {
+                doTransition("quit");
+            }
+            cout << getCurrentStateName() << endl;
+
+            break; // get out of main game play loop
+        }
+        else
+        {
+            // this transition only happen when there is no winner after end of order execution
+            this->doTransition("endexecorders");
+            auditPlayers(); // remove players who lost
+
+            // stay in main game loop
+        }
+
+        numOfTurns++;
     }
-    else
-    {
-        // this transition only happen when there is no winner after end of order execution
-        this->doTransition("endexecorders");
-        auditPlayers(); // remove players who lost
-    }
+
+    // To delete
+    std::exit(0);
+    
 }
