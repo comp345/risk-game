@@ -39,7 +39,11 @@ Card::~Card()
 /** TODO:  A3 Implementation -> card.play called in GameEngine  
  * - Virtual play method?
  * */
-void Card::play(Player &player, Deck &deck) {}
+void Card::play(Player &player, Deck &deck) 
+{
+     // player.issueOrder(Order::getOrder());
+    deck.returnCard(this);
+}
 
 Card::Effect *Card::getEffect()
 {
