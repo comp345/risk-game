@@ -16,8 +16,6 @@
 namespace fs = filesystem;
 using namespace std;
 
-
-
 State::State()
 {
     nameState = "";
@@ -102,7 +100,6 @@ Transition &Transition::operator=(const Transition &t)
     return *this;
 }
 
-
 GameEngine::GameEngine()
 {
     // Create the states and add to states collection
@@ -177,12 +174,12 @@ GameEngine::GameEngine()
 
     //Initialization
     currentPlayers = vector<Player *>();
+    initializedRand(); // randomize deck
     deck = new Deck(30);
     validTransition = false;
 
     commandProcessor = new CommandProcessor();
 }
-
 
 GameEngine::GameEngine(std::string newFile)
 {
@@ -258,6 +255,9 @@ GameEngine::GameEngine(std::string newFile)
     // Create Adapter and pass file
     fileName = newFile;
     commandProcessor = new FileCommandProcessorAdapter(newFile);
+
+    // Initializing stuff TODO
+    initializedRand(); // randomize deck
 }
 
 GameEngine::GameEngine(const GameEngine &e)
@@ -276,7 +276,6 @@ GameEngine::GameEngine(const GameEngine &e)
 /* TODO */
 GameEngine::~GameEngine()
 {
-
 }
 
 GameEngine &GameEngine::operator=(const GameEngine &e)
@@ -454,8 +453,6 @@ void GameEngine::testGameEngine()
     cout << "Voila tous les commands: " << endl;
     commandProcessor->printCommands();
 }
-
-
 
 /* **************************************************************************** */
 /* ***************  Startup Phase Driver and helper functions  **************** */
@@ -670,7 +667,6 @@ void StartupPhase::startup()
     }
 }
 
-
 /* ********************************************************************** */
 /* ***************  Helper functions for Main Game Loop  **************** */
 /* ********************************************************************** */
@@ -780,8 +776,7 @@ bool GameEngine::allPlayersDone()
 }
 
 /* 
-   TODO: Implement this free function as Player:: 
-   Logic of a player creating an order as a free function
+   TODO: Implement put the logic of card creation in Strategy.issueOrder
 */
 Order * createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget)
 {
@@ -809,29 +804,35 @@ Order * createOrderFromCard(Card *card, Player *player, Territory *territorySrc,
     }
     if (checkTypeCard == "Blockade type")
     {
-        Blockade *b = new Blockade();
-        b->setDetails("Debugging creating Blockade order from card!");
+        if (!territorySrc)
+            throw std::exception();
+        Blockade *b = new Blockade(territorySrc, player, new Player("neutral (hardcoded)"));
         cout << b->getDetails() << endl;
         return b;
     }
-    if (checkTypeCard == "Negotiate type")
+    if (checkTypeCard == "Diplomacy type")
     {
-        Negotiate *n = new Negotiate();
-        n->setDetails("Debugging creating Negotiate order from card!");
+        Negotiate *n = new Negotiate(player, new Player("enemy (hardcoded)"));
         cout << n->getDetails() << endl;
         return n;
     }
-
+    if (checkTypeCard == "Reinforcement type")
+    {
+        // TODO: add to player's reinforcement pool
+        return nullptr;
+    }
     else
-        return NULL;
+    {
+        cout << "== DEBUG in: creatingOrderFromCard. Card is not valid!? ==" << endl;
+        return nullptr;
+    }
 }
 
 void playerIssueOrder(Deck *deck, Player *issuingPlayer)
 {
-    // when done issueing deploy and advance, issue cards
+// when done issueing deploy and advance, issue cards
     if (issuingPlayer->isDoneIssuing())
     {
-
         // When done issuing orders, start issuing 1 card order per turn until both player are done...
         // flawed but will work
         Player *player = issuingPlayer;
@@ -933,7 +934,6 @@ void GameEngine::issueOrdersPhase()
     }
 }
 
-
 bool hasOrders(vector<Player *> currentPlayers)
 {
     for (Player *player : currentPlayers)
@@ -1005,7 +1005,6 @@ void GameEngine::executeOrdersPhase()
 
     // ! Do not transition to assignreinforcement state yet: need to check for winners (done in the driver function)
 }
-
 
 /* ***************************************************************************************************************************** */
 /*                                                   Main Game Loop : Driver 
@@ -1197,7 +1196,8 @@ void GameEngine::mainGameLoop()
     Player *winner = hasWinner();
 
     // Forcing a win
-    winner = new Player("TESTING WIN");
+    // winner = new Player("TESTING WIN");
+    cout << "Debug " << winner->getName() << endl;
     if (winner != NULL)
     {
         this->doTransition("win");
