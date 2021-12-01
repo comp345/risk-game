@@ -1087,7 +1087,7 @@ void GameEngine::mainGameLoop()
 
     bool noWinner = true;
     // Keeping track of turns for tournament mode
-    int maximumNumberOfTurns = 5;
+    int maximumNumberOfTurns = 100;
     int numOfTurns = 0;
     while (noWinner && (numOfTurns < maximumNumberOfTurns))
     {
