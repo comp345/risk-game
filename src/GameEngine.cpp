@@ -833,6 +833,8 @@ Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, 
 void playerIssueOrder(Deck *deck, Player *issuingPlayer)
 {
     // when done issueing deploy and advance, issue cards
+    // Bugs: commented out to fix
+
     if (issuingPlayer->isDoneIssuing())
     {
         // When done issuing orders, start issuing 1 card order per turn until both player are done...
@@ -880,39 +882,88 @@ void playerIssueOrder(Deck *deck, Player *issuingPlayer)
     }
 
     // (1) Deploy: until reinforc pool == 0
+    /*
+        Problem:
+        what is there are more armies in the reinforcement pool than there are territory?
+    */
     if (issuingPlayer->getReinforcementPool() > 0)
     {
+        cout << "Debug playerIssueOrder. Num of reinforcement pool: " << issuingPlayer->getReinforcementPool() << endl;
+        // Check if there is no more territory in priority queue -> rebuild it until pool is empty
+        if (issuingPlayer->getPriorityDefending().empty()) 
+        {
+            for (Territory *toDefend : issuingPlayer->toDefend())
+            {
+                issuingPlayer->addToPriorityDefend(toDefend);
+            }
+        }
+
         Territory *territoryTarget = issuingPlayer->getPriorityDefending().top();
-        // Create Deploy -> decrease reinforcement)
+
+        // Create Deploy -> decrease reinforcement
         Deploy *deploy = new Deploy(1, issuingPlayer, territoryTarget);
+        issuingPlayer->setReinforcementPool(issuingPlayer->getReinforcementPool() - 1);
+
         cout << "Issueing: " << deploy->getDetails() << endl;
         issuingPlayer->issueOrder(deploy);
-        /* To do for A3: Able to use same territory in deploy order for advance (add stack to store popped defending territory?) */
         issuingPlayer->popPriorityDefend();
     }
-    else if (issuingPlayer->getPriorityDefending().size() > 0 and issuingPlayer->getPriorityAttacking().size() > 0)
+    else // when no more reinforcementPool
     {
+        cout << "FINALLY CREATING ADVANCE!" << endl;
         // (3) Advance
-        Player *currentPlayer = issuingPlayer;
-        Territory *territorySource = currentPlayer->getPriorityDefending().top();
-        Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
-        Advance *advance = new Advance(1, currentPlayer, territorySource, territoryTarget);
-        cout << "Issueing! " << advance->getDetails() << endl;
-        currentPlayer->issueOrder(advance);
-        currentPlayer->popPriorityAttack();
-        currentPlayer->popPriorityDefend();
-    }
+        /*TODO: Before the first issueing of an Advance order
+            - Put Player::isDoneDeploying flag to TRUE 
+            - Rebuild the defending priority queue after deploying phase is done
+        */
+        if (issuingPlayer->isDoneDeploying() == false)
+        {
+            // This block should be entered only ONCE, before the first Advance order
+            issuingPlayer->setDoneDeploying(true);
+            issuingPlayer->getPriorityDefending() = priority_queue<Territory *, vector<Territory *>, compareArmySize>(); // clear queue
+            for (Territory *toDefend : issuingPlayer->toDefend())
+            {
+                issuingPlayer->addToPriorityDefend(toDefend);
+            }
+        }
 
-    // After a player issue one order, check if reinforcementPool 0 or queues empty
-    if (issuingPlayer->getPriorityDefending().size() == 0 or issuingPlayer->getPriorityAttacking().size() == 0)
-        issuingPlayer->toggleDoneIssuing();
+        if (issuingPlayer->isDoneDeploying() and (issuingPlayer->getPriorityDefending().size() > 0 && issuingPlayer->getPriorityAttacking().size() > 0))
+        {
+            // Need to handle the case when the size of priorityAttack =/= size of priorityDefence => rebuild one or both queues depending on the strategy
+            Player *currentPlayer = issuingPlayer;
+            Territory *territorySource = currentPlayer->getPriorityDefending().top();
+            Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
+            Advance *advance = new Advance(1, currentPlayer, territorySource, territoryTarget);
+            cout << "Issueing! " << advance->getDetails() << endl;
+            currentPlayer->issueOrder(advance);
+            currentPlayer->popPriorityAttack();
+            currentPlayer->popPriorityDefend();
+        }
+        // check if no more advance order can be created -> set isDone flag to true
+        if (issuingPlayer->getPriorityDefending().size() == 0 || issuingPlayer->getPriorityAttacking().size() == 0)
+        {
+            issuingPlayer->toggleDoneIssuing();
+            cout << "Finished issueing Deploy and Advance. isDone flag is set to " << to_string(issuingPlayer->isDoneIssuing()) << endl;
+        }
+    }
+        
 }
 
 void GameEngine::issueOrdersPhase()
 {
+    // For turn 2 and on, need to reset player's fields and flags
+    /*
+        - doneIssuing is set to false
+        - doneDeploying is set to false
+        - doneAdvancing is set to false (?)
+        - rebuilding the priority queues 
+    */
+
     // Updating each players' toAttack and toDefend queues
     for (Player *p : currentPlayers)
     {
+        // set the isDone flag to false
+        p->setDoneIssuing(false);
         // territories are to be attacked in priority
         for (Territory *toAttack : p->toAttack())
         {
@@ -1176,7 +1227,7 @@ void GameEngine::mainGameLoop()
     bool noWinner = true;
     // Keeping track of turns for tournament mode
     int maximumNumberOfTurns = 5;
-    int numOfTurns = 0; 
+    int numOfTurns = 0;
     while (noWinner && (numOfTurns < maximumNumberOfTurns))
     {
 
@@ -1248,5 +1299,4 @@ void GameEngine::mainGameLoop()
 
     // To delete
     std::exit(0);
-    
 }

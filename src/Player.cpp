@@ -24,6 +24,7 @@ Player::Player()
     orderList = new OrderList();
     this->prevTerritorySize = 0;
     this->doneIssuing = false;
+    this->doneDeploying = false;
     priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
 
@@ -41,6 +42,7 @@ Player::Player(string n)
     this->hand = new Hand();
     this->orderList = new OrderList();
     this->doneIssuing = false;
+    this->doneDeploying = false;
     this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
 
@@ -59,6 +61,7 @@ Player::Player(string plName, vector<Territory *> t, Hand *h, OrderList *o)
     this->hand = h;
     this->orderList = o;
     this->doneIssuing = false;
+    this->doneDeploying = false;
     this->prevTerritorySize = territories.size();
     this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
@@ -79,6 +82,7 @@ Player::Player(int armies, string plName, vector<Territory *> t, Hand *h, OrderL
     this->hand = h;
     this->orderList = o;
     this->doneIssuing = false;
+    this->doneDeploying = false;
     this->prevTerritorySize = territories.size();
     this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
@@ -97,6 +101,7 @@ Player::Player(const Player &p)
     this->territories = p.territories;
     this->hand = new Hand(*p.hand);
     this->doneIssuing = p.doneIssuing;
+    this->doneIssuing = p.doneDeploying;
     this->orderList = new OrderList(*p.orderList);
     this->priorityAttacking = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
     this->priorityDefending = priority_queue<Territory *, vector<Territory *>, compareArmySize>();
@@ -155,6 +160,8 @@ Player &Player::operator=(const Player &p)
     plArmies = p.plArmies;
     name = p.name;
     ps = p.ps;
+    doneIssuing = p.doneIssuing;
+    doneDeploying = p.doneDeploying;
     return *this;
 }
 
@@ -412,6 +419,21 @@ void Player::toggleDoneIssuing()
         doneIssuing = false;
     else
         doneIssuing = true;
+}
+
+void Player::setDoneIssuing(bool flag)
+{
+    doneIssuing = flag;
+}
+
+bool Player::isDoneDeploying()
+{
+    return doneDeploying;
+}
+
+void Player::setDoneDeploying(bool flag)
+{
+    doneDeploying = flag;
 }
 
 int Player::getReinforcementPool()

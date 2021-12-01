@@ -78,10 +78,10 @@ Deploy::Deploy(string orderdetails) : Order("Deploy type", orderdetails)
 {
 }
 /** TODO:  TO INTEGRATE IN THE ACTUAL METHOD */
-Deploy::Deploy(string orderdetails, Player *p) : Deploy(orderdetails)
-{
-    playerDeploying->setReinforcementPool(playerDeploying->getReinforcementPool() - 1);
-}
+// Deploy::Deploy(string orderdetails, Player *p) : Deploy(orderdetails)
+// {
+//     // playerDeploying->setReinforcementPool(playerDeploying->getReinforcementPool() - 1);
+// }
 // The pointer fields Player* and Territory* are passed by reference (no deep copy)
 // Note: Player* and Territory* passed as param should be ptr to dymically allocated objects
 Deploy::Deploy(int armies, Player *player, Territory *territory)
@@ -92,8 +92,7 @@ Deploy::Deploy(int armies, Player *player, Territory *territory)
     string _command = "Deploy type";
     setCommand(_command);
     updateDetails();
-    // Alexander test for game loop
-    playerDeploying->setReinforcementPool(playerDeploying->getReinforcementPool() - 1);
+
 }
 
 /** 

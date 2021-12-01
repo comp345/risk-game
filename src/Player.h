@@ -82,6 +82,7 @@ public:
 
     void setPrevTerritorySize();
 
+    // helper functions for issueOrder implementation
     void addToPriorityAttack(Territory *toAdd);
 
     void addToPriorityDefend(Territory *toAdd);
@@ -97,6 +98,12 @@ public:
     bool isDoneIssuing();
 
     void toggleDoneIssuing();
+
+    void setDoneIssuing(bool flag);
+
+    bool isDoneDeploying();
+
+    void setDoneDeploying(bool flag);
 
     int getReinforcementPool();
 
@@ -126,6 +133,7 @@ private:
     OrderList *orderList;
     PlayerStrategy *ps;
 
+    bool doneDeploying;
     bool doneIssuing;
     int plArmies; // Redundant data member -> reinforcementPool
 
