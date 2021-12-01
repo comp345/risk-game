@@ -1,4 +1,5 @@
 loadmap france.map
 validatemap 
 addplayer laila
-x
+addplayer noah
+gamestart
