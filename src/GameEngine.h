@@ -88,7 +88,7 @@ class GameEngine : public ILoggable, public Subject
     friend class Transition;
 
 private:
-    int numberOfPlayers;
+    
     State *currentState;
     bool validTransition;
     std::string fileName;
@@ -99,7 +99,7 @@ private:
 
     Deck *deck;
     vector<Player *> currentPlayers;
-    std::vector<Player *> plVec;
+    int numberOfPlayers; // for the randomizer
     Map *map;
 
 public:
@@ -132,18 +132,15 @@ public:
     void testPart3();
     string stringToLog() override;
 
-    /* A2 */
-
-    // A2 Part 2
-    int getNumOfPlayers();
-
-    // To refactor
-    vector<Player *> getPlayersVect();
-    void randomizePlayersTurn();
-    vector<Player *> &getPlayers();
     
 
+    void randomizePlayersTurn();
+    int getNumOfPlayers(); // used to randomize players turns
     void setNumOfPlayers(int plNumb);
+
+    vector<Player *> &getPlayers();
+
+    
 
     void getMapList();
 

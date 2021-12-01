@@ -269,7 +269,7 @@ GameEngine::GameEngine(const GameEngine &e)
     transitions = vector<Transition *>(e.transitions);
     commandProcessor = new CommandProcessor(*e.commandProcessor);
     listOfFile = vector<string>(e.listOfFile);
-    plVec = vector<Player *>(e.plVec);
+    currentPlayers = vector<Player *>(e.currentPlayers);
 }
 
 /* TODO */
@@ -310,14 +310,14 @@ GameEngine &GameEngine::operator=(const GameEngine &e)
     }
     transitions.clear();
     transitions = vector<Transition *>(e.transitions);
-    for (vector<Player *>::iterator it = plVec.begin(); it != plVec.end(); ++it)
+    for (vector<Player *>::iterator it = currentPlayers.begin(); it != currentPlayers.end(); ++it)
     {
         Player *a = *it;
         delete a;
         a = NULL;
     }
-    plVec.clear();
-    plVec = vector<Player *>(e.plVec);
+    currentPlayers.clear();
+    currentPlayers = vector<Player *>(e.currentPlayers);
 
     return *this;
 }
@@ -389,15 +389,11 @@ void GameEngine::setNumOfPlayers(int plNumb)
 
 void GameEngine::randomizePlayersTurn()
 { //for randomizing players order of appearance on gamestart
-    shuffle(begin(plVec), end(plVec), default_random_engine{});
+    shuffle(begin(currentPlayers), end(currentPlayers), default_random_engine{});
     cout << "players shuffled...\n"
          << endl;
 }
 
-vector<Player *> GameEngine::getPlayersVect()
-{
-    return plVec; //returns the vector containing player objects
-}
 vector<Player *>& GameEngine::getPlayers()
 {
     return currentPlayers;
@@ -510,7 +506,7 @@ void GameEngine::preStartup() {
         p->setReinforcementPool(5);
         cout << *p << "Number of Armies: " << p->getReinforcementPool() << endl;
         cout << "Cards in players hand: " << p->getHand() << endl;
-        plVec.push_back(p);
+        currentPlayers.push_back(p);
 
         cout << "total number of players so far is: " << getNumOfPlayers() << endl;
         if (getNumOfPlayers() == 1) {
@@ -574,7 +570,7 @@ void StartupPhase::setGameEng(GameEngine *en)
 
 void StartupPhase::startup() {
     //randomizing players order
-    vector<Player *> players = eng->getPlayersVect();
+    vector<Player *>& players = eng->getPlayers();
     cout << "Randomize player order: \n" << endl;
     eng->randomizePlayersTurn();
     cout << "Current order of players after randomize: \n" << endl;
@@ -613,7 +609,7 @@ void StartupPhase::startup() {
 
         while (!map->territoryNodeList.empty())
         {
-            vector<Player *> players = eng->getPlayersVect();
+            vector<Player *>& players = eng->getPlayers();
             for (Player *p : players)
             {
                 if (!map->territoryNodeList.empty())
@@ -622,14 +618,14 @@ void StartupPhase::startup() {
                     territories.push_back(map->territoryNodeList.back());
                     p->setTerritories(territories);
                     map->territoryNodeList.pop_back();
-                    for (Territory *t: territories) {
+                    for (Territory *t: territories) { // Bug: only one territory is assigned to each player...
                         t->setOwner(p);
                     }
                 }
             }
         }
         //for displaying players with acquired territories
-        for (Player *p : eng->getPlayersVect())
+        for (Player *p : eng->getPlayers()) // getPlayers() returns a vector&
         {
             cout << *p << endl;
         }
