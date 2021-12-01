@@ -59,11 +59,10 @@ public:
     // Assign new vector of territories
     void setTerritories(vector<Territory *> vector1);
 
+    // For StartUp (not same as setTerritories)
+    void addTerritories(vector<Territory *> t1);
+
     void setCards(Hand *pHand);
-
-    int getPlArmies(); // To delete
-
-    void setPlArmies(int armies); // To delete
 
     void setPlName(string plName);
 
@@ -135,7 +134,7 @@ private:
 
     bool doneDeploying;
     bool doneIssuing;
-    int plArmies; // Redundant data member -> reinforcementPool
+    // int plArmies; // Redundant data member -> reinforcementPool
 
     // implementation of Negotiate order
     vector<Player *> negotiatingWith;

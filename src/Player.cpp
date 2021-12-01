@@ -16,9 +16,8 @@ bool compareArmySize::operator()(Territory const *t1, Territory const *t2)
     return t1->numArmies > t2->numArmies;
 }
 
-Player::Player()
-{
-    plArmies = 0;
+Player::Player() {
+    reinforcementPool = 0;
     territories = vector<Territory *>();
     hand = new Hand();
     orderList = new OrderList();
@@ -38,7 +37,7 @@ Player::Player()
 Player::Player(string n)
 {
     this->name = n;
-    this->plArmies;
+    this->reinforcementPool = 0;
     this->hand = new Hand();
     this->orderList = new OrderList();
     this->doneIssuing = false;
@@ -74,9 +73,8 @@ Player::Player(string plName, vector<Territory *> t, Hand *h, OrderList *o)
 }
 
 //parametrized constructor
-Player::Player(int armies, string plName, vector<Territory *> t, Hand *h, OrderList *o)
-{
-    this->plArmies = armies;
+Player::Player(int armies, string plName, vector<Territory *> t, Hand *h, OrderList *o) {
+    this->reinforcementPool = armies;
     this->name = plName;
     this->territories = t;
     this->hand = h;
@@ -156,8 +154,9 @@ Player &Player::operator=(const Player &p)
     negotiatingWith.clear();
     hand = new Hand(*(p.hand));
     orderList = new OrderList(*(p.orderList));
+    reinforcementPool = p.reinforcementPool;
     negotiatingWith = p.negotiatingWith;
-    plArmies = p.plArmies;
+    // plArmies = p.plArmies;
     name = p.name;
     ps = p.ps;
     doneIssuing = p.doneIssuing;
@@ -169,7 +168,7 @@ Player &Player::operator=(const Player &p)
 ostream &operator<<(ostream &out, const Player &p)
 {
     out << "\nName of player: " << p.name << endl;
-    out << "Army of player: " << p.plArmies << endl;
+    out << "Army of player: " << p.reinforcementPool << endl;
     out << "Territories: " << endl;
     for (Territory *t : p.territories)
     {
@@ -338,6 +337,11 @@ void Player::setTerritories(vector<Territory *> t1)
     prevTerritorySize = territories.size();
 }
 
+void Player::addTerritories(vector<Territory *> t1) {
+    for (Territory *t: t1) {
+        this->territories.push_back(t);
+    }
+}
 void Player::addTerritory(Territory * t1)
 {
     territories.push_back(t1);
@@ -363,18 +367,7 @@ void Player::printOrders()
     }
 }
 
-int Player::getPlArmies()
-{
-    return plArmies;
-}
-
-void Player::setPlArmies(int armies)
-{
-    plArmies = armies;
-}
-
-int Player::getTerritorySize()
-{
+int Player::getTerritorySize() {
     return this->getTerritories().size();
 }
 

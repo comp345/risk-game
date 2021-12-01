@@ -181,8 +181,7 @@ GameEngine::GameEngine()
     commandProcessor = new CommandProcessor();
 }
 
-GameEngine::GameEngine(std::string newFile)
-{
+GameEngine::GameEngine(std::string newFile) {
     // Create the states and add to states collection
     State *startState = new State("start");
     State *maploadedState = new State("maploaded");
@@ -367,15 +366,14 @@ bool GameEngine::doTransition(string command)
     return false;
 }
 
-string GameEngine::stringToLog()
-{
-    return "GameEngine transitioned to a new state: " + getCurrentStateName();
+
+string GameEngine::stringToLog() {
+    return "GameEngine transitioned to a new state: " + currentState->nameState;
 }
 
-Map *GameEngine::getMap()
-{
-    // cout << "got map!\n"
-    //      << endl;
+
+//helper methods
+Map *GameEngine::getMap() {
     return map;
 }
 
@@ -459,99 +457,75 @@ void GameEngine::testGameEngine()
 /* **************************************************************************** */
 
 // Two main phases
-void GameEngine::preStartup()
-{
-    // loadmap <filename> to select map from list of map loaded
-    //if (command=='loadmap') -> do this
-    //GameEngine engine;
-    int mapNum;
-    string path = "../maps/";
-    string mName;
-    string fpath;
+void GameEngine::preStartup() {
+    Command *command;
 
+    // starting with loadmap
+    string path = "../maps/";
     MapLoader *mapLoader = new MapLoader();
     cout << "Initiating map loading stage: \n"
          << endl;
     getMapList();
-    while (true)
-    {
-        cout << "\n Enter the number of the desired map: \n"
-             << endl;
-        cin >> mapNum;
-        while (mapNum > listOfFile.size() || !(cin >> mapNum))
-        {
-            cin.clear();
-            cin.ignore(1000, '\n');
-            if (!isdigit(mapNum))
-            {
-                cout << "Wrong input. Try with a valid number! \n"
-                     << endl;
-                continue; //breaking here if we input wrong number on the first try, doesnt work as intended even when entering correct number on 2nd try
-            }
-            else
-                break;
-        }
-        mName = listOfFile[mapNum - 1];
-        fpath = path.append(mName);
-        Map x1 = *mapLoader->loadMap(fpath);
-        Map *map1 = new Map(x1);
-        map1->validate(); // validates map
-        map1->showLoadedMap();
-        setMap(map1);
-        break;
-    }
+
+    do {
+        command = commandProcessor->getCommand(currentState);
+    } while (command->getArgs().empty() || !doTransition(command->getCommandName()));
+    string mapName = command->getArgs()[0];
+    cout << "current command: " << command->getCommandName() << "\n" << endl;
+    cout << "current mapfile requested: " << mapName << "\n" << endl;
+
+    string fpath = path.append(mapName);
+    Map x1 = *mapLoader->loadMap(fpath);
+    Map *map1 = new Map(x1);
+    cout << "Map " << mapName << " has been loaded. \n" << endl;
+
+    do {
+        command = commandProcessor->getCommand(currentState);
+    } while (!doTransition(command->getCommandName()));
+
+    map1->validate();// validates map
+    map1->showLoadedMap();
+    setMap(map1);
+
     // addplayer loop
-    //if(command==addplayer)-> do this
-    while (true)
-    {
-        //            string playerNameInput;
-        //            cout << "Enter player name: \n" << endl;
-        //            cin >> playerNameInput;
-        cout << "Enter the number of players (between 2-6): \n"
-             << endl;
-        cin >> numberOfPlayers;
+    while (true) {
+        do {
+            command = commandProcessor->getCommand(currentState);
+        } while (command->getArgs().empty() || !doTransition(command->getCommandName()));
+        string cmdPlName = command->getArgs()[0];
+
+        numberOfPlayers++;
         setNumOfPlayers(numberOfPlayers);
-        if (getNumOfPlayers() < 2 || getNumOfPlayers() > 6)
-        {
-            cin.clear();
-            cin.ignore(1000, '\n');
-            std::cout << "Invalid number of players. Please enter between 2-6 players. \n"
-                      << endl;
-        }
-        else
-        {
-            cout << "you have entered: " << getNumOfPlayers() << " players. Proceeding to next step....\n"
-                 << endl;
-            break;
-        }
-    }
-    //creating players based on given input (assigns army, hand, etc) and pushes the info into the player vector
-    string playerName;
-    for (int i = 0; i < getNumOfPlayers(); i++)
-    {
         Player *p = new Player();
-        Deck *cardDeck = new Deck();
-        Hand *plCard = new Hand(cardDeck);
-        cout << "enter name for player " << i + 1 << "....\n"
-             << endl;
-        cin >> playerName;
-        p->setPlName(playerName);
-        p->setCards(plCard);
-        p->setPlArmies(5);
-        cout << *p << "Number of Armies: " << p->getPlArmies() << endl;
+        p->setPlName(cmdPlName);
+        p->setReinforcementPool(5);
+        cout << *p << "Number of Armies: " << p->getReinforcementPool() << endl;
         cout << "Cards in players hand: " << p->getHand() << endl;
         plVec.push_back(p);
-        cout << "-------------------\n"
-             << endl;
+
+        cout << "total number of players so far is: " << getNumOfPlayers() << endl;
+        if (getNumOfPlayers() == 1) {
+            cout << "have 1 player so far" << endl;
+            continue;
+        }
+        if (getNumOfPlayers() < 7) {
+            cout << "continue adding players? (y/n)" << endl;
+            string keyInY;
+            cin >> keyInY;
+            if (keyInY == "y") {
+                continue;
+            } else {
+                break;
+            }
+        }
     }
-    // gamestart ->
-    /**
-         * - distribute territories of map between players
-         * - determine order of play of players
-         * - initially: give 50 armies to the players (50 between them? or 50 each?)
-         * - each player draw 2 cards with deck.draw(2)
-         * - go to play phase
-         */
+    do {
+        command = commandProcessor->getCommand(currentState);
+    } while (!doTransition(command->getCommandName()));
+
+    StartupPhase sp;
+    sp.setGameEng(this);
+    sp.startup();
 }
 
 //startupPhase methods
@@ -565,8 +539,8 @@ StartupPhase::StartupPhase(const StartupPhase &sp)
     this->eng = sp.eng;
 }
 
-StartupPhase::~StartupPhase()
-{
+StartupPhase::~StartupPhase() {
+    //TODO: missing destructor
 }
 
 void StartupPhase::operator=(const StartupPhase &sp)
@@ -574,15 +548,13 @@ void StartupPhase::operator=(const StartupPhase &sp)
     eng = sp.eng;
 }
 
-ostream &operator<<(ostream &out, const StartupPhase &sp)
-{
-    //out<<"\nGame Engine: "<<sp.eng<< endl;//to fix
+ostream &operator<<(ostream &out, const StartupPhase &sp) {
+    //out<<"\nGame Engine: "<<sp.eng<< endl;//TODO: fix
     return out;
 }
 
-std::istream &operator>>(std::istream &in, const StartupPhase &sp)
-{
-    //in>>sp.eng;
+std::istream &operator>>(std::istream &in, const StartupPhase &sp) {
+    //in>>sp.eng; //TODO: fix
     return in;
 }
 
@@ -591,47 +563,36 @@ void StartupPhase::setGameEng(GameEngine *en)
     eng = en;
 }
 
-void StartupPhase::startup()
-{
-    int b = 0;
+void StartupPhase::startup() {
     //randomizing players order
-    vector<Player *> a = eng->getPlayersVect();
-    cout << "Randomize player order: \n"
-         << endl;
+    vector<Player *> players = eng->getPlayersVect();
+    cout << "Randomize player order: \n" << endl;
     eng->randPlVec();
-    cout << "Current order of players after randomize: \n"
-         << endl;
-    for (Player *p : eng->getPlayersVect())
-    {
+    cout << "Current order of players after randomize: \n" << endl;
+    for (Player *p: players) {
         cout << *p << "----" << endl;
     }
 
     //giving armies to players:
-    cout << "Starting Army distribution for players: \n"
-         << endl;
-    for (int i = 0; i < eng->getNumOfPlayers(); i++)
-    {
-        eng->getPlayersVect()[i]->setPlArmies(50);
+    cout << "Starting Army distribution for players: \n" << endl;
+    for (int i = 0; i < eng->getNumOfPlayers(); i++) {
+        players[i]->setReinforcementPool(50);
     }
-    cout << "Players have received 50 army each! \n"
-         << endl;
-    for (Player *p1 : a)
-    {
-        cout << "player " << p1->getName() << ": " << p1->getPlArmies() << endl;
+    cout << "Players have received 50 army each! \n" << endl;
+    for (Player *p: players) {
+        cout << "player " << p->getName() << ": " << p->getReinforcementPool() << endl;
     }
 
     //letting players draw 2 cards
-    //    for (int i = 0; i < a.size(); i++) {
-    //        Deck *d = new Deck();
-    //        Hand *h = new Hand();
-    //        a[i]->setCards(h);
-    //        Player *p2 = a[i];
-    //        cout << "Player " << p2->getName() << " :\n" << endl;
-    //        d->showDeck();
-    //        d->draw(*p2);
-    //        d->draw(*p2);
-    //        cout << "Player drew 2 cards!" << endl;//needs fix
-    //    }
+    for (Player *p: players) {
+        Hand *h = new Hand();
+        p->setCards(h);
+        Deck* deck = eng->deck;
+        for (int i = 0; i <= 2; i++) {
+            deck->draw(*p);
+        }
+        cout << p->getName() << " drew 2 cards!" << endl;
+    }
 
     //territory assignment
     cout << "Distributing territories to the players: \n"
@@ -652,6 +613,9 @@ void StartupPhase::startup()
                     territories.push_back(map->territoryNodeList.back());
                     p->setTerritories(territories);
                     map->territoryNodeList.pop_back();
+                    for (Territory *t: territories) {
+                        t->setOwner(p);
+                    }
                 }
             }
         }
@@ -676,13 +640,11 @@ bool checkWinCondition()
     return false;
 }
 
-void GameEngine::auditPlayers()
-{
-    for (Player *p : currentPlayers)
-    {
-        if (p->getTerritories().size() == 0)
-        {
-            cout << "\nPlayer " << p->getName() << " no longer has any territories left and will be removed from the game \n";
+void GameEngine::auditPlayers() {
+    for (Player *p: currentPlayers) {
+        if (p->getTerritories().size() == 0) {
+            cout << "\nPlayer " << p->getName()
+                 << " no longer has any territories left and will be removed from the game \n";
 
             currentPlayers.erase(remove(currentPlayers.begin(), currentPlayers.end(), p));
 
@@ -692,14 +654,11 @@ void GameEngine::auditPlayers()
     }
 }
 
-Player *GameEngine::hasWinner()
-{
+Player *GameEngine::hasWinner() {
     //Get the players territories
-    for (Player *p : currentPlayers)
-    {
+    for (Player *p: currentPlayers) {
 
-        if (map->getTerritories().size() == p->getTerritories().size())
-        {
+        if (map->getTerritories().size() == p->getTerritories().size()) {
             return p;
         }
     }
@@ -733,19 +692,17 @@ void GameEngine::reinforcementPhase(Player *p)
     bool ownsContinent = false;
 
     //Get all the continents then their territories:
-    for (Continent *c : map->continentList)
-    {
+    for (Continent *c: map->continentList) {
         int territoryCount = 0;
         controlBonus = c->controlBonus;
         vector<Territory *> listOfContentsTerritories = c->territories;
 
         //Loop through what the player has to check if the owns the full continent
-        for (Territory *t : p->getTerritories())
-        {
+        for (Territory *t: p->getTerritories()) {
 
             //Count of how many of the players Territories we find of the continent
-            if (find(listOfContentsTerritories.begin(), listOfContentsTerritories.end(), t) != listOfContentsTerritories.end())
-            {
+            if (find(listOfContentsTerritories.begin(), listOfContentsTerritories.end(), t) !=
+                listOfContentsTerritories.end()) {
                 territoryCount++;
             }
         }
@@ -754,8 +711,7 @@ void GameEngine::reinforcementPhase(Player *p)
         if (territoryCount == listOfContentsTerritories.size())
             ownsContinent = true;
 
-        if (ownsContinent == true)
-        {
+        if (ownsContinent) {
             cout << "continent bonus has been applied! adding an additional " << controlBonus << " units";
             numberOfArmies += controlBonus;
             ownsContinent = false;
@@ -774,10 +730,8 @@ void GameEngine::reinforcementPhase(Player *p)
 }
 
 // returns false if someone is still issuing orders
-bool GameEngine::allPlayersDone()
-{
-    for (Player *p : currentPlayers)
-    {
+bool GameEngine::allPlayersDone() {
+    for (Player *p: currentPlayers) {
         if (!p->isDoneIssuing())
             return false;
     }
@@ -792,8 +746,7 @@ Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, 
 {
     string checkTypeCard = card->getCommand();
 
-    if (checkTypeCard == "Airlift type")
-    {
+    if (checkTypeCard == "Airlift type") {
         cout << "... player desires to create an AirLift order by using a valid card!..." << endl;
         if (!territoryTarget or !territorySrc)
             throw std::exception();
@@ -802,8 +755,7 @@ Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, 
         return a;
     }
 
-    if (checkTypeCard == "Bomb type")
-    {
+    if (checkTypeCard == "Bomb type") {
         cout << "... player desires to create a Bomb order by using a valid card!..." << endl;
 
         if (!territoryTarget)
@@ -995,18 +947,15 @@ void GameEngine::issueOrdersPhase()
     }
 }
 
-bool hasOrders(vector<Player *> currentPlayers)
-{
-    for (Player *player : currentPlayers)
-    {
+bool hasOrders(vector<Player *> currentPlayers) {
+    for (Player *player: currentPlayers) {
         if (player->getOrderList()->getList().size() != 0)
             return true;
     }
     return false;
 }
 
-void GameEngine::executeOrdersPhase()
-{
+void GameEngine::executeOrdersPhase() {
     //players have signified that they are not issuing one more order
     bool hasDeploy = false;
 
@@ -1020,8 +969,7 @@ void GameEngine::executeOrdersPhase()
     while (hasOrders(currentPlayers))
     {
         //Iterate over each player
-        for (int i = 0; i < currentPlayers.size(); i++)
-        {
+        for (int i = 0; i < currentPlayers.size(); i++) {
             Player *currentPlayer = currentPlayers.at(i);
             bool played = false;
 

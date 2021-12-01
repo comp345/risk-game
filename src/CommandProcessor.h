@@ -14,6 +14,7 @@ class Command : public ILoggable, public Subject
 private:
     std::string commandName;
     std::string commandEffect;
+    vector<std::string> args;
 public:
     Command();
     Command(std::string commandName, std::string commandEffect);
@@ -24,6 +25,9 @@ public:
     void saveEffect(std::string commandEffect);
     void setCommandName(std::string name);
     std::string getCommandEffect();
+    vector<std::string> getArgs();
+    void setArgs(vector<std::string>);
+    void addArgs(std::string);
     string stringToLog();
 };
 
@@ -32,7 +36,7 @@ class CommandProcessor : public ILoggable, public Subject
     friend class GameEngine; //To let gameengine access stuff in here
 protected:
     std::vector<Command *> commands;
-    virtual std::string readCommand(State*& currentState); //Get console arg
+    virtual vector<string> readCommand(State*& currentState); //Get console arg
 private:
     State *currentState;
 public:

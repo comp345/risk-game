@@ -3,13 +3,22 @@
 
 using namespace std;
 
-//int main(int, char **)
-//{
-//    GameEngine *engine= new GameEngine();
-//    StartupPhase sp;
-//    //engine.testGameEngine();
-//    engine->preStartup();
-//    sp.setGameEng(engine);
-//    sp.startup();
-//    return 0;
-//}
+extern void riskGameDriver(); // driver for A2 P3
+
+int main(int, char **)
+{
+    /* ******************************* */
+    /*          A2 P2 : Startup        */
+    /* ******************************* */
+    // GameEngine *engine= new GameEngine();
+    // engine->preStartup();
+
+    /* *************************************** */
+    /*          A2 P3 : Main Game play         */
+    /* *************************************** */
+
+    riskGameDriver();
+
+
+
+}

@@ -9,27 +9,27 @@ extern void riskGameDriver();
 
 void debuggingStateMachine(GameEngine * e);
 
-int main()
-{
-    // A2 Part 1
-    // GameEngine e; // solves the bug -> GameEngine * e = new GameEngine(); BUGGY
-    // e.testGameEngine();
+// int main()
+// {
+//     // A2 Part 1
+//     // GameEngine e; // solves the bug -> GameEngine * e = new GameEngine(); BUGGY
+//     // e.testGameEngine();
 
 
 
-    // Noah refactoring a2 part 3
-    riskGameDriver();
+//     // Noah refactoring a2 part 3
+//     riskGameDriver();
 
 
 
-    // Debugging the state machine
-    // GameEngine * eng = new GameEngine();
-    // debuggingStateMachine(eng);
+//     // Debugging the state machine
+//     // GameEngine * eng = new GameEngine();
+//     // debuggingStateMachine(eng);
         
     
 
-    return 0;
-}
+//     return 0;
+// }
 
 void debuggingStateMachine(GameEngine * e)
 {

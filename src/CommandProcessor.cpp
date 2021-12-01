@@ -105,6 +105,18 @@ void Command::saveEffect(string command)
     notify(this);
 }
 
+void Command::setArgs(vector<std::string> args) {
+    this->args = args;
+}
+
+vector<std::string> Command::getArgs() {
+    return args;
+}
+
+void Command::addArgs(std::string arg) {
+    args.push_back(arg);
+}
+
 CommandProcessor::CommandProcessor()
 {
     fileName = "";
@@ -154,32 +166,35 @@ std::string CommandProcessor::getCurrentStateName(State*& currentState)
 }
 
 // Reads string from console. Validates then returns input
-std::string CommandProcessor::readCommand(State*& currentState)
+vector<string> CommandProcessor::readCommand(State*& currentState)
 {
-    string keyinput;
+    string fpath;
+    vector<string> cmdInput, cmdInput2;
+    string keyIn, keyIn2;
+    string temp;
+    string commandName;
 
     cout << "Enter a valid command to progress in the game."
          << "(Enter x to quit or press any key when at final State)" << endl;
 
-    cin >> keyinput;
-    if (keyinput == "x" or this->getCurrentStateName(currentState) == "final")
+    getline(cin, keyIn);
+    for (int i = 0; i < keyIn.length(); ++i) {
+        if (keyIn[i] == ' ') {
+            cmdInput.push_back(temp);
+            temp = "";
+        } else {
+            temp.push_back(keyIn[i]);
+        }
+    }
+    cmdInput.push_back(temp);
+    commandName = cmdInput[0];
+
+    if (commandName == "x" or this->getCurrentStateName(currentState) == "final")
         std::exit(0);
     else
     {
         cout << "\n***\n" << endl;
-        // Validates the command.
-        // Returns true if command was valid, in order to display correct message.
-        bool isCommandValid = this->validateCommand(currentState, keyinput);
-
-        if (isCommandValid)
-        {
-            cout << "Valid command. Current state is: " << this->getCurrentStateName(currentState) << endl;
-        }
-        else
-        {
-            cout << "Invalid command. Replay current state: " << this->getCurrentStateName(currentState) << endl;
-        }
-        return keyinput;
+        return cmdInput;
     }
 }
 
@@ -193,10 +208,22 @@ void CommandProcessor::saveCommand(Command* c)
 Command* CommandProcessor::getCommand(State*& currentState)
 {
     Command* newCommand = new Command();
-    string newCommandName = readCommand(currentState);
+    vector<string> command = readCommand(currentState);
+    string newCommandName = command[0];
+    for (int i = 1; i < command.size(); i++) {
+        newCommand->addArgs(command[i]);
+    }
     newCommand->setCommandName(newCommandName);
     newCommand->saveEffect(newCommandName);
-    saveCommand(newCommand);
+
+    bool isCommandValid = this->validateCommand(currentState, newCommandName);
+    if (isCommandValid) {
+        cout << "Valid command. Current state is: " << this->getCurrentStateName(currentState) << endl;
+        saveCommand(newCommand);
+    } else {
+        cout << "Invalid command. Replay current state: " << this->getCurrentStateName(currentState) << endl;
+    }
+
     return newCommand;
 }
 
