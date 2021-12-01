@@ -13,32 +13,37 @@ class Order;
 
 class OrderList;
 
+class PlayerStrategy;
+
 using namespace std;
 
-struct compareArmySize {
+struct compareArmySize
+{
     bool operator()(Territory const *t1, Territory const *t2);
 };
 
-class Player {
+class Player
+{
 public:
-
     Player();
 
     Player(const Player &); //copy constructor
-    Player(string);
+    Player(string); // Used
 
     Player(int, string, vector<Territory *>, Hand *, OrderList *);
 
     Player(string plName, vector<Territory *> t, Hand *h, OrderList *o);
 
     ~Player(); //destructor
-    vector<Territory *> toAttack();
+    virtual vector<Territory *> toAttack();
 
-    vector<Territory *> toDefend();
+    virtual vector<Territory *> toDefend();
+
+    void issueOrder(); // A3 
 
     void issueOrder(string, string);
 
-    void issueOrder(Order *o);
+    void issueOrder(Order *o); // A2
 
     void printOrders();
 
@@ -51,7 +56,11 @@ public:
 
     OrderList *getOrderList();
 
+    // Assign new vector of territories
     void setTerritories(vector<Territory *> vector1);
+
+    // For StartUp (not same as setTerritories)
+    void addTerritories(vector<Territory *> t1);
 
     void setCards(Hand *pHand);
 
@@ -72,7 +81,7 @@ public:
 
     void setPrevTerritorySize();
 
-
+    // helper functions for issueOrder implementation
     void addToPriorityAttack(Territory *toAdd);
 
     void addToPriorityDefend(Territory *toAdd);
@@ -89,12 +98,27 @@ public:
 
     void toggleDoneIssuing();
 
+    void setDoneIssuing(bool flag);
+
+    bool isDoneDeploying();
+
+    void setDoneDeploying(bool flag);
+
     int getReinforcementPool();
 
     void setReinforcementPool(int val);
 
-    void addTerritories(vector<Territory *> t1);
+    // TODO: Reimplement to add one territory at a time
+    void addTerritory(Territory * t1);
 
+    // implementation of Negotiate order
+    bool isNegotiating(Player *p);
+    void addNegotiatingWith(Player *p);
+    void removeNegotiatingWith(Player *p);
+    vector<Player *> getNegotiatingWith() const;
+    void removeAllNegotiation();
+    PlayerStrategy *getPlayerStrategy();
+    void setPlayerStrategy(PlayerStrategy *ps);
 
 private:
     int reinforcementPool;
@@ -106,6 +130,12 @@ private:
     vector<Territory *> territories;
     Hand *hand;
     OrderList *orderList;
+    PlayerStrategy *ps;
 
+    bool doneDeploying;
     bool doneIssuing;
+    // int plArmies; // Redundant data member -> reinforcementPool
+
+    // implementation of Negotiate order
+    vector<Player *> negotiatingWith;
 };

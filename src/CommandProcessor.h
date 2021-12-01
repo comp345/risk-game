@@ -2,7 +2,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "GameEngine.h"
 #include "LoggingObserver.h"
 
 class CommandProcessor;
@@ -21,6 +20,7 @@ public:
     Command(std::string commandName, std::string commandEffect);
     Command(const Command &c);
     ~Command();
+    Command& operator=(const Command& c);
     std::string getCommandName();
     void saveEffect(std::string commandEffect);
     void setCommandName(std::string name);
@@ -42,8 +42,10 @@ private:
 public:
     std::string fileName;
     CommandProcessor();
+    CommandProcessor(const CommandProcessor& c);
     CommandProcessor(std::string fileInput, State*& setState);
     ~CommandProcessor();
+    CommandProcessor& operator=(const CommandProcessor& c);
     bool validateCommand(State*& currentState, std::string command);
     virtual void printCommands();
     virtual Command* getCommand(State*& currentState); // Class driver, runs everything - input is a ref to currentState pointer
@@ -54,7 +56,6 @@ public:
 
 class FileCommandProcessorAdapter: virtual public CommandProcessor
 {
-    friend class FileLineReader;
 private:
     FileLineReader* reader;
     std::string fileName;
@@ -69,7 +70,6 @@ public:
 
 class FileLineReader
 {
-    friend class FileCommandProcessorAdapter;
 private:
     std::string fileName;
     std::vector<std::string> listOfCommands;

@@ -4,15 +4,15 @@
 #include <string>
 #include <vector>
 #include "LoggingObserver.h"
-#include "Player.h"
-#include "Map.h"
-#include "CommandProcessor.h"
-#include "Card.h"
 
 /* The states and transitions are stored in a linked list like structure */
 class Deck;
 // States are Nodes in the game flow
-
+class Order;
+class Map;
+class Player;
+class Territory;
+class Card;
 class State;
 class Transition;
 class FileCommandProcessorAdapter;
@@ -82,7 +82,8 @@ public:
     friend std::ostream &operator<<(std::ostream &out, const State &s);
 };
 
-class GameEngine : public ILoggable, public Subject {
+class GameEngine : public ILoggable, public Subject
+{
     friend class State;
 
     friend class Transition;
@@ -90,12 +91,11 @@ class GameEngine : public ILoggable, public Subject {
 private:
     int numberOfPlayers;
     State *currentState;
-    bool isFile;
+    bool validTransition;
     std::string fileName;
-    std::vector<State *> states; // GameEngine maintains collection of all states
+    std::vector<State *> states;           // GameEngine maintains collection of all states
     std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
     CommandProcessor *commandProcessor;
-    FileCommandProcessorAdapter *fileAdapter;
     std::vector<std::string> listOfFile;
     std::vector<Player *> plVec;
     Map *map;
@@ -104,6 +104,12 @@ public:
     GameEngine();
 
     GameEngine(std::string fileName);
+
+    GameEngine(const GameEngine &e);
+
+    ~GameEngine();
+
+    GameEngine& operator=(const GameEngine& e);
 
     // return name of current state
     std::string getCurrentStateName();
@@ -148,20 +154,26 @@ public:
     void reinforcementPhase(Player *p);
     void issueOrdersPhase();
     void executeOrdersPhase();
-    Order* createOrderFromCard(Card *card, Player* player, Territory* territorySrc, Territory* territoryTarget);
 
+    // createOrderFromCard to be deleted 
+    // Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget);
 
-        // Noah: Data members should be private and only accessed with public methods
-        vector<Player *> currentPlayers;
-        Deck* deck;
-        bool allPlayersDone();
-        Player *hasWinner();
-        void auditPlayers();
-    };
+    // Noah: Data members should be private and only accessed with public methods
+    vector<Player *> currentPlayers;
+    Deck *deck;
+    bool allPlayersDone();
+    Player *hasWinner();
+    void auditPlayers();
 
-class StartupPhase {
+    // Noah additions for refacting A2 part 3
+    void refactoring_mainGameLoop();
+};
+
+class StartupPhase
+{
 private:
     GameEngine *eng;
+
 public:
     StartupPhase();
 
@@ -179,4 +191,3 @@ public:
 
     friend istream &operator>>(istream &in, const StartupPhase &sp);
 };
-

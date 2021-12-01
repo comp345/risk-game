@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include "CommandProcessor.h"
+#include "GameEngine.h"
 
 using namespace std;
 
@@ -34,6 +35,13 @@ Command::Command(const Command &c)
 
 Command::~Command()
 {
+}
+
+Command& Command::operator=(const Command& c)
+{
+    commandName = c.commandName;
+    commandEffect = c.commandEffect;
+    return *this;
 }
 
 string Command::getCommandName()
@@ -112,6 +120,12 @@ void Command::addArgs(std::string arg) {
 CommandProcessor::CommandProcessor()
 {
     fileName = "";
+    currentState = new State();
+}
+CommandProcessor::CommandProcessor(const CommandProcessor& c)
+{
+    fileName = c.fileName;
+    currentState = new State(*c.currentState);
 }
 
 CommandProcessor::CommandProcessor(std::string fileInput, State*& setState)
@@ -122,6 +136,16 @@ CommandProcessor::CommandProcessor(std::string fileInput, State*& setState)
 
 CommandProcessor::~CommandProcessor()
 {
+}
+CommandProcessor& CommandProcessor::operator=(const CommandProcessor& c)
+{
+    if (this == &c)
+        return *this;
+    if (currentState) { delete currentState; }
+    fileName = c.fileName;
+    currentState = new State(*c.currentState);
+
+    return *this;
 }
 
 bool CommandProcessor::validateCommand(State*& currentState, string command)
@@ -242,7 +266,7 @@ std::string FileCommandProcessorAdapter::readCommand(std::string fileName, State
     {
         cout << "Invalid command. Must check transition for current state: " << this->getCurrentStateName(currentState) << endl;
     }
-return validatedCommand;
+    return validatedCommand;
 }
 
 Command* FileCommandProcessorAdapter::getCommand(State*& currentState)

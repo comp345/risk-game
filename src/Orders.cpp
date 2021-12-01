@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
 #include "Orders.h"
+#include "Player.h"
+#include "Map.h"
+#include "PlayerStrategies.h"
 
 using namespace std;
 
@@ -38,65 +41,6 @@ ostream &operator<<(ostream &out, const Order &o)
 }
 istream &operator>>(istream &in, Order &o)
 {
-    // Make user enter every data member of the Order
-    cout << "Enter the command type for this new Order.\n";
-
-    bool invalidOrderType = true;
-    while (invalidOrderType)
-    {
-        cout << "Chose a valid command type between advance, airlift, bomb, blockade, deploy, or negotiate (lowercase) :\n";
-        string userChosenOrder;
-        in >> userChosenOrder;
-        if (userChosenOrder.compare("advance") == 0)
-        {
-            o.command = "Advance type";
-            invalidOrderType = false;
-            // Below: note for future implementation
-            // string command = "Advance type";
-            // cout << "Enter details: ";
-            // string details;
-            // cin >> details;
-            // o = Advance(command, details);
-            // invalidOrderType = false;
-        }
-        else if (userChosenOrder.compare("airlift") == 0)
-        {
-            o.command = "AirLift type";
-            invalidOrderType = false;
-        }
-        else if (userChosenOrder.compare("bomb") == 0)
-        {
-            o.command = "Bomb type";
-            invalidOrderType = false;
-        }
-        else if (userChosenOrder.compare("deploy") == 0)
-        {
-            o.command = "Deploy type";
-            invalidOrderType = false;
-        }
-        else if (userChosenOrder.compare("blockade") == 0)
-        {
-            o.command = "Blockade type";
-            invalidOrderType = false;
-        }
-        else if (userChosenOrder.compare("negotiate") == 0)
-        {
-            o.command = "Negotiate type";
-            invalidOrderType = false;
-        }
-        else
-        {
-            // continue loop until valid order type (command) entered
-        }
-    }
-
-    cout << "Details: \n";
-    in >> o.details;
-
-    // ... Add future data member
-    // in >> o.player
-    // in >> o.territory
-
     return in;
 }
 Order *Order::getOrder()
@@ -120,7 +64,8 @@ void Order::setDetails(std::string orderDetails)
     details = orderDetails;
 }
 
-string Order::stringToLog() {
+string Order::stringToLog()
+{
     return "Order was executed: " + this->getDetails();
 }
 
@@ -133,10 +78,10 @@ Deploy::Deploy(string orderdetails) : Order("Deploy type", orderdetails)
 {
 }
 /** TODO:  TO INTEGRATE IN THE ACTUAL METHOD */
-Deploy::Deploy(string orderdetails, Player *p) : Deploy(orderdetails)
-{
-    playerDeploying->setReinforcementPool(playerDeploying->getReinforcementPool() - 1);
-}
+// Deploy::Deploy(string orderdetails, Player *p) : Deploy(orderdetails)
+// {
+//     // playerDeploying->setReinforcementPool(playerDeploying->getReinforcementPool() - 1);
+// }
 // The pointer fields Player* and Territory* are passed by reference (no deep copy)
 // Note: Player* and Territory* passed as param should be ptr to dymically allocated objects
 Deploy::Deploy(int armies, Player *player, Territory *territory)
@@ -147,8 +92,7 @@ Deploy::Deploy(int armies, Player *player, Territory *territory)
     string _command = "Deploy type";
     setCommand(_command);
     updateDetails();
-    // Alexander test for game loop
-    playerDeploying->setReinforcementPool(playerDeploying->getReinforcementPool() - 1);
+
 }
 
 /** 
@@ -209,9 +153,7 @@ Deploy &Deploy::operator=(const Deploy &d)
 
 bool Deploy::validate()
 {
-    cout << "Validate Deploy order." << endl;
-    // cout << "this->getTerritory()->getOwner(): " << this->getTerritory()->getOwner() << endl
-    // << "playerDeploying: " << playerDeploying << endl;
+    // cout << "Validate Deploy order." << endl;
     if (this->getTerritory()->getOwner() != playerDeploying)
         return false;
     return true;
@@ -220,12 +162,11 @@ bool Deploy::execute()
 {
     if (!validate()) // if invalid order
     {
-        cout << "Invalid Deploy order. Exit of Deploy::execute" << endl;
-        // Note about the Logger: do we notify if the order is invalid?
+        // cout << "Invalid Deploy order. Exit of Deploy::execute" << endl;
         return false;
     }
 
-    cout << "Execute Deploy order." << endl;
+    // cout << "Execute Deploy order." << endl;
     /** TODO: Check num of armies to deploy and Remove army units from reinforcement pool
      *      if (getPlayer()->getReinforcementPool() < getArmies()) { cout <<  << endl ;return false; }
      *      getPlayer()->setReinforcementPool(getPlayer()->getReinforcementPool() - getArmies());
@@ -312,16 +253,23 @@ Advance &Advance::operator=(const Advance &a)
     return *this;
 }
 
-/** TODO: Check if src and target are adjacent   */
 bool Advance::validate()
 {
-    cout << "Debug: Validate Advance order." << endl;
+    // cout << "Debug: Validate Advance order." << endl;
     if (this->getTerritorySource()->getOwner() != playerAdvancing)
         return false;
-    /** to add: check adjacency of territorytarget to territorysource, else return false
-     * 
-     */
-    return true;
+    for (auto negotiatee : playerAdvancing->getNegotiatingWith())
+    {
+        if (negotiatee == territoryTarget->getOwner())
+        {
+            // cout << "Debug: Advance::validate() Negotiation is happening between advancing player "
+                //  << playerAdvancing->getName() << " and target territory owner, " 
+                //  << territoryTarget->getOwner()->getName() << endl;
+            return false;
+        }
+    }
+
+    return getTerritorySource()->isNeighbor(territoryTarget);
 }
 // Returns true if exect
 bool Advance::execute()
@@ -329,17 +277,16 @@ bool Advance::execute()
     bool bonus = false; // bonus is true if advance execution leads to enemy territory conquest
     if (!validate())
     {
-        cout << "Debug: Invalid Advance order." << endl;
+        // cout << "Debug: Invalid Advance order." << endl;
         return false;
     }
-    cout << "Debug: Execute Advance order.";
+    // cout << "Debug: Execute Advance order.";
 
-    // Case 1
+    // Case 1 if target belong to player, basically deploy src -> target
     if (getTerritoryTarget()->getOwner() == playerAdvancing)
     {
-        // if target belong to player, basically deploy src -> target
 
-        /** TODO: check that num of armies ordered to advance is not greater than armies on territory source
+        /** check that num of armies ordered to advance is not greater than armies on territory source
          */
         if (getArmies() <= getTerritorySource()->getNumberOfArmies())
         {
@@ -350,7 +297,7 @@ bool Advance::execute()
         }
         else
         {
-            cout << "Debug: Invalid number of army units to advance (greater than the number of units available on territory source." << endl;
+            // cout << "Debug: Invalid number of army units to advance (greater than the number of units available on territory source." << endl;
             return false;
         }
     }
@@ -366,10 +313,17 @@ bool Advance::execute()
                 getTerritorySource()->getNumberOfArmies() - getArmies());
             // Attack enemy
             bonus = simulateAttack();
+
+            //Check if the enemy was a Netural player
+            if(getTerritoryTarget()->getOwner()->getPlayerStrategy()->strategyName() == "Neutral strategy"){
+                //Cast it
+                NeutralPlayerStrategy* nps = dynamic_cast<NeutralPlayerStrategy*>(getTerritoryTarget()->getOwner()->getPlayerStrategy());
+                nps->toggleHasBeenAttacked();
+            }
         }
         else
         {
-            cout << "Debug: Invalid number of army units to advance (greater than the number of units available on territory source." << endl;
+            // cout << "Debug: Invalid number of army units to advance (greater than the number of units available on territory source." << endl;
             return false;
         }
     }
@@ -382,11 +336,6 @@ bool Advance::execute()
 bool Advance::simulateAttack()
 {
     cout << "Attacking enemy!" << endl;
-    /** DONE: Implement randomized battle result
-     * Attacking army and Defending alternate their attack on each other
-     * Attacking army -> Defending army: each unit has 60% chance to kill
-     * Defending army -> Attacking army: each unit has 70% chance to kill
-     */
     int attackUnit = getArmies(), defendUnit = territoryTarget->getNumberOfArmies(); // Number of attacker and defender units alive
     int deadAttacker = 0, deadDefender = 0;                                          // body count
     bool isAttackingTurn = true;
@@ -400,7 +349,7 @@ bool Advance::simulateAttack()
             if (resultAttack <= 5) // Advancing player kills one defending army
             {
                 territoryTarget->setNumberOfArmies(territoryTarget->getNumberOfArmies() - 1);
-                cout << "Debug: Attacker kills Defender #" << to_string(++deadDefender) << endl;
+                // cout << "Debug: Attacker kills Defender #" << to_string(++deadDefender) << endl;
                 --defendUnit; // 1 defender killed
             }
         }
@@ -411,7 +360,7 @@ bool Advance::simulateAttack()
             if (resultAttack <= 6) // Defending player kills one attacking army
             {
                 this->setArmies(this->getArmies() - 1);
-                cout << "Debug: Defender kills Attacker #" << to_string(++deadAttacker) << endl;
+                // cout << "Debug: Defender kills Attacker #" << to_string(++deadAttacker) << endl;
                 --attackUnit; // 1 attacker killed
             }
         }
@@ -428,8 +377,9 @@ bool Advance::simulateAttack()
     {
         // set target armies number as remaining attacking armies
         territoryTarget->setNumberOfArmies(this->getArmies());
-        // change ownership of territory
+        // change ownership of territory and add territory to player::territories
         territoryTarget->setOwner(this->getPlayer());
+        this->getPlayer()->addTerritory(territoryTarget);
     }
 
     updateDetails(); // Advance order is modified
@@ -463,7 +413,9 @@ void Advance::setTerritoryTarget(Territory *t)
 void Advance::updateDetails()
 {
     string _desc = getCommand() + " = {" + getPlayer()->getName() + " advances " +
-                   to_string(getArmies()) + " army units from " + getTerritorySource()->getName() + " to " + getTerritoryTarget()->getName() + "}.";
+                   to_string(getArmies()) + " army units from " + getTerritorySource()->getName() + " to " 
+                   + getTerritoryTarget()->getName() + ", owned by " 
+                   + getTerritoryTarget()->getOwner()->getName() + "}.";
     setDetails(_desc);
 }
 
@@ -505,25 +457,42 @@ Bomb &Bomb::operator=(const Bomb &b)
     return *this;
 }
 
-/** TODO: Check adjacency of target to at least one territory of player! */
+//TODO: check if adjacency works
 bool Bomb::validate()
 {
-    cout << "Validate Bomb order." << endl;
-    // TODO: Check adjacency
+    bool adjacent = false;
+    for (Territory *t : playerBombing->getTerritories())
+    {
+        if (t->isNeighbor(getTerritory()))
+        {
+            adjacent = true;
+            break;
+        }
+    }
     // Check if target territory is enemy's
     if (getTerritory()->getOwner() == playerBombing)
         return false;
 
-    return true;
+    for (auto negotiatee : playerBombing->getNegotiatingWith())
+    {
+        if (negotiatee == territoryTarget->getOwner())
+        {
+            // cout << "Debug: Bomb::validate() Negotiation is happening between bombing player "
+            //      << playerBombing->getName() << " and target territory owner, "
+            //      << territoryTarget->getOwner()->getName() << endl;
+            return false;
+        }
+    }
+    return adjacent;
 }
 bool Bomb::execute()
 {
     if (!validate())
     {
-        cout << "Invalid Bomb order." << endl;
+        // cout << "Invalid Bomb order." << endl;
         return false;
     }
-    cout << "Execute Bomb order.";
+    // cout << "Execute Bomb order." << endl;
     getTerritory()->setNumberOfArmies(
         getTerritory()->getNumberOfArmies() / 2);
 
@@ -549,30 +518,127 @@ void Bomb::updateDetails()
                    getTerritory()->getName() + "}.";
     setDetails(_desc);
 }
-Blockade::Blockade() : Order("Blockade type", "")
+
+/* ---------------------- Blockade ------------------------- */
+Blockade::Blockade() : Order("Blockade type", ""), target(new Territory),
+                       player(new Player), neutral(new Player)
 {
 }
 Blockade::Blockade(string orderdetails) : Order("Blockade type", orderdetails)
 {
 }
-Blockade::Blockade(const Blockade &b) // USING IT FOR A2
+Blockade::Blockade(const Blockade &b) : Order(b.getCommand(), b.getDetails()),
+                                        player(new Player(*b.getPlayer())), target(new Territory(*b.getTerritory())),
+                                        neutral(new Player(*b.getNeutral()))
 {
-    Blockade cpyBlockade = b;
-    setCommand(cpyBlockade.getCommand());
-    setDetails(cpyBlockade.getDetails());
 }
-// Fake validate and execute methods to implement later
+
+// Constructor used to issue orders
+Blockade::Blockade(Territory *target1, Player *p1, Player *neutral1)
+{
+    target = target1;
+    player = p1;
+    neutral = neutral1;
+    string _command = "Blockade type";
+    setCommand(_command);
+    updateDetails();
+};
+Blockade::~Blockade()
+{
+    delete player;
+    delete target;
+    delete neutral;
+}
+
+Blockade &Blockade::operator=(const Blockade &b)
+{
+    if (this == &b)
+        return *this;
+    if (player)
+        delete player;
+    if (target)
+        delete target;
+    if (neutral)
+        delete neutral;
+    player = new Player(*b.getPlayer());
+    target = new Territory(*b.getTerritory());
+    neutral = new Player(*b.getNeutral());
+    string _command = "Blockade type";
+    setCommand("Blockade type");
+    updateDetails();
+    return *this;
+}
+
+void Blockade::updateDetails()
+{
+    string _details = "Player " + player->getName() + " blockades " + target->getName() + ", owned by " + target->getOwner()->getName()
+    + ". Territory ownership is passed to the neutral player " + neutral->getName();
+    string desc = getCommand() + " = {" + _details + "}";
+    setDetails(desc);
+}
+
 bool Blockade::validate()
 {
-    cout << "Validate Blockade order.";
-    return true;
+    if ((target->getOwner() == player))
+    {
+        // std::cout << "\nThe Blockade Order is valid.";
+        return true;
+    }
+    std::cout << "\nThe Blockade Order is invalid.";
+    return false;
 }
 bool Blockade::execute()
 {
-    cout << "Execute Blockade order.";
-    notify(this);
-    return true;
+    if (validate())
+    {
+        target->setNumberOfArmies(target->getNumberOfArmies() * 2);
+        target->setOwner(neutral);
+        neutral->addTerritory(target);
+        
+        int count = 0;
+
+        //removing the target from player territory list
+        vector<Territory *> playerTerr = player->getTerritories();
+        for (vector<Territory *>::iterator it = playerTerr.begin(); it != playerTerr.end(); ++it)
+        {
+            if (*it == target)
+            {
+                break;
+            }
+            ++count;
+        }
+
+        playerTerr.erase(playerTerr.begin() + count);
+
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
+
+Player *Blockade::getPlayer() const { return player; }
+Territory *Blockade::getTerritory() const { return target; }
+Player *Blockade::getNeutral() const { return neutral; }
+void Blockade::setPlayer(Player *p)
+{
+    player = p;
+    updateDetails();
+}
+void Blockade::setTerritory(Territory *t)
+{
+    target = t;
+    updateDetails();
+}
+void Blockade::setNeutral(Player *n)
+{
+    neutral = n;
+    updateDetails();
+}
+
+// ---------------------------
 
 AirLift::AirLift() : Order("Airlift type", ""), armiesToMove(0),
                      playerAirlifting(new Player), territorySource(new Territory), territoryTarget(new Territory)
@@ -619,12 +685,14 @@ AirLift &AirLift::operator=(const AirLift &a)
     this->territorySource = new Territory(*a.getTerritorySource());
     this->territoryTarget = new Territory(*a.getTerritoryTarget());
 
+    updateDetails();
+
     return *this;
 }
 
 bool AirLift::validate()
 {
-    cout << "Validate AirLift order." << endl;
+    // cout << "Validate AirLift order." << endl;
     if (getTerritorySource()->getOwner() != playerAirlifting ||
         getTerritoryTarget()->getOwner() != playerAirlifting)
         return false; // Only airlift from and to own territories
@@ -633,16 +701,16 @@ bool AirLift::validate()
 
 bool AirLift::execute()
 {
-    cout << "Execute AirLift order.";
+    // cout << "Execute AirLift order.";
     if (!validate())
     {
-        cout << "Debug: Invalid AirLift order." << endl;
+        // cout << "Debug: Invalid AirLift order." << endl;
         return false;
     }
     // Check if armiesToMove ≤ number of armies on territory source
     if (getArmies() > getTerritorySource()->getNumberOfArmies())
     {
-        cout << "Debug: Invalid number of armies to AirLift" << endl;
+        // cout << "Debug: Invalid number of armies to AirLift" << endl;
         return false;
     }
     // Remove army units from source and AirLift army units to target
@@ -687,29 +755,113 @@ void AirLift::updateDetails()
     setDetails(_desc);
 }
 
-Negotiate::Negotiate() : Order("Negotiate type", "")
+/* ---------------------- Negotiate ---------------------------*/
+Negotiate::Negotiate() : Order("Negotiate type", ""),
+                         source(new Player), target(new Player)
 {
 }
+
+// do not use
 Negotiate::Negotiate(string orderdetails) : Order("Negotiate type", orderdetails) // USING IT FOR A2
 {
 }
 Negotiate::Negotiate(const Negotiate &n)
 {
-    Negotiate cpyNegotiate = n;
-    setCommand(cpyNegotiate.getCommand());
-    setDetails(cpyNegotiate.getDetails());
+    setCommand(n.getCommand());
+    setDetails(n.getDetails());
+    source = n.source;
+    target = n.target;
 }
+Negotiate::Negotiate(Player *source1, Player *target1)
+{
+    source = source1;
+    target = target1;
+    string _command = "Negotiate type";
+    setCommand(_command);
+    updateDetails();
+}
+
+Negotiate::~Negotiate()
+{
+    delete source;
+    delete target;
+}
+
+Negotiate &Negotiate::operator=(const Negotiate &n)
+{
+    if (this == &n)
+        return *this;
+    if (source)
+        delete source;
+    if (target)
+        delete target;
+    source = new Player(*n.getSource());
+    target = new Player(*n.getTarget());
+    updateDetails();
+
+    return *this;
+}
+
 bool Negotiate::validate()
 {
-    cout << "Validate Negotiate order.";
-    return true;
-}
+    if (source != target)
+    {
+        // std::cout << "The Negotiate Order is valid.\n";
+        return true;
+    };
+    // std::cout << "The Negotiate Order is invalid.\n";
+    return false;
+};
 bool Negotiate::execute()
 {
-    cout << "Execute Negotiate order.";
-    notify(this);
-    return true;
+    if (validate())
+    {
+        //TODO: in ExecuteOrder phase, flush all players' negotiateWith vector with helper method
+        /*
+            Source player and Target player cannot attack each other during a turn
+            
+            Definition of "one turn" : ~one sequence of execution during which every player 
+            executes exactly one order.~ OR a whole execution turn (every player finished executing all orders from their list)
+            
+            When sourcePlayer negotiates with targetPlayer, during this turn (aka one whole OrdersExecution phase),
+            any advance orders of one of these player on the other enemy ARE DROPPED.
+
+            => add this implementation by adding Player * isNegotiating (and other helpers)  to Player class. DONE.
+            => add implementation inside Advance: Check if territory is not owed by advancing player + check if
+            player and enemy are negotiating... DONE.
+            
+            => TODO Remove negotiatees from vector (FLUSH negotiatingWith vector) at the end of turn/OrderExecutionPhase.
+            (logic to implement in GameEngine?? using Player::removeAllNegotiation)
+        */
+        this->getSource()->addNegotiatingWith(this->getTarget());
+        this->getTarget()->addNegotiatingWith(this->getSource());
+
+        notify(this);
+        return true;
+    }
+    return false;
+};
+
+Player *Negotiate::getSource() const { return source; }
+Player *Negotiate::getTarget() const { return target; }
+void Negotiate::setSource(Player *p)
+{
+    source = p;
+    updateDetails();
 }
+void Negotiate::setTarget(Player *p)
+{
+    target = p;
+    updateDetails();
+}
+void Negotiate::updateDetails()
+{
+    string _details = "Player " + source->getName() + " negotiates with " + target->getName();
+    string desc = getCommand() + " = {" + _details + "}";
+    setDetails(desc);
+}
+
+//-----------------------------------------------------------------------
 
 // Implementation of OrderList
 OrderList::OrderList()

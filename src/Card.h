@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <string>
-// #include "Player.h"
 #include "LoggingObserver.h"
 #include "Orders.h"
 
@@ -16,7 +15,7 @@ using namespace std;
 void initializedRand();
 
 // Original declarations from A1
-
+// Rewrite Card not as a derived class of Order for A3
 class Card : virtual public Order
 {
 public:
@@ -34,9 +33,11 @@ public:
     ~Card();
 
     // Methods
-    void play(Player &player, Deck &deck);
+    // A3: play is made virtual
+    virtual void play(Player &player, Deck &deck);
 
     Effect *getEffect();
+
 
     bool validate ();
     bool execute ();
@@ -56,13 +57,19 @@ protected:
 };
 
 
-class CardBomb : virtual public Card {
+// Diamond problem: Order needs to be declared as virtual
+// Need to explicitely call Order constructor 
+// (if using Order parametized constructor in Card, Bomb)
+class CardBomb: public Card {
 private:
 
 public:
     CardBomb(Effect* effect);
     CardBomb(const CardBomb &b);
+    // CardBomb(Player *p, Territory * target);
     ~CardBomb();
+    void play(Player &player, Deck &deck);
+
 
     std::ostream &write(std::ostream &os) const;
 };
@@ -75,6 +82,8 @@ public:
     Reinforcement(const Reinforcement& reinforcement);
     ~Reinforcement();
 
+    void play(Player &player, Deck &deck);
+
     std::ostream &write(std::ostream &os) const;
 };
 
@@ -85,6 +94,8 @@ public:
     CardBlockade(Effect* effect);
     CardBlockade(const CardBlockade& blockade);
     ~CardBlockade();
+
+    void play(Player &player, Deck &deck);
 
     std::ostream &write(std::ostream &os) const;
 };
@@ -97,6 +108,8 @@ public:
     Airlift(const Airlift& airlift);
     ~Airlift();
 
+    void play(Player &player, Deck &deck);
+
     std::ostream &write(std::ostream &os) const;
 };
 
@@ -107,6 +120,8 @@ public:
     Diplomacy(Effect* effect);
     Diplomacy(const Diplomacy& diplomacy);
     ~Diplomacy();
+
+    void play(Player &player, Deck &deck);
 
     std::ostream &write(std::ostream &os) const;
 };

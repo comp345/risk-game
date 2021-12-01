@@ -1,12 +1,9 @@
-#include<iostream>
-#include<string>
+#include <iostream>
+#include <string>
 #include "Card.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include <ctime>
+#include <cstdlib>
+#include "Player.h"
 using namespace std;
 
 // Extra helper functions (Noah)
@@ -14,7 +11,6 @@ void initializedRand() // makes rand() "more" random
 {
     srand(time(NULL));
 }
-
 
 // **************** //
 // Card functions:  //
@@ -24,14 +20,13 @@ Card::Card(Effect value)
     m_effect = new Effect(value);
 }
 
-Card::Card(const Card& other)
+Card::Card(const Card &other)
 {
     m_effect = other.m_effect;
 }
 
 Card::Card()
 {
-
 }
 
 Card::~Card()
@@ -41,17 +36,16 @@ Card::~Card()
 
 // Creates an Order, and adds it to the players list of order
 // Then removes that card from the deck
-void Card::play(Player& player, Deck& deck)
+/** TODO:  A3 Implementation -> card.play called in GameEngine  
+ * - Virtual play method?
+ * */
+void Card::play(Player &player, Deck &deck) 
 {
-    // A1 implementation 
-
-    // player.issueOrder(Order::getOrder());
+     // player.issueOrder(Order::getOrder());
     deck.returnCard(this);
-    // cout << "\n" << m_effect << " was played by " << player.getName() << "\n";
 }
 
-
-Card::Effect* Card::getEffect()
+Card::Effect *Card::getEffect()
 {
     return m_effect;
 }
@@ -67,7 +61,7 @@ bool Card::execute()
     return true;
 }
 
-Card& Card::operator=(const Card& c)
+Card &Card::operator=(const Card &c)
 {
     if (this == &c)
         return *this;
@@ -77,35 +71,35 @@ Card& Card::operator=(const Card& c)
 }
 
 //Main write function responsible for the card class
-std::ostream& Card::write(std::ostream &os) const
+std::ostream &Card::write(std::ostream &os) const
 {
     cout << m_effect;
     return os;
 }
 
-std::ostream& operator<<(std::ostream& lhs, Card::Effect* e)
+std::ostream &operator<<(std::ostream &lhs, Card::Effect *e)
 {
     switch (*e)
     {
-        case Card::Effect::BOMB:
-            return lhs << "Bomb";
-        case Card::Effect::REINFORCEMENT:
-            return lhs << "Reinforcement";
-        case Card::Effect::BLOCKADE:
-            return lhs << "Blockade";
-        case Card::Effect::AIRLIFT:
-            return lhs << "Airlift";
-        case Card::Effect::DIPLOMACY:
-            return lhs << "Diplomacy";
+    case Card::Effect::BOMB:
+        return lhs << "Bomb";
+    case Card::Effect::REINFORCEMENT:
+        return lhs << "Reinforcement";
+    case Card::Effect::BLOCKADE:
+        return lhs << "Blockade";
+    case Card::Effect::AIRLIFT:
+        return lhs << "Airlift";
+    case Card::Effect::DIPLOMACY:
+        return lhs << "Diplomacy";
     }
     return lhs;
 }
-std::ostream& operator<<(std::ostream& lhs, Card* card)
+std::ostream &operator<<(std::ostream &lhs, Card *card)
 {
     return lhs << card->m_effect;
 }
 
-std::ostream& operator<<(std::ostream& lhs, Card& card)
+std::ostream &operator<<(std::ostream &lhs, Card &card)
 {
     return card.write(lhs);
 }
@@ -113,7 +107,7 @@ std::ostream& operator<<(std::ostream& lhs, Card& card)
 // **************** //
 // Bomb functions:  //
 // **************** //
-CardBomb::CardBomb(Card::Effect* effect) : Order("Bomb type", "")
+CardBomb::CardBomb(Card::Effect *effect) : Order("Bomb type", "")
 {
     m_effect = effect;
 }
@@ -126,21 +120,50 @@ CardBomb::CardBomb(const CardBomb &b) : Order("Bomb type", "")
     m_effect = b.m_effect;
 }
 // function which is called when we are printing the name of each card.
-std::ostream& CardBomb::write(std::ostream &os) const
+std::ostream &CardBomb::write(std::ostream &os) const
 {
     cout << m_effect;
     return os;
 }
 
+
+void CardBomb::play(Player &player, Deck &deck)
+{
+    // Get a territory to bomb
+    Territory * targetTerritory = player.getPriorityAttacking().top();
+
+    Bomb * bombOrder = new Bomb(&player, targetTerritory);
+
+    /*Creates a Bomb order
+    */
+
+
+
+   
+
+
+    /* 
+    Should Player::issueOrder() use toAttack and toDefend? No, because then 
+    it would need to manip toAttack and toDefend the same ways for every orders
+    -> inside Card::play(), preprocess using player.toAttack/toDefend and create Bomb order
+    */
+
+    // Player issues Bomb order
+    player.issueOrder(bombOrder);
+
+    // Return card to deck
+    deck.returnCard(this);
+}
+
 // **************** //
 // Reinforcement functions:  //
 // **************** //
-Reinforcement::Reinforcement(Card::Effect* effect) : Order("Reinforcement type", "")
+Reinforcement::Reinforcement(Card::Effect *effect) : Order("Reinforcement type", "")
 {
     m_effect = effect;
 }
 
-Reinforcement::Reinforcement(const Reinforcement& other) : Order("Reinforcement type", "")
+Reinforcement::Reinforcement(const Reinforcement &other) : Order("Reinforcement type", "")
 {
     m_effect = other.m_effect;
 }
@@ -151,21 +174,24 @@ Reinforcement::~Reinforcement()
 }
 
 // function which is called when we are printing the name of each card.
-std::ostream& Reinforcement::write(std::ostream &os) const
+std::ostream &Reinforcement::write(std::ostream &os) const
 {
     cout << m_effect;
     return os;
+}
+void Reinforcement::play(Player &player, Deck &deck)
+{
 }
 
 // **************** //
 // Blockade functions:  //
 // **************** //
-CardBlockade::CardBlockade(Card::Effect* effect) : Order("Blockade type", "")
+CardBlockade::CardBlockade(Card::Effect *effect) : Order("Blockade type", "")
 {
     m_effect = effect;
 }
 
-CardBlockade::CardBlockade(const CardBlockade& other) : Order("Blockade type", "")
+CardBlockade::CardBlockade(const CardBlockade &other) : Order("Blockade type", "")
 {
     m_effect = other.m_effect;
 }
@@ -176,21 +202,24 @@ CardBlockade::~CardBlockade()
 }
 
 // function which is called when we are printing the name of each card.
-std::ostream& CardBlockade::write(std::ostream &os) const
+std::ostream &CardBlockade::write(std::ostream &os) const
 {
     cout << m_effect;
     return os;
+}
+void CardBlockade::play(Player &player, Deck &deck)
+{
 }
 
 // **************** //
 // Airlift functions:  //
 // **************** //
-Airlift::Airlift(Card::Effect* effect) : Order("Airlift type", "")
+Airlift::Airlift(Card::Effect *effect) : Order("Airlift type", "")
 {
     m_effect = effect;
 }
 
-Airlift::Airlift(const Airlift& other) : Order("Airlift type", "")
+Airlift::Airlift(const Airlift &other) : Order("Airlift type", "")
 {
     m_effect = other.m_effect;
 }
@@ -201,21 +230,24 @@ Airlift::~Airlift()
 }
 
 // function which is called when we are printing the name of each card.
-std::ostream& Airlift::write(std::ostream &os) const
+std::ostream &Airlift::write(std::ostream &os) const
 {
     cout << m_effect;
     return os;
+}
+void Airlift::play(Player &player, Deck &deck)
+{
 }
 
 // **************** //
 // Diplomacy functions:  //
 // **************** //
-Diplomacy::Diplomacy(Card::Effect* effect) : Order("Diplomacy type", "")
+Diplomacy::Diplomacy(Card::Effect *effect) : Order("Diplomacy type", "")
 {
     m_effect = effect;
 }
 
-Diplomacy::Diplomacy(const Diplomacy& other) : Order("Diplomacy type", "")
+Diplomacy::Diplomacy(const Diplomacy &other) : Order("Diplomacy type", "")
 {
     m_effect = other.m_effect;
 }
@@ -226,20 +258,23 @@ Diplomacy::~Diplomacy()
 }
 
 // function which is called when we are printing the name of each card.
-std::ostream& Diplomacy::write(std::ostream &os) const
+std::ostream &Diplomacy::write(std::ostream &os) const
 {
     cout << m_effect;
     return os;
 }
 
-
+void Diplomacy::play(Player &player, Deck &deck)
+{
+}
 
 // **************** //
 // Deck functions:  //
 // **************** //
 
-Deck::Deck() {//default
-    m_cards= vector<Card*>();
+Deck::Deck()
+{ //default
+    m_cards = vector<Card *>();
     //srand(time(0));
 }
 
@@ -251,29 +286,29 @@ Deck::Deck(int size)
 //Function responsible for initializing the deck of playing cards to the given size.
 void Deck::initialize(int size)
 {
-    for(int i=0; i < size; i++)
+    for (int i = 0; i < size; i++)
     {
-        int randomNumber = rand() % 5;      //Random number within the type of cards
+        int randomNumber = rand() % 5; //Random number within the type of cards
         // Notes from Noah: randomNumber is not truly random: https://tinyurl.com/8m37ewu3
 
-        Card::Effect* effect = new Card::Effect(static_cast<Card::Effect>(randomNumber));    //Create the card
+        Card::Effect *effect = new Card::Effect(static_cast<Card::Effect>(randomNumber)); //Create the card
         switch (*effect)
         {
-            case Card::Effect::BOMB:
-                m_cards.push_back(new CardBomb(effect));
-                break;
-            case Card::Effect::REINFORCEMENT:
-                m_cards.push_back(new Reinforcement(effect));
-                break;
-            case Card::Effect::BLOCKADE:
-                m_cards.push_back(new CardBlockade(effect));
-                break;
-            case Card::Effect::AIRLIFT:
-                m_cards.push_back(new Airlift(effect));
-                break;
-            case Card::Effect::DIPLOMACY:
-                m_cards.push_back(new Diplomacy(effect));
-                break;
+        case Card::Effect::BOMB:
+            m_cards.push_back(new CardBomb(effect));
+            break;
+        case Card::Effect::REINFORCEMENT:
+            m_cards.push_back(new Reinforcement(effect));
+            break;
+        case Card::Effect::BLOCKADE:
+            m_cards.push_back(new CardBlockade(effect));
+            break;
+        case Card::Effect::AIRLIFT:
+            m_cards.push_back(new Airlift(effect));
+            break;
+        case Card::Effect::DIPLOMACY:
+            m_cards.push_back(new Diplomacy(effect));
+            break;
         }
     }
 
@@ -284,7 +319,8 @@ void Deck::initialize(int size)
     }
 }
 
-Deck::Deck(const Deck& other){
+Deck::Deck(const Deck &other)
+{
     m_cards = other.m_cards;
 }
 
@@ -294,11 +330,11 @@ Deck::~Deck()
 }
 
 // Ensures that when the deck is generated, that there is exactly one of each type of card
-bool Deck::validate(vector<Card*> cards)
+bool Deck::validate(vector<Card *> cards)
 {
     // Create an array with an index for each possible card value
     int sum[5] = {};
-    for(Card* card: cards)
+    for (Card *card : cards)
     {
         // Convert the cards effect enum to an int, then increment the value at that index
         sum[static_cast<int>(*card->getEffect())] += 1;
@@ -306,10 +342,10 @@ bool Deck::validate(vector<Card*> cards)
 
     // Display the amount of each type of card in the deck
     cout << "There is,\n";
-    for(int i = 0; i < 5; i++)
+    for (int i = 0; i < 5; i++)
     {
         cout << sum[i] << " " << new Card(Card::Effect(i)) << " cards\n";
-        if(sum[i] == 0)
+        if (sum[i] == 0)
         {
             cout << "Validation failed.";
             return false;
@@ -325,7 +361,7 @@ void Deck::showDeck()
 {
     int count = 1;
     cout << "\nThe deck currently contains:\n";
-    for(Card* i: m_cards)
+    for (Card *i : m_cards)
     {
         std::cout << count++ << ": " << i << "\n";
     }
@@ -333,12 +369,12 @@ void Deck::showDeck()
 }
 
 //Takes a card from the deck and places it in the players list of cards
-void Deck::draw(Player& player)
+void Deck::draw(Player &player)
 {
     // Fetches the players hand and the card that will be drawn
 
-    Hand* playerHand = player.getHand();
-    Card* toDraw = m_cards.back();
+    Hand *playerHand = player.getHand();
+    Card *toDraw = m_cards.back();
     playerHand->drawCard(toDraw);
 
     cout << "Player: " << player.getName() << " drew a " << toDraw << "\n";
@@ -348,28 +384,29 @@ void Deck::draw(Player& player)
 }
 
 // Returns the given card to the deck.
-void Deck::returnCard(Card* card)
+void Deck::returnCard(Card *card)
 {
     m_cards.insert(m_cards.begin(), card);
 }
-vector<Card*> Deck::getDeckCards() {
+vector<Card *> Deck::getDeckCards()
+{
     return m_cards;
 }
 
-std::ostream& operator<<(std::ostream& lhs, Deck& deck)
+std::ostream &operator<<(std::ostream &lhs, Deck &deck)
 {
     int count = 1;
     cout << "\nThe deck currently contains:\n";
-    for(Card* i: deck.m_cards)
+    for (Card *i : deck.m_cards)
     {
         std::cout << count++ << ": " << i << "\n";
     }
     return lhs;
 }
 
-Deck& Deck::operator=(const Deck& rhs)
+Deck &Deck::operator=(const Deck &rhs)
 {
-    if(this == &rhs)
+    if (this == &rhs)
         return *this;
 
     m_cards = rhs.m_cards;
@@ -382,29 +419,30 @@ Deck& Deck::operator=(const Deck& rhs)
 Hand::Hand()
 {
 }
-Hand::Hand(Deck* hDeck) {
-    m_cards=hDeck->getDeckCards();
+Hand::Hand(Deck *hDeck)
+{
+    m_cards = hDeck->getDeckCards();
 }
 
-Hand::Hand(const Hand& other)
+Hand::Hand(const Hand &other)
 {
     m_cards = other.m_cards;
 }
 
 Hand::~Hand()
 {
-    for (auto p : m_cards) delete p;
+    for (auto p : m_cards)
+        delete p;
     m_cards.clear();
 }
 
-
-std::vector<Card*> Hand::getCards()
+std::vector<Card *> Hand::getCards()
 {
     return m_cards;
 }
 
 // Adds a card to the players hand
-void Hand::drawCard(Card* card)
+void Hand::drawCard(Card *card)
 {
     m_cards.push_back(card);
 }
@@ -412,35 +450,33 @@ void Hand::drawCard(Card* card)
 // Prints out all the cards in a given players hand
 void Hand::showCards()
 {
-    for(Card* c: m_cards)
+    for (Card *c : m_cards)
     {
         std::cout << c << "\n";
     }
-
 }
 
 //Gets the last cast in the users hand and plays that one.
-Card* Hand::useLast()
+Card *Hand::useLast()
 {
-    Card* toUse = m_cards.back();
+    Card *toUse = m_cards.back();
     m_cards.pop_back();
     return toUse;
 }
 // Note from Noah TODO: Add a way to use any card from hand, not just the last one
 
-
-std::ostream& operator<<(std::ostream& lhs, Hand& hand)
+std::ostream &operator<<(std::ostream &lhs, Hand &hand)
 {
-    for(Card* i: hand.getCards())
+    for (Card *i : hand.getCards())
     {
         std::cout << i << " card\n";
     }
     return lhs;
 }
 
-Hand& Hand::operator=(const Hand& rhs)
+Hand &Hand::operator=(const Hand &rhs)
 {
-    if(this == &rhs)
+    if (this == &rhs)
         return *this;
 
     m_cards = rhs.m_cards;
