@@ -3,8 +3,8 @@
 
 using namespace std;
 
-// int main(int, char **)
-// {
-//     GameEngine *engine= new GameEngine();
-//     engine->preStartup();
-// }
+int main(int, char **)
+{
+    GameEngine *engine= new GameEngine();
+    engine->preStartup();
+}

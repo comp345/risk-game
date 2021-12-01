@@ -31,36 +31,36 @@ std::vector<std::string> checkCliArgs(int argNumber,char *argv[])
     return args;
 }
 
-int main(int argc, char *argv[], char **)
-{
-    vector<std::string> args = checkCliArgs(argc, argv);
+// int main(int argc, char *argv[], char **)
+// {
+//     vector<std::string> args = checkCliArgs(argc, argv);
 
-    //args[0] contains maps
-    //args[1] contains player strats
-    //args[2] contains game number
-    //args[3] contains max turns
-    for(int i =0; i < args.size();i++)
-    {
-        cout << "This is what my array contains" << args[i] << endl;
-    }
-    if(args[0].empty())
-    {
-        GameEngine engine;
-        engine.testGameEngine();
-        //engine->preStartup(); //Replace with this eventually
-    }
-    else if(args[args.size()-1].find(".txt") != string::npos){
-        //
-        cout << "file mode" << endl;
-        GameEngine engine{args[args.size()-1]}; //Dunno how to handle yet. Can pass all to gameengine and it splits 
-                                    // Or we create 4 constructors for each case. Empty/file/tourna/tourna + file 
-        engine.testGameEngine();
-        //engine->preStartup(); //Replace with this eventually
-    }
-    else
-    {
-        GameEngine engine{args[0]};
-        engine.testGameEngine();
-        //engine->preStartup(); //Replace with this eventually
-    }
-}
+//     //args[0] contains maps
+//     //args[1] contains player strats
+//     //args[2] contains game number
+//     //args[3] contains max turns
+//     for(int i =0; i < args.size();i++)
+//     {
+//         cout << "This is what my array contains" << args[i] << endl;
+//     }
+//     if(args[0].empty())
+//     {
+//         GameEngine engine;
+//         engine.testGameEngine();
+//         //engine->preStartup(); //Replace with this eventually
+//     }
+//     else if(args[args.size()-1].find(".txt") != string::npos){
+//         //
+//         cout << "file mode" << endl;
+//         GameEngine engine{args[args.size()-1]}; //Dunno how to handle yet. Can pass all to gameengine and it splits 
+//                                     // Or we create 4 constructors for each case. Empty/file/tourna/tourna + file 
+//         engine.testGameEngine();
+//         //engine->preStartup(); //Replace with this eventually
+//     }
+//     else
+//     {
+//         GameEngine engine{args[0]};
+//         engine.testGameEngine();
+//         //engine->preStartup(); //Replace with this eventually
+//     }
+// }
