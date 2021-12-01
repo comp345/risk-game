@@ -41,65 +41,6 @@ ostream &operator<<(ostream &out, const Order &o)
 }
 istream &operator>>(istream &in, Order &o)
 {
-    // Make user enter every data member of the Order
-    cout << "Enter the command type for this new Order.\n";
-
-    bool invalidOrderType = true;
-    while (invalidOrderType)
-    {
-        cout << "Chose a valid command type between advance, airlift, bomb, blockade, deploy, or negotiate (lowercase) :\n";
-        string userChosenOrder;
-        in >> userChosenOrder;
-        if (userChosenOrder.compare("advance") == 0)
-        {
-            o.command = "Advance type";
-            invalidOrderType = false;
-            // Below: note for future implementation
-            // string command = "Advance type";
-            // cout << "Enter details: ";
-            // string details;
-            // cin >> details;
-            // o = Advance(command, details);
-            // invalidOrderType = false;
-        }
-        else if (userChosenOrder.compare("airlift") == 0)
-        {
-            o.command = "AirLift type";
-            invalidOrderType = false;
-        }
-        else if (userChosenOrder.compare("bomb") == 0)
-        {
-            o.command = "Bomb type";
-            invalidOrderType = false;
-        }
-        else if (userChosenOrder.compare("deploy") == 0)
-        {
-            o.command = "Deploy type";
-            invalidOrderType = false;
-        }
-        else if (userChosenOrder.compare("blockade") == 0)
-        {
-            o.command = "Blockade type";
-            invalidOrderType = false;
-        }
-        else if (userChosenOrder.compare("negotiate") == 0)
-        {
-            o.command = "Negotiate type";
-            invalidOrderType = false;
-        }
-        else
-        {
-            // continue loop until valid order type (command) entered
-        }
-    }
-
-    cout << "Details: \n";
-    in >> o.details;
-
-    // ... Add future data member
-    // in >> o.player
-    // in >> o.territory
-
     return in;
 }
 Order *Order::getOrder()
@@ -629,7 +570,8 @@ Blockade &Blockade::operator=(const Blockade &b)
 
 void Blockade::updateDetails()
 {
-    string _details = "Player " + player->getName() + " blockades " + target->getName() + ", owned by " + target->getOwner()->getName();
+    string _details = "Player " + player->getName() + " blockades " + target->getName() + ", owned by " + target->getOwner()->getName()
+    + ". Territory ownership is passed to the neutral player " + neutral->getName();
     string desc = getCommand() + " = {" + _details + "}";
     setDetails(desc);
 }
