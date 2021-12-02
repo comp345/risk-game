@@ -86,18 +86,20 @@ public:
 class GameEngine : public ILoggable, public Subject
 {
     friend class State;
-
     friend class Transition;
 
 private:
-    int numberOfPlayers;
+    
     State *currentState;
     bool validTransition;
     std::vector<State *> states;           // GameEngine maintains collection of all states
     std::vector<Transition *> transitions; // GameEngine maintains collection of all valid commands/transitions
     CommandProcessor *commandProcessor;
     std::vector<std::string> listOfFile;
-    std::vector<Player *> plVec;
+
+    Deck *deck;
+    vector<Player *> currentPlayers;
+    int numberOfPlayers; // for the randomizer
     Map *map;
 
 public:
@@ -107,7 +109,7 @@ public:
 
     ~GameEngine();
 
-    GameEngine& operator=(const GameEngine& e);
+    GameEngine &operator=(const GameEngine &e);
 
     // return name of current state
     std::string getCurrentStateName();
@@ -128,18 +130,17 @@ public:
     void testPart3();
     string stringToLog() override;
 
-    /* A2 */
+    
 
-    // A2 Part 2
-    int getNumOfPlayers();
-
-    vector<Player *> getPlayersVect();
-
+    void randomizePlayersTurn();
+    int getNumOfPlayers(); // used to randomize players turns
     void setNumOfPlayers(int plNumb);
 
-    void getMapList();
+    vector<Player *> &getPlayers();
 
-    void randPlVec();
+    
+
+    void getMapList();
 
     void preStartup();
 
@@ -147,24 +148,17 @@ public:
 
     void setMap(Map *m);
 
-    //Alexanders additions:
+    Deck *getDeck();
+
+    // Alexanders additions:
     void mainGameLoop();
     void reinforcementPhase(Player *p);
     void issueOrdersPhase();
     void executeOrdersPhase();
 
-    // createOrderFromCard to be deleted 
-    // Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget);
-
-    // Noah: Data members should be private and only accessed with public methods
-    vector<Player *> currentPlayers;
-    Deck *deck;
     bool allPlayersDone();
     Player *hasWinner();
     void auditPlayers();
-
-    // Noah additions for refacting A2 part 3
-    void refactoring_mainGameLoop();
 
     void enterTournamentMode(Command *pCommand);
 

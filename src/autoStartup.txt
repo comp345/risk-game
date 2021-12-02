@@ -1,0 +1,8 @@
+loadmap europe.map
+validatemap
+addplayer noah
+addplayer alexander
+y
+addplayer laila
+n
+gamestart
