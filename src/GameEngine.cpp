@@ -110,6 +110,7 @@ GameEngine::GameEngine(std::string newFile)
     currentPlayers = vector<Player *>();
     initializedRand(); // randomize deck
     deck = new Deck(30);
+    map = new Map();
     validTransition = false;
     if (newFile.empty())
     {
@@ -119,6 +120,11 @@ GameEngine::GameEngine(std::string newFile)
     {
         commandProcessor = new FileCommandProcessorAdapter(newFile);
     }
+
+    /* New additions */
+    vector<Player *> eliminatedPlayers = vector<Player*>(); 
+    // we cannot delete players or remove them from currentPlayers
+    // we can only delete them at the end of a game, when gameengine destructor is called
 }
 
 void GameEngine::initStates()
@@ -207,11 +213,30 @@ GameEngine::GameEngine(const GameEngine &e)
     commandProcessor = new CommandProcessor(*e.commandProcessor);
     listOfFile = vector<string>(e.listOfFile);
     currentPlayers = vector<Player *>(e.currentPlayers);
+    vector<Player *> eliminatedPlayers = vector<Player *>(e.eliminatedPlayers);
+    map = new Map(*e.map);
 }
 
 /* TODO */
+// Destructor gives malloc error
 GameEngine::~GameEngine()
 {
+    // deallocate states and transitions
+    for (auto state : states) { delete state; } 
+    states.clear();
+    for (auto transition : transitions) { delete transition; }
+    transitions.clear();
+
+    // deallocate other vectors
+    for (auto p : currentPlayers) {delete p; }
+    currentPlayers.clear(); 
+    for (auto p : eliminatedPlayers) { delete p; }
+    eliminatedPlayers.clear();
+    delete deck;
+    delete commandProcessor;
+    delete map;
+    
+
 }
 
 GameEngine &GameEngine::operator=(const GameEngine &e)
@@ -334,6 +359,14 @@ void GameEngine::randomizePlayersTurn()
 vector<Player *> &GameEngine::getPlayers()
 {
     return currentPlayers;
+}
+vector<Player *> &GameEngine::getEliminatedPlayers()
+{
+    return eliminatedPlayers;
+}
+void GameEngine::addOneEliminatedPlayer(Player * p)
+{
+    eliminatedPlayers.push_back(p);
 }
 
 void GameEngine::getMapList()
@@ -503,6 +536,7 @@ StartupPhase::StartupPhase(const StartupPhase &sp)
 StartupPhase::~StartupPhase()
 {
     // TODO: missing destructor
+    // delete eng;
 }
 
 void StartupPhase::operator=(const StartupPhase &sp)
@@ -627,8 +661,11 @@ void GameEngine::auditPlayers()
 
             currentPlayers.erase(remove(currentPlayers.begin(), currentPlayers.end(), p));
 
-            delete p;
-            p = NULL;
+            // delete p;
+            // p = NULL;
+
+            // add to eliminated players vector
+            addOneEliminatedPlayer(p);
         }
     }
 }
@@ -659,7 +696,7 @@ void GameEngine::reinforcementPhase(Player *p)
     int numConqueredTerritories = p->getTerritorySize() - p->getPrevTerritorySize();
     cout << "reached here -1" << endl;
     if (numConqueredTerritories > 0)
-        // deck->draw(*p);
+        // deck->draw(*p); // Segmentation fault: to investigate
     cout << "reached here 0" << endl;
 
     // update prevTerritorySize
@@ -1078,6 +1115,8 @@ void riskGameDriver()
         {
             cout << "There is a bug... program should end or trigger the startUp, or there is no winner" << endl;
         }
+        
+        // delete engine; // todo: GameEngine destructor ? gives malloc error...
     }
 
     cout << "Debug: Exiting the program. Thanks for playing!" << endl;

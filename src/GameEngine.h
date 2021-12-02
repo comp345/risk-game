@@ -102,6 +102,9 @@ private:
     int numberOfPlayers; // for the randomizer
     Map *map;
 
+    /* NEW */
+    vector<Player *> eliminatedPlayers; // keep tracks of players who lost (0 territory)
+
 public:
     GameEngine(std::string newFile = "");
 
@@ -137,6 +140,8 @@ public:
     void setNumOfPlayers(int plNumb);
 
     vector<Player *> &getPlayers();
+    vector<Player *> &getEliminatedPlayers();
+    void addOneEliminatedPlayer(Player * p);
 
     
 
