@@ -615,7 +615,7 @@ bool Blockade::execute()
 
         //removing the target from player territory list
         // REVIEW THIS 
-        // CAREFUL: playerTerr is a COPY of player.territories, careful when trying to modify p.t with playerTerr
+        // CAREFUL: isn't playerTerr a reference?
         vector<Territory *> playerTerr = player->getTerritories();
         for (vector<Territory *>::iterator it = playerTerr.begin(); it != playerTerr.end(); ++it)
         {
