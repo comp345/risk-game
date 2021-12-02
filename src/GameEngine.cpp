@@ -22,7 +22,7 @@ using namespace std;
 /* ***************************** */
 bool debuggingMode = true; // Setting the value to true will run the program with debug messages
 
-section debugsection = section::all;
+section debugsection = section::mainGameLoop;
 
 // Noah: debugger that only prints debugging message when debugging mode is true
 void dprint(string message, section option)
