@@ -438,7 +438,7 @@ void GameEngine::preStartup() {
         p->setPlName(cmdPlName);
         p->setReinforcementPool(5);
         cout << *p << "Number of Armies: " << p->getReinforcementPool() << endl;
-        cout << "Cards in players hand: " << p->getHand() << endl;
+        cout << "Cards in players hand: " << p->getHand() << endl; //TODO: prints address
         plVec.push_back(p);
 
         cout << "total number of players so far is: " << getNumOfPlayers() << endl;
@@ -455,6 +455,8 @@ void GameEngine::preStartup() {
             } else {
                 break;
             }
+        } else {
+            break;
         }
     }
     do {

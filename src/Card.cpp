@@ -469,7 +469,7 @@ std::ostream &operator<<(std::ostream &lhs, Hand &hand)
 {
     for (Card *i : hand.getCards())
     {
-        std::cout << i << " card\n";
+        std::cout << *i << " card\n";
     }
     return lhs;
 }

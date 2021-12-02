@@ -254,10 +254,12 @@ vector<string> FileCommandProcessorAdapter::readCommand(State*& currentState)
 {
     vector<string> splitCommand;
     string temp, commandName;
-//    if (listOfCommands.empty()) {
-//        return "";
-//    }
-    string command = listOfCommands.at(0);
+    string command;
+    try {
+        command = listOfCommands.at(0);
+    } catch (exception& e) {
+        cout << "No more commands to read" << endl;
+    }
     listOfCommands.erase(listOfCommands.begin());
 
     for (int i = 0; i < command.length(); ++i) {
