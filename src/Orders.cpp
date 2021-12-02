@@ -377,9 +377,25 @@ bool Advance::simulateAttack()
     {
         // set target armies number as remaining attacking armies
         territoryTarget->setNumberOfArmies(this->getArmies());
+
+        // !! Remove ownership of the previous player (remove from enemy's territory list)
+        int count = 0;
+        vector<Territory *>& enemyTerr = territoryTarget->getOwner()->getTerritories();
+        for (vector<Territory *>::iterator it = enemyTerr.begin(); it != enemyTerr.end(); ++it)
+        {
+            if (*it == getTerritoryTarget())
+            {
+                break;
+            }
+            ++count;
+        }
+        enemyTerr.erase(enemyTerr.begin() + count);
+
         // change ownership of territory and add territory to player::territories
         territoryTarget->setOwner(this->getPlayer());
         this->getPlayer()->addTerritory(territoryTarget);
+
+        cout << "Successful attack: Territory " << territoryTarget->getName() << " is won by " << playerAdvancing->getName() << endl; 
     }
 
     updateDetails(); // Advance order is modified
@@ -598,6 +614,8 @@ bool Blockade::execute()
         int count = 0;
 
         //removing the target from player territory list
+        // REVIEW THIS 
+        // CAREFUL: playerTerr is a COPY of player.territories, careful when trying to modify p.t with playerTerr
         vector<Territory *> playerTerr = player->getTerritories();
         for (vector<Territory *>::iterator it = playerTerr.begin(); it != playerTerr.end(); ++it)
         {

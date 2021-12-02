@@ -316,7 +316,7 @@ Hand *Player::getHand()
     return hand;
 }
 
-vector<Territory *> Player::getTerritories()
+vector<Territory *>& Player::getTerritories()
 {
     return territories;
 }

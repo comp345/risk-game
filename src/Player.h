@@ -48,7 +48,7 @@ public:
     void printOrders();
 
     // Getters
-    vector<Territory *> getTerritories();
+    vector<Territory *>& getTerritories();
 
     string getName();
 

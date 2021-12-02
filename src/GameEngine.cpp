@@ -519,7 +519,7 @@ void StartupPhase::startup() {
     //giving armies to players:
     cout << "Starting Army distribution for players: \n" << endl;
     for (int i = 0; i < eng->getNumOfPlayers(); i++) {
-        players[i]->setReinforcementPool(50);
+        players[i]->setReinforcementPool(5);
     }
     cout << "Players have received 50 army each! \n" << endl;
     for (Player *p: players) {
@@ -1024,9 +1024,10 @@ void GameEngine::mainGameLoop()
 
     bool noWinner = true;
     // Keeping track of turns for tournament mode
-    int maximumNumberOfTurns = 5;
+    int maximumNumberOfTurns = 50;
     int numOfTurns = 0;
-    while (noWinner && (numOfTurns < maximumNumberOfTurns))
+    // while (noWinner && (numOfTurns < maximumNumberOfTurns))
+    while (noWinner)
     {
 
         /* ****************************** */
@@ -1057,6 +1058,11 @@ void GameEngine::mainGameLoop()
             executeOrdersPhase();
             // cout << "reached outside execution order" << endl;
         }
+
+        // Debug: Press any key to start next turn
+        char stop;
+        cout << "====== press any key to continue ===== " << endl;
+        cin >> stop;
 
         Player *winner = hasWinner();
 
