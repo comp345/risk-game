@@ -446,7 +446,7 @@ void GameEngine::preStartup() {
             cout << "have 1 player so far" << endl;
             continue;
         }
-        if (getNumOfPlayers() < 7) {
+        if (getNumOfPlayers() < 7 && commandProcessor->fileName.empty()) {
             cout << "continue adding players? (y/n)" << endl;
             string keyInY;
             getline(cin, keyInY);

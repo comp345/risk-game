@@ -86,7 +86,7 @@ void Command::saveEffect(string command)
     }
     else if (command == "gamestart")
     {
-        commandEffect = "Game Engine Started!";
+        commandEffect = "Game started!";
         cout << "The effect - " << commandEffect << std::endl;
 
     }
@@ -176,8 +176,8 @@ vector<string> CommandProcessor::readCommand(State*& currentState)
     vector<string> cmdInput;
     string keyIn, temp, commandName;
 
-    cout << "Enter a valid command to progress in the game."
-         << "(Enter x to quit or press any key when at final State)" << endl;
+    cout << "Enter a valid command."
+         << " (Enter x to quit)" << endl;
 
     getline(cin, keyIn);
     for (int i = 0; i < keyIn.length(); ++i) {
@@ -243,6 +243,7 @@ void CommandProcessor::printCommands()
 //Adapter to handle reading from file. Takes a new file input and creates reader obj
 FileCommandProcessorAdapter::FileCommandProcessorAdapter(std::string newFile)
 {
+    this->fileName = newFile;
     reader = new FileLineReader();
     //reads commands from file and saves it to listOfCommands
     listOfCommands = reader->readLineFromFile(newFile);
@@ -253,6 +254,9 @@ vector<string> FileCommandProcessorAdapter::readCommand(State*& currentState)
 {
     vector<string> splitCommand;
     string temp, commandName;
+//    if (listOfCommands.empty()) {
+//        return "";
+//    }
     string command = listOfCommands.at(0);
     listOfCommands.erase(listOfCommands.begin());
 

@@ -399,7 +399,7 @@ std::ostream &operator<<(std::ostream &lhs, Deck &deck)
     cout << "\nThe deck currently contains:\n";
     for (Card *i : deck.m_cards)
     {
-        std::cout << count++ << ": " << i << "\n";
+        std::cout << count++ << ": " << *i << "\n";
     }
     return lhs;
 }
