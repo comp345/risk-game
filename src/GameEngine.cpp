@@ -551,7 +551,7 @@ void StartupPhase::startup() {
                 {
                     vector<Territory *> territories;
                     territories.push_back(map->territoryNodeList.back());
-                    p->setTerritories(territories);
+                    p->addTerritories(territories);
                     map->territoryNodeList.pop_back();
                     for (Territory *t: territories) {
                         t->setOwner(p);
@@ -1233,11 +1233,15 @@ void GameEngine::enterTournamentMode(Command *command) {
         exit(0);
     }
 
+    //TODO: create player types + load the maps, add it to the gameEngine players and maps
     for (int i = 0; i < numOfGames; i++) {
-        StartupPhase sp;
-        sp.setGameEng(this);
-        sp.startup();
-        mainGameLoop();
+        for (int j = 0; j < mapFileNames.size(); j++) {
+            //TODO: load map here
+            StartupPhase sp;
+            sp.setGameEng(this);
+            sp.startup();
+            mainGameLoop();
+        }
     }
     exit(0);
 }

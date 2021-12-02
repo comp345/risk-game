@@ -1,5 +1,1 @@
-loadmap france.map
-validatemap 
-addplayer laila
-addplayer noah
-gamestart
+tournament -M france.map Hawaii.map -P Neutral -G 4 -D 3
