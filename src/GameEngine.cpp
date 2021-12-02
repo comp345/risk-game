@@ -203,7 +203,7 @@ GameEngine::GameEngine(const GameEngine &e)
     transitions = vector<Transition *>(e.transitions);
     commandProcessor = new CommandProcessor(*e.commandProcessor);
     listOfFile = vector<string>(e.listOfFile);
-    plVec = vector<Player *>(e.plVec);
+    currentPlayers = vector<Player *>(e.currentPlayers);
 }
 
 /* TODO */
@@ -244,14 +244,14 @@ GameEngine &GameEngine::operator=(const GameEngine &e)
     }
     transitions.clear();
     transitions = vector<Transition *>(e.transitions);
-    for (vector<Player *>::iterator it = plVec.begin(); it != plVec.end(); ++it)
+    for (vector<Player *>::iterator it = currentPlayers.begin(); it != currentPlayers.end(); ++it)
     {
         Player *a = *it;
         delete a;
         a = NULL;
     }
-    plVec.clear();
-    plVec = vector<Player *>(e.plVec);
+    currentPlayers.clear();
+    currentPlayers = vector<Player *>(e.currentPlayers);
 
     return *this;
 }
@@ -321,16 +321,16 @@ void GameEngine::setNumOfPlayers(int plNumb)
     numberOfPlayers = plNumb;
 }
 
-void GameEngine::randPlVec()
+void GameEngine::randomizePlayersTurn()
 { //for randomizing players order of appearance on gamestart
-    shuffle(begin(plVec), end(plVec), default_random_engine{});
+    shuffle(begin(currentPlayers), end(currentPlayers), default_random_engine{});
     cout << "players shuffled...\n"
          << endl;
 }
 
-vector<Player *> GameEngine::getPlayersVect()
+vector<Player *>& GameEngine::getPlayers()
 {
-    return plVec; //returns the vector containing player objects
+    return currentPlayers;
 }
 
 void GameEngine::getMapList()
@@ -351,6 +351,11 @@ void GameEngine::getMapList()
 void GameEngine::setMap(Map *m)
 {
     map = m;
+}
+
+Deck * GameEngine::getDeck()
+{
+    return deck;
 }
 
 /* ****************************************************************** */
@@ -439,7 +444,7 @@ void GameEngine::preStartup() {
         p->setReinforcementPool(5);
         cout << *p << "Number of Armies: " << p->getReinforcementPool() << endl;
         cout << "Cards in players hand: " << p->getHand() << endl; //TODO: prints address
-        plVec.push_back(p);
+        currentPlayers.push_back(p);
 
         cout << "total number of players so far is: " << getNumOfPlayers() << endl;
         if (getNumOfPlayers() == 1) {
@@ -505,9 +510,9 @@ void StartupPhase::setGameEng(GameEngine *en)
 
 void StartupPhase::startup() {
     //randomizing players order
-    vector<Player *> players = eng->getPlayersVect();
+    vector<Player *>& players = eng->getPlayers();
     cout << "Randomize player order: \n" << endl;
-    eng->randPlVec();
+    eng->randomizePlayersTurn();
     cout << "Current order of players after randomize: \n" << endl;
     for (Player *p: players) {
         cout << *p << "----" << endl;
@@ -527,7 +532,7 @@ void StartupPhase::startup() {
     for (Player *p: players) {
         Hand *h = new Hand();
         p->setCards(h);
-        Deck* deck = eng->deck;
+        Deck* deck = eng->getDeck();
         for (int i = 0; i <= 2; i++) {
             deck->draw(*p);
         }
@@ -544,23 +549,23 @@ void StartupPhase::startup() {
 
         while (!map->territoryNodeList.empty())
         {
-            vector<Player *> players = eng->getPlayersVect();
+            vector<Player *>& players = eng->getPlayers();
             for (Player *p : players)
             {
                 if (!map->territoryNodeList.empty())
                 {
                     vector<Territory *> territories;
                     territories.push_back(map->territoryNodeList.back());
-                    p->setTerritories(territories);
+                    p->addTerritories(territories);
                     map->territoryNodeList.pop_back();
-                    for (Territory *t: territories) {
+                    for (Territory *t: territories) { // Bug: only one territory is assigned to each player...
                         t->setOwner(p);
                     }
                 }
             }
         }
         //for displaying players with acquired territories
-        for (Player *p : eng->getPlayersVect())
+        for (Player *p : eng->getPlayers()) // getPlayers() returns a vector&
         {
             cout << *p << endl;
         }
@@ -862,18 +867,28 @@ void GameEngine::issueOrdersPhase()
     // Updating each players' toAttack and toDefend queues
     for (Player *p : currentPlayers)
     {
-        // set the isDone flag to false
+        // set isDone flag to false
         p->setDoneIssuing(false);
-        // territories are to be attacked in priority
+
+        // set isDoneDeploying flag to false
+        p->setDoneDeploying(false);
+
+        // Debugging: why no Advance Orders are created
+        cout << endl << "= Start of issueOrderPhase : player " << p->getName() << "'s toAttack = ";
         for (Territory *toAttack : p->toAttack())
         {
             p->addToPriorityAttack(toAttack);
+            cout << toAttack->getName() << ", ";
         }
-        // Defend
+
+        //Debugging
+        cout << endl << "= Start of issueOrderPhase : player " << p->getName() << "'s toDefend = ";
         for (Territory *toDefend : p->toDefend())
         {
             p->addToPriorityDefend(toDefend);
+            cout << toDefend->getName() << ", ";
         }
+        cout << endl << endl;
     }
     while (!allPlayersDone())
     {
@@ -882,7 +897,7 @@ void GameEngine::issueOrdersPhase()
             cout << "\nGameEngine:: Player: " << currentPlayers.at(i)->getName() << " is currently in the issue order phase.\n";
 
             // Free function to implement as Player::issueOrder
-            playerIssueOrder(deck, currentPlayers.at(i));
+            playerIssueOrder(this->deck, currentPlayers.at(i));
         }
     }
 }
@@ -967,116 +982,6 @@ void GameEngine::executeOrdersPhase() {
 /*                                                   Main Game Loop : Driver 
 /* ***************************************************************************************************************************** */
 
-void fakeStartup(GameEngine *engine)
-{
-    cout << "Welcome to WarZone!" << endl;
-    cout << "Current State: " << engine->getCurrentStateName() << endl;
-
-    /** Stand-in Startup Phase (Automatic) 
-     * */
-    // loadmap (now in mapvalidated state)
-    engine->doTransition("loadmap");
-    cout << "________ Command LOADMAP ________" << endl;
-    MapLoader *mapLoader = new MapLoader();
-    Map x5 = *mapLoader->loadMap("../maps/france.map");
-    Map *map5 = new Map(x5);
-
-    // validatemap (now in state)
-    engine->doTransition("validatemap");
-    cout << "_________ Command VALIDATEMAP _________" << endl;
-    map5->validate();
-    engine->setMap(map5);
-
-    // addplayer (now in state playersadded)
-    engine->doTransition("addplayer");
-    cout << "_________ Command ADDPLAYER _________" << endl;
-    {
-        /* Hard coded creating Player 1 */
-        Player *p = new Player("Alexander");
-        p->setReinforcementPool(0);
-
-        //Get the latest continent from the maps
-        Continent *mapsContinent = engine->getMap()->continentList.at(0);
-        vector<Territory *> p1Territories;
-        for (Territory *t : mapsContinent->territories)
-        {
-            p1Territories.push_back(t);
-        }
-        p->setTerritories(p1Territories);
-
-        //Show what we created
-        cout << "\n\n"
-             << p->getName() << " was created!\n";
-
-        for (Territory *t : p->getTerritories())
-        {
-            cout << t->getName() << "\n";
-            t->setNumberOfArmies(2);
-            t->setOwner(p);
-        }
-
-        p->getTerritories().front()->setNumberOfArmies(4); //Offset to see if soarting is working.
-        engine->currentPlayers.push_back(p);
-        cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
-
-        /* Hard coded creating Player 2 */
-        Player *p2 = new Player("Andrew");
-        p2->setReinforcementPool(0);
-
-        mapsContinent = engine->getMap()->continentList.at(1);
-        vector<Territory *> p2Territories;
-        for (Territory *t : mapsContinent->territories)
-        {
-            p2Territories.push_back(t);
-        }
-        p2->setTerritories(p2Territories);
-
-        cout << "\n\n"
-             << p2->getName() << " was created! \n";
-        for (Territory *t : p2->getTerritories())
-        {
-            cout << t->getName() << "\n";
-            t->setNumberOfArmies(5);
-            t->setOwner(p2);
-        }
-        cout << endl;
-        for (auto t : p2->getTerritories())
-        {
-            cout << " DEBUGGING Player::getTerritories => " << t->getName() << endl;
-        }
-        cout << endl;
-
-        engine->currentPlayers.push_back(p2);
-        cout << "For this continent there are " << mapsContinent->numOfTerritories << " number of territories and " << mapsContinent->controlBonus << " Control bonus.";
-
-        //Empty player
-        Player *p3 = new Player("noob");
-        p3->setReinforcementPool(0);
-        vector<Territory *> p3Territories = vector<Territory *>();
-        p3->setTerritories(p3Territories);
-        cout << "\nNumber of territories: " << p3->getTerritories().size() << "\n";
-        engine->currentPlayers.push_back(p3);
-    }
-
-    engine->auditPlayers(); // remove players with zero territories
-
-    // Drawing some extra cards
-    for (auto p : engine->currentPlayers)
-    {
-        // cout << *p << endl;
-        engine->deck->draw(*p);
-        engine->deck->draw(*p);
-        engine->deck->draw(*p);
-        engine->deck->draw(*p);
-        engine->deck->draw(*p);
-    }
-
-    // Note: this while loop keeps request input from the console
-    // Stand-in CommandProcessor
-    // MainGameLoop transitions between phases using user input (not automatic)
-
-    engine->doTransition("gamestart");
-}
 
 // Rewriting the mainLoop test as a free function
 void riskGameDriver()
@@ -1087,8 +992,8 @@ void riskGameDriver()
     {
         GameEngine *engine = new GameEngine(); // need to re-instantiate engine after each game (else, segmentation fault error... badly defined GameEngine Constructors?)
 
-        cout << "Debug: Entering fakeStartup phase" << endl;
-        fakeStartup(engine);
+        cout << "Debug: Entering StartUp phase" << endl;
+        engine->preStartup();
 
         cout << "Debug: Entering mainGamePlay phase" << endl;
         engine->mainGameLoop();

@@ -134,7 +134,6 @@ private:
 
     bool doneDeploying;
     bool doneIssuing;
-    // int plArmies; // Redundant data member -> reinforcementPool
 
     // implementation of Negotiate order
     vector<Player *> negotiatingWith;

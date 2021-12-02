@@ -49,11 +49,12 @@ public:
     friend std::istream &operator>>(std::istream &in, const Territory &t); //overloaded stream extraction operator
 
     bool operator<(const Territory& rhs);
-int numArmies = 0;
+    int numArmies = 0; // do not make private
 private:
     int ID;
     string name;
     Player* owner;
+    
     
     // int neighbors = 0;
     vector<Territory*> neighbors;
