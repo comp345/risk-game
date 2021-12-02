@@ -79,7 +79,7 @@ Territory &Territory::operator=(const Territory &t)
 std::ostream &operator<<(std::ostream &out, const Territory &t)
 {
     out << "\tTerritory Name: " << t.name;
-    out << "\tTerritory Number of Armies: " << t.numArmies;
+    out << "\t\tTerritory Number of Armies: " << t.numArmies;
     return out;
 }
 

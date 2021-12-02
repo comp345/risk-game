@@ -21,16 +21,8 @@ using namespace std;
 /*        Custom debugger        */
 /* ***************************** */
 bool debuggingMode = true; // Setting the value to true will run the program with debug messages
-enum section
-{
-    all,
-    mainGameLoop,
-    reinforcement,
-    issueorder,
-    execorder,
-    issueOrderFromPlayer
-};
-section debugsection = section::mainGameLoop;
+
+section debugsection = section::all;
 
 // Noah: debugger that only prints debugging message when debugging mode is true
 void dprint(string message, section option)
@@ -749,30 +741,24 @@ void GameEngine::reinforcementPhase(Player *p)
     /* ******************* */
     /*      Card Bonus     */
     /* ******************* */
-    dprint("reached here -2", section::reinforcement);
 
     // Check if player won territories in the last round. If yes, draw one card max
     int numConqueredTerritories = p->getTerritorySize() - p->getPrevTerritorySize();
-    dprint("reached here -1", section::reinforcement);
     if (numConqueredTerritories > 0)
         // deck->draw(*p); // Segmentation fault: to investigate
-        dprint("reached here 0", section::reinforcement);
 
     // update prevTerritorySize
     p->setPrevTerritorySize();
-    dprint("reached here 1", section::reinforcement);
 
     /* ************************* */
     /*      Continent Bonus      */
     /* ************************* */
     // Get players number of territories
     int numberOfArmies = floor(p->getTerritorySize() / 3);
-    dprint("reached here 2", section::reinforcement);
 
     // Find if the player owns all the territories of an entire contenent:
     int controlBonus = 0;
     bool ownsContinent = false;
-    dprint("reached here 3", section::reinforcement);
 
     // Get all the continents then their territories:
     for (Continent *c : map->continentList)
@@ -780,32 +766,27 @@ void GameEngine::reinforcementPhase(Player *p)
         int territoryCount = 0;
         controlBonus = c->controlBonus;
         vector<Territory *> listOfContentsTerritories = c->territories;
-        dprint("reached here 4", section::reinforcement);
         // Loop through what the player has to check if the owns the full continent
         for (Territory *t : p->getTerritories())
         {
-            dprint("reached here 5", section::reinforcement);
             // Count of how many of the players Territories we find of the continent
             if (find(listOfContentsTerritories.begin(), listOfContentsTerritories.end(), t) !=
                 listOfContentsTerritories.end())
             {
                 territoryCount++;
             }
-            dprint("reached here 6", section::reinforcement);
         }
-        dprint("reached here 7", section::reinforcement);
 
         // If both are equal sizes, then players owns continent.
         if (territoryCount == listOfContentsTerritories.size())
             ownsContinent = true;
-        dprint("reached here 8", section::reinforcement);
         if (ownsContinent)
         {
-            cout << "continent bonus has been applied! adding an additional " << controlBonus << " units";
+            string bonusMsg = "\tcontinent bonus has been applied! adding an additional " + to_string(controlBonus) + " units\n";
+            dprint(bonusMsg, section::reinforcement);
             numberOfArmies += controlBonus;
             ownsContinent = false;
         }
-        dprint("reached here 9", section::reinforcement);
 
         string doneReinforcement = "Player: " +  p->getName() + " has " + to_string(p->getReinforcementPool())
          +" in his reinforcement pool.";
@@ -819,11 +800,9 @@ void GameEngine::reinforcementPhase(Player *p)
     // the minimal number of reinforcement armies per turn for any player is 3
     if (numberOfArmies < 3)
         numberOfArmies = 3;
-    dprint("reached here 10", section::reinforcement);
 
     // placed in the player’s reinforcement pool.
     p->setReinforcementPool(p->getReinforcementPool() + numberOfArmies);
-    dprint("reached here 11", section::reinforcement);
 }
 
 // returns false if someone is still issuing orders
@@ -1231,8 +1210,18 @@ void GameEngine::mainGameLoop()
             this->doTransition("win");
             cout << " ****************************************** " << endl;
             cout << "\nPlayer " << winner->getName() << " won the game!" << endl;
-            // Print out resulting territories conquered
-            for (auto p : getPlayers())
+            
+            // Show the territories conquered by winner and the territories owned by losers (should be none)
+            for (auto p : getEliminatedPlayers()) // loop for players who were audited out
+            {
+                cout << p->getName() << " conquered territories = (";
+                for (auto t : p->getTerritories())
+                {
+                    cout << t->getName() << ", ";
+                }
+                cout << ")" << endl;
+            }
+            for (auto p : getPlayers()) // loop for last 2 players in the game
             {
                 cout << p->getName() << " conquered territories = (";
                 for (auto t : p->getTerritories())

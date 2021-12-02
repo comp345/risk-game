@@ -232,7 +232,7 @@ void Player::issueOrder(Order *o)
     getPlayerStrategy()->issueOrder(o);
 }
 
-// A3: calls the strategy's
+// TODO = A3: calls the strategy's
 void Player::issueOrder()
 {
     if (this->isDoneIssuing())

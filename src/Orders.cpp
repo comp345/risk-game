@@ -4,8 +4,14 @@
 #include "Player.h"
 #include "Map.h"
 #include "PlayerStrategies.h"
+#include "GameEngine.h"
+
 
 using namespace std;
+
+
+// Debugger (declared in GameEngine.cpp), enum type section declared in GameEngine.h
+extern void dprint(string message, section option);
 
 // Implementation of Orders
 Order::Order() : command(""), details("")
@@ -335,7 +341,7 @@ bool Advance::execute()
 // Note: simulateAttack modifies the number of armies being advanced, as they are killed
 bool Advance::simulateAttack()
 {
-    cout << "Attacking enemy!" << endl;
+    dprint("\t\tAttacking enemy!\n", section::fromOrder);
     int attackUnit = getArmies(), defendUnit = territoryTarget->getNumberOfArmies(); // Number of attacker and defender units alive
     int deadAttacker = 0, deadDefender = 0;                                          // body count
     bool isAttackingTurn = true;
@@ -368,9 +374,9 @@ bool Advance::simulateAttack()
         isAttackingTurn = !(isAttackingTurn); // switch turn
 
     } // Outcome: Either all defenders are dead, or all attackers are dead
-    cout << "Result of battle: "
-         << "Attacker armies=" << this->getArmies()
-         << " Defender armies=" << territoryTarget->getNumberOfArmies() << endl;
+    dprint("\t\tResult of battle: \n", section::fromOrder);
+    dprint("\t\tResult of battle: Attacker armies=" + to_string(this->getArmies())
+         + " Defender armies=" + to_string(territoryTarget->getNumberOfArmies()) + "\n", section::fromOrder);
     // If attack wins
     bool win = (this->getArmies() > 0) ? true : false;
     if (win)
@@ -395,7 +401,7 @@ bool Advance::simulateAttack()
         territoryTarget->setOwner(this->getPlayer());
         this->getPlayer()->addTerritory(territoryTarget);
 
-        cout << "Successful attack: Territory " << territoryTarget->getName() << " is won by " << playerAdvancing->getName() << endl; 
+        dprint("\t\tSuccessful attack: Territory " + territoryTarget->getName() + " is won by " + playerAdvancing->getName() + "\n", section::fromOrder); 
     }
 
     updateDetails(); // Advance order is modified
