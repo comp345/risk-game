@@ -36,12 +36,12 @@ Card::~Card()
 
 // Creates an Order, and adds it to the players list of order
 // Then removes that card from the deck
-/** TODO:  A3 Implementation -> card.play called in GameEngine  
+/** TODO:  A3 Implementation -> card.play called in GameEngine
  * - Virtual play method?
  * */
-void Card::play(Player &player, Deck &deck) 
+void Card::play(Player &player, Deck &deck)
 {
-     // player.issueOrder(Order::getOrder());
+    // player.issueOrder(Order::getOrder());
     deck.returnCard(this);
 }
 
@@ -70,7 +70,7 @@ Card &Card::operator=(const Card &c)
     return *this;
 }
 
-//Main write function responsible for the card class
+// Main write function responsible for the card class
 std::ostream &Card::write(std::ostream &os) const
 {
     cout << m_effect;
@@ -126,24 +126,18 @@ std::ostream &CardBomb::write(std::ostream &os) const
     return os;
 }
 
-
 void CardBomb::play(Player &player, Deck &deck)
 {
     // Get a territory to bomb
-    Territory * targetTerritory = player.getPriorityAttacking().top();
+    Territory *targetTerritory = player.getPriorityAttacking().top();
 
-    Bomb * bombOrder = new Bomb(&player, targetTerritory);
+    Bomb *bombOrder = new Bomb(&player, targetTerritory);
 
     /*Creates a Bomb order
-    */
+     */
 
-
-
-   
-
-
-    /* 
-    Should Player::issueOrder() use toAttack and toDefend? No, because then 
+    /*
+    Should Player::issueOrder() use toAttack and toDefend? No, because then
     it would need to manip toAttack and toDefend the same ways for every orders
     -> inside Card::play(), preprocess using player.toAttack/toDefend and create Bomb order
     */
@@ -273,9 +267,9 @@ void Diplomacy::play(Player &player, Deck &deck)
 // **************** //
 
 Deck::Deck()
-{ //default
+{ // default
     m_cards = vector<Card *>();
-    //srand(time(0));
+    // srand(time(0));
 }
 
 Deck::Deck(int size)
@@ -283,15 +277,15 @@ Deck::Deck(int size)
     initialize(size);
 }
 
-//Function responsible for initializing the deck of playing cards to the given size.
+// Function responsible for initializing the deck of playing cards to the given size.
 void Deck::initialize(int size)
 {
     for (int i = 0; i < size; i++)
     {
-        int randomNumber = rand() % 5; //Random number within the type of cards
+        int randomNumber = rand() % 5; // Random number within the type of cards
         // Notes from Noah: randomNumber is not truly random: https://tinyurl.com/8m37ewu3
 
-        Card::Effect *effect = new Card::Effect(static_cast<Card::Effect>(randomNumber)); //Create the card
+        Card::Effect *effect = new Card::Effect(static_cast<Card::Effect>(randomNumber)); // Create the card
         switch (*effect)
         {
         case Card::Effect::BOMB:
@@ -312,7 +306,7 @@ void Deck::initialize(int size)
         }
     }
 
-    //Checks if the deck is valid before continuing
+    // Checks if the deck is valid before continuing
     while (!validate(m_cards))
     {
         initialize(size);
@@ -341,18 +335,20 @@ bool Deck::validate(vector<Card *> cards)
     }
 
     // Display the amount of each type of card in the deck
-    cout << "There is,\n";
-    for (int i = 0; i < 5; i++)
-    {
-        cout << sum[i] << " " << new Card(Card::Effect(i)) << " cards\n";
-        if (sum[i] == 0)
-        {
-            cout << "Validation failed.";
-            return false;
-        }
-    }
+    /*
+     cout << "There is,\n";
+     for (int i = 0; i < 5; i++)
+     {
+         cout << sum[i] << " " << new Card(Card::Effect(i)) << " cards\n";
+         if (sum[i] == 0)
+         {
+             cout << "Validation failed.";
+             return false;
+         }
+     }
 
-    cout << "\n";
+     cout << "\n";
+    */
     return true;
 }
 
@@ -368,7 +364,7 @@ void Deck::showDeck()
     cout << "\n";
 }
 
-//Takes a card from the deck and places it in the players list of cards
+// Takes a card from the deck and places it in the players list of cards
 void Deck::draw(Player &player)
 {
     // Fetches the players hand and the card that will be drawn
@@ -379,7 +375,7 @@ void Deck::draw(Player &player)
 
     cout << "Player: " << player.getName() << " drew a " << toDraw << "\n";
 
-    //Removes the card from the deck
+    // Removes the card from the deck
     m_cards.pop_back();
 }
 
@@ -456,7 +452,7 @@ void Hand::showCards()
     }
 }
 
-//Gets the last cast in the users hand and plays that one.
+// Gets the last cast in the users hand and plays that one.
 Card *Hand::useLast()
 {
     Card *toUse = m_cards.back();

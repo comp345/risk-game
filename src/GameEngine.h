@@ -89,7 +89,6 @@ class GameEngine : public ILoggable, public Subject
     friend class Transition;
 
 private:
-    
     State *currentState;
     bool validTransition;
     std::vector<State *> states;           // GameEngine maintains collection of all states
@@ -101,6 +100,9 @@ private:
     vector<Player *> currentPlayers;
     int numberOfPlayers; // for the randomizer
     Map *map;
+
+    /* NEW */
+    vector<Player *> eliminatedPlayers; // keep tracks of players who lost (0 territory)
 
 public:
     GameEngine(std::string newFile = "");
@@ -130,15 +132,13 @@ public:
     void testPart3();
     string stringToLog() override;
 
-    
-
     void randomizePlayersTurn();
     int getNumOfPlayers(); // used to randomize players turns
     void setNumOfPlayers(int plNumb);
 
     vector<Player *> &getPlayers();
-
-    
+    vector<Player *> &getEliminatedPlayers();
+    void addOneEliminatedPlayer(Player *p);
 
     void getMapList();
 
