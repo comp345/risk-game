@@ -621,7 +621,8 @@ void GameEngine::auditPlayers()
     {
         if (p->getTerritories().size() == 0)
         {
-            cout << "\nPlayer " << p->getName()
+            cout << "GameEngine::auditPlayer found a losing player:" 
+            << "\nPlayer " << p->getName()
                  << " no longer has any territories left and will be removed from the game \n";
 
             currentPlayers.erase(remove(currentPlayers.begin(), currentPlayers.end(), p));
@@ -653,23 +654,29 @@ void GameEngine::reinforcementPhase(Player *p)
     /* ******************* */
     /*      Card Bonus     */
     /* ******************* */
+    cout << "reached here -2" << endl;
     // Check if player won territories in the last round. If yes, draw one card max
     int numConqueredTerritories = p->getTerritorySize() - p->getPrevTerritorySize();
+    cout << "reached here -1" << endl;
     if (numConqueredTerritories > 0)
-        deck->draw(*p);
+        // deck->draw(*p);
+    cout << "reached here 0" << endl;
 
     // update prevTerritorySize
     p->setPrevTerritorySize();
+    cout << "reached here 1" << endl;
 
     /* ************************* */
     /*      Continent Bonus      */
     /* ************************* */
     // Get players number of territories
     int numberOfArmies = floor(p->getTerritorySize() / 3);
+    cout << "reached here 2" << endl;
 
     // Find if the player owns all the territories of an entire contenent:
     int controlBonus = 0;
     bool ownsContinent = false;
+    cout << "reached here 3" << endl;
 
     // Get all the continents then their territories:
     for (Continent *c : map->continentList)
@@ -677,29 +684,32 @@ void GameEngine::reinforcementPhase(Player *p)
         int territoryCount = 0;
         controlBonus = c->controlBonus;
         vector<Territory *> listOfContentsTerritories = c->territories;
-
+        cout << "reached here 4" << endl;
         // Loop through what the player has to check if the owns the full continent
         for (Territory *t : p->getTerritories())
         {
-
+            cout << "reached here 5" << endl;
             // Count of how many of the players Territories we find of the continent
             if (find(listOfContentsTerritories.begin(), listOfContentsTerritories.end(), t) !=
                 listOfContentsTerritories.end())
             {
                 territoryCount++;
             }
+            cout << "reached here 6" << endl;
         }
+        cout << "reached here 7" << endl;
 
         // If both are equal sizes, then players owns continent.
         if (territoryCount == listOfContentsTerritories.size())
             ownsContinent = true;
-
+        cout << "reached here 8" << endl;
         if (ownsContinent)
         {
             cout << "continent bonus has been applied! adding an additional " << controlBonus << " units";
             numberOfArmies += controlBonus;
             ownsContinent = false;
         }
+        cout << "reached here 9" << endl;
     }
 
     /* ************************************* */
@@ -708,9 +718,11 @@ void GameEngine::reinforcementPhase(Player *p)
     // the minimal number of reinforcement armies per turn for any player is 3
     if (numberOfArmies < 3)
         numberOfArmies = 3;
+    cout << "reached here 10" << endl;
 
     // placed in the player’s reinforcement pool.
     p->setReinforcementPool(p->getReinforcementPool() + numberOfArmies);
+    cout << "reached here 11" << endl;
 }
 
 // returns false if someone is still issuing orders
@@ -990,7 +1002,7 @@ void GameEngine::executeOrdersPhase()
                 cout << endl
                      << currentPlayer->getName() << " is done executing. Skip." << endl;
 
-                continue; 
+                continue;
             }
 
             if (currentPlayer->getOrderList()->getList().at(0)->getCommand() == "Deploy type")
@@ -1022,7 +1034,7 @@ void GameEngine::executeOrdersPhase()
 
             // Remove it from the list of orders
             if (currentPlayers.at(i)->getOrderList()->getList().size() != 0)
-                currentPlayers.at(i)->getOrderList()->remove(currentPlayers.at(i)->getOrderList()->getList().front());
+                currentPlayers.at(i)->getOrderList()->remove(0);
         }
     }
 
@@ -1088,6 +1100,9 @@ void GameEngine::mainGameLoop()
         // this->doTransition("gamestart");
         for (Player *p : currentPlayers)
         {
+            cout << "\nPlayer " << p->getName() << " entering reinforcementPhase" << endl;
+            cout << "\n\tTerritories size = " << to_string(p->getTerritories().size()) << endl;
+
             reinforcementPhase(p);
             cout << "\nPlayer: " << p->getName() << " has " << p->getReinforcementPool() << " in his reinforcement pool.\n";
         }
@@ -1111,20 +1126,21 @@ void GameEngine::mainGameLoop()
             // cout << "reached outside execution order" << endl;
         }
 
-        // Debug: This stops the game after each turn 
+        // Debug: This stops the game after each turn
         // char stop;
         // cout << "====== press any key to continue ===== " << endl;
         // cin >> stop;
-/*
-        Player *winner = hasWinner();
+        /*
+                Player *winner = hasWinner();
 
-        if (winner == nullptr)
-            cout << "Debug winner = " << winner << endl;
-        else 
-        {
-            cout << "Debug winner = " << winner->getName() << endl;
-        }
-*/      Player * winner = 0;
+                if (winner == nullptr)
+                    cout << "Debug winner = " << winner << endl;
+                else
+                {
+                    cout << "Debug winner = " << winner->getName() << endl;
+                }
+        */
+        Player *winner = 0;
         for (auto p : getPlayers())
         {
             if (p->getTerritories().size() == getMap()->getTerritorySize())
@@ -1145,12 +1161,6 @@ void GameEngine::mainGameLoop()
                 }
                 cout << ")" << endl;
             }
-            // cout << getCurrentStateName() << endl;
-            // for (auto t : getNextTransitions())
-            // {
-            //     cout << t << ", ";
-            // } 
-            // cout << endl;
             cout << "Do you wish to replay? (y/n)" << endl;
             string input;
             cin >> input;
