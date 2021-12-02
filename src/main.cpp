@@ -12,8 +12,8 @@ int main(int, char **)
     /* *************************************** */
     /*              A2 P2 : Startup            */
     /* *************************************** */
-    // GameEngine *engine= new GameEngine();
-    // engine->preStartup();
+     GameEngine *engine= new GameEngine("../debug.txt");
+     engine->preStartup();
 
     /* *************************************** */
     /*          A2 P3 : Main Game play         */

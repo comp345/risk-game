@@ -58,23 +58,17 @@ class FileCommandProcessorAdapter: virtual public CommandProcessor
 {
 private:
     FileLineReader* reader;
-    std::string fileName;
-    bool readFile;
     std::vector<std::string> listOfCommands;
-    std::string readCommand(std::string fileName, State*& currentState); // Overloaded version for adapter pattern
+    std::vector<std::string> readCommand(State*& currentState);
 public:
     FileCommandProcessorAdapter(std::string newFile);
     Command* getCommand(State*& currentState);
-    std::string validateCommand(State*& currentState, std::vector<std::string> &commands);
 };
 
 class FileLineReader
 {
-private:
-    std::string fileName;
-    std::vector<std::string> listOfCommands;
 public:
-    FileLineReader(std::string newFile);
+    FileLineReader();
     ~FileLineReader();
-    std::vector<std::string> &readLineFromFile(std::string fileName);
+    std::vector<std::string> readLineFromFile(std::string fileName);
 };

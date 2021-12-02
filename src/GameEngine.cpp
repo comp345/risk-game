@@ -546,7 +546,7 @@ void GameEngine::preStartup()
         p->setPlName(cmdPlName);
         p->setReinforcementPool(5);
         cout << *p << "Number of Armies: " << p->getReinforcementPool() << endl;
-        cout << "Cards in players hand: " << p->getHand() << endl;
+        cout << "Cards in players hand: " << p->getHand() << endl; //TODO: prints address
         currentPlayers.push_back(p);
 
         cout << "total number of players so far is: " << getNumOfPlayers() << endl;
@@ -555,8 +555,7 @@ void GameEngine::preStartup()
             cout << "have 1 player so far" << endl;
             continue;
         }
-        if (getNumOfPlayers() < 7)
-        {
+        if (getNumOfPlayers() < 7 && commandProcessor->fileName.empty()) {
             cout << "continue adding players? (y/n)" << endl;
             string keyInY;
             getline(cin, keyInY);
@@ -568,6 +567,8 @@ void GameEngine::preStartup()
             {
                 break;
             }
+        } else {
+            break;
         }
     }
     do
@@ -1322,12 +1323,15 @@ void GameEngine::enterTournamentMode(Command *command)
         exit(0);
     }
 
-    for (int i = 0; i < numOfGames; i++)
-    {
-        StartupPhase sp;
-        sp.setGameEng(this);
-        sp.startup();
-        mainGameLoop();
+    //TODO: create player types + load the maps, add it to the gameEngine players and maps
+    for (int i = 0; i < numOfGames; i++) {
+        for (int j = 0; j < mapFileNames.size(); j++) {
+            //TODO: load map here
+            StartupPhase sp;
+            sp.setGameEng(this);
+            sp.startup();
+            mainGameLoop();
+        }
     }
     exit(0);
 }

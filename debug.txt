@@ -1,0 +1,1 @@
+tournament -M france.map Hawaii.map -P Neutral -G 4 -D 3

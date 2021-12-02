@@ -395,7 +395,7 @@ std::ostream &operator<<(std::ostream &lhs, Deck &deck)
     cout << "\nThe deck currently contains:\n";
     for (Card *i : deck.m_cards)
     {
-        std::cout << count++ << ": " << i << "\n";
+        std::cout << count++ << ": " << *i << "\n";
     }
     return lhs;
 }
@@ -465,7 +465,7 @@ std::ostream &operator<<(std::ostream &lhs, Hand &hand)
 {
     for (Card *i : hand.getCards())
     {
-        std::cout << i << " card\n";
+        std::cout << *i << " card\n";
     }
     return lhs;
 }
