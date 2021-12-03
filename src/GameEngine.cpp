@@ -1208,7 +1208,11 @@ PlayerStrategy* getPlayerStrategy(string pType, Player* p) {
 void GameEngine::logWinners(Player* player, string map, int game) {
     std::ofstream logFile;
     logFile.open("../tournament_results.txt", std::ios_base::app);
-    logFile << "Map: " << map << " | Game: " << game << " | Winner: " << player->getName() << endl;
+    if (player == nullptr) {
+        logFile << "Map: " << map << " | Game: " << game << " | Winner: Draw" << endl;
+    } else {
+        logFile << "Map: " << map << " | Game: " << game << " | Winner: " << player->getName() << endl;
+    }
     logFile.close();
 }
 
