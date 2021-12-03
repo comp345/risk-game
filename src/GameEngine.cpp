@@ -12,6 +12,7 @@
 #include "Orders.h"
 #include "Card.h"
 #include <exception>
+#include <fstream>
 #include "CommandProcessor.h"
 #include "PlayerStrategies.h"
 
@@ -697,13 +698,13 @@ void StartupPhase::startup()
             cout << *p << endl;
         }
 
-        dprint("= Debugging before gamestart: Hardcoding player strategies\n", section::startup);
-        // Hardcoding the second player to be whatever strategy we want to test
-        eng->getPlayers().at(1)->setPlayerStrategy(new NeutralPlayerStrategy(eng->getPlayers().at(1)));
-        for (auto player : eng->getPlayers())
-        {
-            dprint("\t" + player->getName() + " uses strat " + player->getPlayerStrategy()->strategyName(), section::startup);
-        }
+//        dprint("= Debugging before gamestart: Hardcoding player strategies\n", section::startup);
+//        // Hardcoding the second player to be whatever strategy we want to test
+//        eng->getPlayers().at(1)->setPlayerStrategy(new NeutralPlayerStrategy(eng->getPlayers().at(1)));
+//        for (auto player : eng->getPlayers())
+//        {
+//            dprint("\t" + player->getName() + " uses strat " + player->getPlayerStrategy()->strategyName(), section::startup);
+//        }
     }
     else
     {
@@ -735,16 +736,13 @@ void GameEngine::auditPlayers()
 Player *GameEngine::hasWinner()
 {
     // Get the players territories
-    for (Player *p : currentPlayers)
+    for (auto p : getPlayers())
     {
-
-        if (map->getTerritorySize() == p->getTerritories().size())
-        {
+        if (p->getTerritories().size() == getMap()->getTerritorySize())
             return p;
-        }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void GameEngine::reinforcementPhase(Player *p)
@@ -1046,6 +1044,7 @@ void riskGameDriver()
         if (engine->getCurrentStateName() == "start")
         {
             pressToContinueWith("REPLAY");
+
         }
         else if (engine->getCurrentStateName() == "final")
         {
@@ -1069,10 +1068,8 @@ void GameEngine::mainGameLoop()
 
     bool noWinner = true;
     // Keeping track of turns for tournament mode
-    int maximumNumberOfTurns = 50;
     int numOfTurns = 0;
-    // while (noWinner && (numOfTurns < maximumNumberOfTurns))
-    while (noWinner)
+    while ((noWinner && !isTournamentMode) || numOfTurns < getMaxTurn())
     {
 
         /* ****************************** */
@@ -1138,6 +1135,11 @@ void GameEngine::mainGameLoop()
                 }
                 cout << ")" << endl;
             }
+            if (isTournamentMode) {
+                cout << "Results were logged to a file." << endl;
+                doTransition("quit");
+                return;
+            }
             cout << "Do you wish to replay? (y/n)" << endl;
             string input;
             cin >> input;
@@ -1165,7 +1167,9 @@ void GameEngine::mainGameLoop()
         numOfTurns++;
         string endOfTurnMsg = "End of turn " + to_string(numOfTurns) + "\n";
         dprint(endOfTurnMsg, section::mainGameLoop);
-        pressToContinueWith("TURN");
+        if (!isTournamentMode) {
+            pressToContinueWith("TURN");
+        }
     }
 
     // To delete
@@ -1178,70 +1182,120 @@ void GameEngine::mainGameLoop()
 /*    (๑•̀ᗝ•́)૭               (ง°ل͜°)ง       */
 /* **************************************** */
 
+int GameEngine::getMaxTurn() {
+    return maxTurn;
+}
+void GameEngine::setMaxTurn(int turn) {
+    maxTurn = turn;
+}
+
+PlayerStrategy* getPlayerStrategy(string pType, Player* p) {
+    if (pType == "aggressive") {
+        return new AggressivePlayerStrategy(p);
+    } else if (pType == "benevolent") {
+        return new BenevolentPlayerStrategy(p);
+    } else if (pType == "cheater") {
+        return new CheaterPlayerStrategy(p);
+    } else if (pType == "human") {
+        return new NormalPlayerStrategy(p);
+    } else if (pType == "neutral") {
+        return new NeutralPlayerStrategy(p);
+    } else {
+        return new NormalPlayerStrategy(p);
+    }
+}
+
+void GameEngine::logWinners(Player* player, string map, int game) {
+    std::ofstream logFile;
+    logFile.open("../tournament_results.txt", std::ios_base::app);
+    if (player == nullptr) {
+        logFile << "Map: " << map << " | Game: " << game << " | Winner: Draw" << endl;
+    } else {
+        logFile << "Map: " << map << " | Game: " << game << " | Winner: " << player->getName() << endl;
+    }
+    logFile.close();
+}
+
 // Format: tournament -M <listofmapfiles> -P <listofplayerstrategies> -G <numberofgames> -D <maxnumberofturns>
-void GameEngine::enterTournamentMode(Command *command)
-{
+void GameEngine::enterTournamentMode(Command *command) {
+    isTournamentMode = true;
     vector<string> args = command->getArgs();
     vector<string> mapFileNames = {};
     vector<string> playerTypes = {};
     int numOfGames = 0;
-    int numOfTurns = 0;
-    try
-    {
-        for (int i = 0; i < command->getArgs().size();)
-        {
+    try {
+        for (int i = 0; i < command->getArgs().size();) {
             // extract args
-            if (args[i] == "-M")
-            {
+            if (args[i] == "-M") {
                 // while we haven't reached another -
                 i++;
-                while (args[i].find('-') == std::string::npos)
-                {
+                while (args[i].find('-') == std::string::npos) {
                     mapFileNames.push_back(args[i]);
                     i++;
                 }
-            }
-            else if (args[i] == "-P")
-            {
+            } else if (args[i] == "-P") {
                 // while we haven't reached another -
                 i++;
-                while (args[i].find('-') == std::string::npos)
-                {
+                while (args[i].find('-') == std::string::npos) {
                     playerTypes.push_back(args[i]);
                     i++;
                 }
-            }
-            else if (args[i] == "-G")
-            {
+            } else if (args[i] == "-G") {
                 numOfGames = std::stoi(args[++i]);
-            }
-            else if (args[i] == "-D")
-            {
-                numOfTurns = std::stoi(args[++i]);
-            }
-            else
-            {
+            } else if (args[i] == "-D") {
+                setMaxTurn(std::stoi(args[++i]));
+            } else {
                 i++;
             }
         }
-    }
-    catch (exception &e)
-    {
+    } catch (exception &e) {
         cout << e.what();
         exit(0);
     }
+    MapLoader *mapLoader = new MapLoader();
 
-    // TODO: create player types + load the maps, add it to the gameEngine players and maps
-    for (int i = 0; i < numOfGames; i++)
-    {
-        for (int j = 0; j < mapFileNames.size(); j++)
-        {
-            // TODO: load map here
-            StartupPhase sp;
-            sp.setGameEng(this);
+    StartupPhase sp;
+    sp.setGameEng(this);
+
+    for (int i = 0; i < mapFileNames.size(); i++) { //loops over all the maps first
+        for (int j = 0; j < numOfGames; j++) {  //then number of games
+            cout << "Starting game: " << j+1 << endl;
+            string path = "../maps/";
+            //load map from each indexes of mapFileNames vector
+            cout << "loading map: " << mapFileNames[i] << endl;
+            string fpath = path.append(mapFileNames[i]);
+            Map x1 = *mapLoader->loadMap(fpath);
+            Map *map1 = new Map(x1);
+            setMap(map1);
+
+            // creating players
+            for (string pType: playerTypes) {
+                Player *p = new Player();
+                PlayerStrategy *ps = getPlayerStrategy(pType, p);
+                p->setPlayerStrategy(ps);
+                p->setPlName(pType);
+                p->setReinforcementPool(5);
+                currentPlayers.push_back(p);
+            }
+
             sp.startup();
             mainGameLoop();
+            Player *winner = hasWinner();
+            logWinners(winner, mapFileNames[i], j + 1);
+            this->cleanup();
         }
     }
     exit(0);
+}
+
+void GameEngine::cleanup() {
+    this->currentPlayers.clear();
+    delete currentState;
+    this->currentState = new State("start");
+    initializedRand(); // randomize deck
+    delete deck;
+    deck = new Deck(30);
+    delete map;
+    map = new Map();
+    eliminatedPlayers.clear();
 }

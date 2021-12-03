@@ -114,7 +114,9 @@ private:
     Map *map;
 
     /* NEW */
-    vector<Player *> eliminatedPlayers; // keep tracks of players who lost (0 territory)
+    vector<Player *> eliminatedPlayers; // keep tracks of players who lost
+    int maxTurn;
+    bool isTournamentMode;
 
 public:
     GameEngine(std::string newFile = "");
@@ -137,11 +139,7 @@ public:
     // check if command is valid and updates current state accordingly
     bool doTransition(std::string command);
 
-    // check if command is valid. no update.
-    bool validateCommand(std::string command);
-
     void testGameEngine();
-    void testPart3();
     string stringToLog() override;
 
     void randomizePlayersTurn();
@@ -162,6 +160,9 @@ public:
 
     Deck *getDeck();
 
+    int getMaxTurn();
+    void setMaxTurn(int turn);
+
     // Alexanders additions:
     void mainGameLoop();
     void reinforcementPhase(Player *p);
@@ -175,6 +176,8 @@ public:
     void enterTournamentMode(Command *pCommand);
 
     void initStates();
+    void cleanup();
+    void logWinners(Player* player, string map, int game);
 };
 
 class StartupPhase
