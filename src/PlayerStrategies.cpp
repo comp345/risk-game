@@ -179,8 +179,11 @@ NeutralPlayerStrategy::~NeutralPlayerStrategy()
 
 void NeutralPlayerStrategy::issueOrder(Order *o)
 {
-    if(hasBeenAttacked == true)
+    if(hasBeenAttacked == true){
+        cout << "DEBUG:: " << getPlayer()->getName() << " use to be a " << getPlayer()->getPlayerStrategy()->strategyName();
         getPlayer()->setPlayerStrategy(new AggressivePlayerStrategy(getPlayer()));
+        cout << " and is now a " << getPlayer()->getPlayerStrategy()->strategyName();
+    }
 }
 
 vector<Territory *> NeutralPlayerStrategy::toAttack()
@@ -200,16 +203,14 @@ string NeutralPlayerStrategy::strategyName()
 }
 
 void NeutralPlayerStrategy::toggleHasBeenAttacked(){
-    cout << "DEBUG:: " << getPlayer()->getName() << " use to be a " << this->strategyName();
     if(hasBeenAttacked) {
         hasBeenAttacked = false;
     }else {
         hasBeenAttacked = true;
     }
-    cout << " and is now a " << this->strategyName();
 }
 
-NeutralPlayerStrategy::NeutralPlayerStrategy(const NeutralPlayerStrategy &ps) : PlayerStrategy(ps)
+NeutralPlayerStrategy::NeutralPlayerStrategy(const NeutralPlayerStrategy &ps)
 {
     cout << "COPY CTOR CALLED @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@";
     this->hasBeenAttacked = ps.hasBeenAttacked;

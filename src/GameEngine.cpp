@@ -983,7 +983,7 @@ void playerIssueOrder(Deck *deck, Player *issuingPlayer)
 
             //Changing the neutral players flag added by Alexander
             if(territoryTarget->getOwner() != currentPlayer && territoryTarget->getOwner()->getPlayerStrategy()->strategyName() == "Neutral strategy")
-                dynamic_cast<NeutralPlayerStrategy*>(territoryTarget->getOwner())->toggleHasBeenAttacked();
+            dynamic_cast<NeutralPlayerStrategy*>(territoryTarget->getOwner()->getPlayerStrategy())->toggleHasBeenAttacked();
         }
         // check if no more advance order can be created -> set isDone flag to true
         if (issuingPlayer->getPriorityDefending().size() == 0 || issuingPlayer->getPriorityAttacking().size() == 0)
@@ -1273,7 +1273,7 @@ void GameEngine::mainGameLoop()
 //                  DEBUG PURPOSES                  //
 //**************************************************//
 
-//        if (breakCount == 0) this->currentPlayers.at(0)->setPlayerStrategy(new BenevolentPlayerStrategy(this->currentPlayers.at(0)));
+        if (breakCount == 0) this->currentPlayers.at(0)->setPlayerStrategy(new NeutralPlayerStrategy(this->currentPlayers.at(0)));
 //        if (breakCount == 0) this->currentPlayers.at(1)->setPlayerStrategy(new BenevolentPlayerStrategy(this->currentPlayers.at(1)));
 //        if (breakCount == 3) break;
         breakCount++;
