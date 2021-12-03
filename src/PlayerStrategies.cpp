@@ -3,6 +3,9 @@
 #include "Map.h"
 #include <algorithm>
 #include "Orders.h"
+#include "GameEngine.h"
+
+extern void dprint(string message, section option);
 
 // ********************************** //
 //      PlayerStrategy functions:     //
@@ -55,10 +58,14 @@ NormalPlayerStrategy::NormalPlayerStrategy(Player *p) : PlayerStrategy(p) {}
 void NormalPlayerStrategy::issueOrder()
 {
     Player *issuingPlayer = this->getPlayer();
-    if (issuingPlayer->isDoneIssuing())
+    // Second condition added due to cheating player who eliminated player durig issueOrdersPhase
+    if (issuingPlayer->isDoneIssuing() or issuingPlayer->getTerritories().empty())
     {
-        // when done issueing deploy and advance, issue cards
-        // Bugs: commented out the creation of Orders from Cards
+        if (issuingPlayer->getTerritories().empty())
+        {
+            dprint("\tPlayer " + issuingPlayer->getName() + " has been eliminated (not yet audited) by a cheater. isDone flag set to 1", section::issueOrderFromPlayer);
+            issuingPlayer->setDoneIssuing(true);
+        }
         return void();
     }
 
@@ -121,7 +128,6 @@ void NormalPlayerStrategy::issueOrder()
 }
 vector<Territory *> NormalPlayerStrategy::toAttack()
 {
-    // TO CORRECT
     vector<Territory *> attackableTerritories = vector<Territory *>();
 
     // Get the players territories
@@ -144,9 +150,8 @@ vector<Territory *> NormalPlayerStrategy::toAttack()
             // If we haven't already seen the territory, add it to the list.
             if (!count(neighbourTerritories.begin(), neighbourTerritories.end(), neighbour))
 
-                // If it already belongs to us then we dont have to attack it.
-                if (neighbour->getOwner() != getPlayer())
-                    neighbourTerritories.push_back(neighbour);
+                // ALLOW ADVANCE ON OWN TERRITORY AND OPPONENT TERRITORY
+                neighbourTerritories.push_back(neighbour);
         }
     }
 
@@ -169,21 +174,78 @@ CheaterPlayerStrategy::CheaterPlayerStrategy(Player *p) : PlayerStrategy(p){};
 
 void CheaterPlayerStrategy::issueOrder()
 {
-    // does not issue order
-    // executes shit
+    /** CORRECT ALGORITHM : return vector of enemy territories to attack
+     * - No orders created
+     * - "execute" conquest of all toAttack territories in issueOrder
+     * - cheater's territories don't have armies on them
+     * - cheated does not touch reinforcement pool -> not good condition to end issueorder
+     */
+    Player *issuingPlayer = this->getPlayer();
+    // Second condition necessary to skip players who were eliminated by cheaters
+    if (issuingPlayer->isDoneIssuing() or issuingPlayer->getTerritories().empty())
+    {
+        if (issuingPlayer->getTerritories().empty())
+        {
+            dprint("\tPlayer " + issuingPlayer->getName() + " has been eliminated (not yet audited) by a cheater. isDone flag set to 1", section::issueOrderFromPlayer);
+            issuingPlayer->setDoneIssuing(true);
+        }
+        dprint("\tCheater " + issuingPlayer->getName() + " hit the isDoneIssuing check, and will now return void back to GameEngine::issueOrdersPhase", section::issueOrderFromPlayer);
+        return void();
+    }
+    dprint("\tCheater " + issuingPlayer->getName() + " has entered issueOrder", section::issueOrderFromPlayer);
+
+    // is this necessary, since there is a check for isDoneIssuing in GameEngine::issueOrdersPhase ?
+    if (issuingPlayer->isDoneIssuing())
+    {
+        return void();
+    }
+    // conquer neighbors until all are ours
+    while (!issuingPlayer->getPriorityAttacking().empty())
+    {
+        // Change ownership of territory:
+        Territory *conquest = issuingPlayer->popPriorityAttack();
+        dprint("\t... cheater " + issuingPlayer->getName() + " is conquering " + conquest->getName(), section::issueOrderFromPlayer);
+        issuingPlayer->addTerritory(conquest);
+        // remove territory from opponent
+        int count = 0;
+        vector<Territory *> &enemyTerr = conquest->getOwner()->getTerritories();
+        for (vector<Territory *>::iterator it = enemyTerr.begin(); it != enemyTerr.end(); ++it)
+        {
+            if (*it == conquest)
+            {
+                break;
+            }
+            ++count;
+        }
+        enemyTerr.erase(enemyTerr.begin() + count);
+        conquest->setOwner(issuingPlayer); // set new owner of territory
+    }
+
+    // check if getPriorityAttacking is empty -> every opponent neighbor territory is conquered
+    if (issuingPlayer->getPriorityAttacking().size() == 0)
+    {
+        issuingPlayer->toggleDoneIssuing();
+        dprint("Cheater " + issuingPlayer->getName() + "'s isDone flag is set to " + to_string(issuingPlayer->isDoneIssuing()) + "\n", section::issueOrderFromPlayer);
+    }
 }
 
 vector<Territory *> CheaterPlayerStrategy::toAttack()
 {
-    // TODO : return vector of enemy territories to attack
+    /** CORRECT ALGORITHM : return vector of enemy territories to attack
+     * - No orders created
+     * - "execute" conquest of all toAttack territories in issueOrder
+     * - cheater's territories don't have armies on them
+     */
     vector<Territory *> attackableTerritories = vector<Territory *>();
 
     // Get the players territories
     for (Territory *territory : getPlayer()->getTerritories())
     {
-        // add them to the attackable Territories if they have an army on them
-        if (territory->getNumberOfArmies() > 0)
+        // since cheater has no armies on territories, remove below condition
+        // if (territory->getNumberOfArmies() > 0)
+        {
             attackableTerritories.push_back(territory);
+        }
     }
 
     vector<Territory *> neighbourTerritories = vector<Territory *>();

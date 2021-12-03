@@ -13,6 +13,7 @@
 #include "Card.h"
 #include <exception>
 #include "CommandProcessor.h"
+#include "PlayerStrategies.h"
 
 namespace fs = filesystem;
 using namespace std;
@@ -695,6 +696,14 @@ void StartupPhase::startup()
         {
             cout << *p << endl;
         }
+
+        dprint("= Debugging before gamestart: Hardcoding player strategies\n", section::startup);
+        // Hardcode first 2 players' strategies
+        eng->getPlayers().at(0)->setPlayerStrategy(new CheaterPlayerStrategy(eng->getPlayers().at(0)));
+        for (auto player : eng->getPlayers())
+        {
+            dprint("\t" + player->getName() + " uses strat " + player->getPlayerStrategy()->strategyName(), section::startup);
+        }
     }
     else
     {
@@ -791,12 +800,7 @@ void GameEngine::reinforcementPhase(Player *p)
             numberOfArmies += controlBonus;
             ownsContinent = false;
         }
-
-        string doneReinforcement = "Player: " + p->getName() + " has " + to_string(p->getReinforcementPool()) + " in his reinforcement pool.";
-
-        dprint(doneReinforcement, section::reinforcement);
     }
-
     /* ************************************* */
     /*      Minimal Reinforcement to add     */
     /* ************************************* */
@@ -806,6 +810,9 @@ void GameEngine::reinforcementPhase(Player *p)
 
     // placed in the player’s reinforcement pool.
     p->setReinforcementPool(p->getReinforcementPool() + numberOfArmies);
+    string doneReinforcement = "Player: " + p->getName() + " has " + to_string(p->getReinforcementPool()) + " in his reinforcement pool.";
+
+    dprint(doneReinforcement, section::reinforcement);
 }
 
 // returns false if someone is still issuing orders
@@ -828,73 +835,67 @@ Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, 
     return nullptr;
 }
 
-void playerIssueOrder(Deck *deck, Player *issuingPlayer)
-{
-
-    if (issuingPlayer->isDoneIssuing())
-    {
-        // when done issueing deploy and advance, issue cards
-        // Bugs: commented out the creation of Orders from Cards
-        return void();
-    }
-
-    // (1) Deploy: until reinforc pool == 0
-    if (issuingPlayer->getReinforcementPool() > 0)
-    {
-        // cout << "Debug playerIssueOrder. Num of reinforcement pool: " << issuingPlayer->getReinforcementPool() << endl;
-        // Check if there is no more territory in priority queue -> rebuild it until pool is empty
-        if (issuingPlayer->getPriorityDefending().empty())
-        {
-            for (Territory *toDefend : issuingPlayer->toDefend())
-            {
-                issuingPlayer->addToPriorityDefend(toDefend);
-            }
-        }
-
-        Territory *territoryTarget = issuingPlayer->getPriorityDefending().top();
-
-        // Create Deploy -> decrease reinforcement
-        Deploy *deploy = new Deploy(1, issuingPlayer, territoryTarget);
-        issuingPlayer->setReinforcementPool(issuingPlayer->getReinforcementPool() - 1);
-
-        // cout << "Issueing: " << deploy->getDetails() << endl;
-        issuingPlayer->issueOrder(deploy);
-        issuingPlayer->popPriorityDefend();
-    }
-    else // when no more reinforcementPool
-    {
-        // (3) Advance
-        if (issuingPlayer->isDoneDeploying() == false)
-        {
-            // This block should be entered only ONCE, before the first Advance order
-            issuingPlayer->setDoneDeploying(true);
-            issuingPlayer->getPriorityDefending() = priority_queue<Territory *, vector<Territory *>, compareArmySize>(); // clear queue
-            for (Territory *toDefend : issuingPlayer->toDefend())
-            {
-                issuingPlayer->addToPriorityDefend(toDefend);
-            }
-        }
-
-        if (issuingPlayer->isDoneDeploying() and (issuingPlayer->getPriorityDefending().size() > 0 && issuingPlayer->getPriorityAttacking().size() > 0))
-        {
-            // Need to handle the case when the size of priorityAttack =/= size of priorityDefence => rebuild one or both queues depending on the strategy
-            Player *currentPlayer = issuingPlayer;
-            Territory *territorySource = currentPlayer->getPriorityDefending().top();
-            Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
-            Advance *advance = new Advance((territorySource->getNumberOfArmies() / 2), currentPlayer, territorySource, territoryTarget);
-            // cout << "Issueing! " << advance->getDetails() << endl;
-            currentPlayer->issueOrder(advance);
-            currentPlayer->popPriorityAttack();
-            currentPlayer->popPriorityDefend();
-        }
-        // check if no more advance order can be created -> set isDone flag to true
-        if (issuingPlayer->getPriorityDefending().size() == 0 || issuingPlayer->getPriorityAttacking().size() == 0)
-        {
-            issuingPlayer->toggleDoneIssuing();
-            // cout << "Finished issueing Deploy and Advance. isDone flag is set to " << to_string(issuingPlayer->isDoneIssuing()) << endl;
-        }
-    }
-}
+// void playerIssueOrder(Deck *deck, Player *issuingPlayer)
+// {
+//     if (issuingPlayer->isDoneIssuing())
+//     {
+//         // when done issueing deploy and advance, issue cards
+//         // Bugs: commented out the creation of Orders from Cards
+//         return void();
+//     }
+//     // (1) Deploy: until reinforc pool == 0
+//     if (issuingPlayer->getReinforcementPool() > 0)
+//     {
+//         // cout << "Debug playerIssueOrder. Num of reinforcement pool: " << issuingPlayer->getReinforcementPool() << endl;
+//         // Check if there is no more territory in priority queue -> rebuild it until pool is empty
+//         if (issuingPlayer->getPriorityDefending().empty())
+//         {
+//             for (Territory *toDefend : issuingPlayer->toDefend())
+//             {
+//                 issuingPlayer->addToPriorityDefend(toDefend);
+//             }
+//         }
+//         Territory *territoryTarget = issuingPlayer->getPriorityDefending().top();
+//         // Create Deploy -> decrease reinforcement
+//         Deploy *deploy = new Deploy(1, issuingPlayer, territoryTarget);
+//         issuingPlayer->setReinforcementPool(issuingPlayer->getReinforcementPool() - 1);
+//         // cout << "Issueing: " << deploy->getDetails() << endl;
+//         issuingPlayer->issueOrder(deploy);
+//         issuingPlayer->popPriorityDefend();
+//     }
+//     else // when no more reinforcementPool
+//     {
+//         // (3) Advance
+//         if (issuingPlayer->isDoneDeploying() == false)
+//         {
+//             // This block should be entered only ONCE, before the first Advance order
+//             issuingPlayer->setDoneDeploying(true);
+//             issuingPlayer->getPriorityDefending() = priority_queue<Territory *, vector<Territory *>, compareArmySize>(); // clear queue
+//             for (Territory *toDefend : issuingPlayer->toDefend())
+//             {
+//                 issuingPlayer->addToPriorityDefend(toDefend);
+//             }
+//         }
+//         if (issuingPlayer->isDoneDeploying() and (issuingPlayer->getPriorityDefending().size() > 0 && issuingPlayer->getPriorityAttacking().size() > 0))
+//         {
+//             // Need to handle the case when the size of priorityAttack =/= size of priorityDefence => rebuild one or both queues depending on the strategy
+//             Player *currentPlayer = issuingPlayer;
+//             Territory *territorySource = currentPlayer->getPriorityDefending().top();
+//             Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
+//             Advance *advance = new Advance((territorySource->getNumberOfArmies() / 2), currentPlayer, territorySource, territoryTarget);
+//             // cout << "Issueing! " << advance->getDetails() << endl;
+//             currentPlayer->issueOrder(advance);
+//             currentPlayer->popPriorityAttack();
+//             currentPlayer->popPriorityDefend();
+//         }
+//         // check if no more advance order can be created -> set isDone flag to true
+//         if (issuingPlayer->getPriorityDefending().size() == 0 || issuingPlayer->getPriorityAttacking().size() == 0)
+//         {
+//             issuingPlayer->toggleDoneIssuing();
+//             // cout << "Finished issueing Deploy and Advance. isDone flag is set to " << to_string(issuingPlayer->isDoneIssuing()) << endl;
+//         }
+//     }
+// }
 
 void GameEngine::issueOrdersPhase()
 {
@@ -930,14 +931,35 @@ void GameEngine::issueOrdersPhase()
     }
     while (!allPlayersDone())
     {
-        for (int i = 0; i < currentPlayers.size(); i++)
+        for (int i = 0; i < currentPlayers.size(); )
         {
             dprint("\nGameEngine:: Player " + currentPlayers.at(i)->getName() + " is now entering playerIssueOrder method.\n", section::issueorder);
 
-            // Free function to implement as Player::issueOrder
-            // playerIssueOrder(this->deck, currentPlayers.at(i));
             currentPlayers.at(i)->issueOrder();
         }
+        // Cannot iterate through players normally while erasing players as they lose
+        // std::vector<int> v = {1, 2, 3, 4, 5, 6};
+
+        // auto player = currentPlayers.begin();
+        // while (player != currentPlayers.end())
+        // {
+        //     // remove odd numbers
+        //     if (*player & 1)
+        //     {
+        //         // `erase()` invalidates the iterator, use returned iterator
+        //         it = v.erase(it);
+        //     }
+        //     // Notice that the iterator is incremented only on the else part (why?)
+        //     else
+        //     {
+        //         ++it;
+        //     }
+        // }
+
+        // for (int const &i : v)
+        // {
+        //     std::cout << i << ' ';
+        // }
     }
 }
 
@@ -1161,6 +1183,7 @@ void GameEngine::mainGameLoop()
         numOfTurns++;
         string endOfTurnMsg = "End of turn " + to_string(numOfTurns) + "\n";
         dprint(endOfTurnMsg, section::mainGameLoop);
+        pressToContinueWith("TURN");
     }
 
     // To delete

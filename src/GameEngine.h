@@ -23,6 +23,7 @@ class CommandProcessor;
 enum section
 {
     all,
+    startup,
     mainGameLoop,
     reinforcement,
     issueorder,
