@@ -118,7 +118,7 @@ public:
     vector<Player *> getNegotiatingWith() const;
     void removeAllNegotiation();
     PlayerStrategy *getPlayerStrategy();
-    void setPlayerStrategy(PlayerStrategy *ps);
+    void setPlayerStrategy(PlayerStrategy *playerStrategy);
 
 private:
     int reinforcementPool;
@@ -130,7 +130,7 @@ private:
     vector<Territory *> territories;
     Hand *hand;
     OrderList *orderList;
-    PlayerStrategy *ps;
+    PlayerStrategy *playerStrategy;
 
     bool doneDeploying;
     bool doneIssuing;

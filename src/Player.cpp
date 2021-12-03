@@ -13,7 +13,16 @@ bool compareArmySize::operator()(Territory const *t1, Territory const *t2)
 {
     // return "true" if "p1" is ordered
     // before "p2", for example:
-    return t1->numArmies > t2->numArmies;
+
+    // For aggresive player we need to only select the strongest territories:
+    // For simplification, we assume aggressive players deploy/advance toward their strongest territory, but
+    // also attacks strongest enemy territories!
+    if (t1->owner->getPlayerStrategy()->strategyName() == "Aggressive strategy")
+    {
+        return t1->numArmies < t2->numArmies;
+    }
+    else
+        return t1->numArmies > t2->numArmies; // Default, used in A2
 }
 
 Player::Player()
@@ -32,7 +41,7 @@ Player::Player()
     negotiatingWith = vector<Player *>();
 
     // From a3_strategy
-    this->ps = new AggressivePlayerStrategy(this);
+    this->playerStrategy = new NormalPlayerStrategy(this);
 }
 
 Player::Player(string n)
@@ -50,7 +59,7 @@ Player::Player(string n)
     negotiatingWith = vector<Player *>();
 
     // a3_strategy
-    this->ps = new AggressivePlayerStrategy(this);
+    this->playerStrategy = new NormalPlayerStrategy(this);
 }
 
 // parametrized constructor
@@ -70,7 +79,7 @@ Player::Player(string plName, vector<Territory *> t, Hand *h, OrderList *o)
     negotiatingWith = vector<Player *>();
 
     // Link player with strategy
-    this->ps = new AggressivePlayerStrategy(this);
+    this->playerStrategy = new NormalPlayerStrategy(this);
 }
 
 // parametrized constructor
@@ -90,7 +99,7 @@ Player::Player(int armies, string plName, vector<Territory *> t, Hand *h, OrderL
     // Implementing Negotiate order
     negotiatingWith = vector<Player *>();
     // Link player with strategy
-    this->ps = new AggressivePlayerStrategy(this);
+    this->playerStrategy = new NormalPlayerStrategy(this);
 }
 
 // copy constructor: Deep copy, cannot be used for reference semantic or to
@@ -110,7 +119,7 @@ Player::Player(const Player &p)
     // Implementing Negotiate order
     this->negotiatingWith = p.negotiatingWith;
     // Link player with strategy
-    this->ps = p.ps;
+    this->playerStrategy = p.playerStrategy;
 }
 
 // destructor
@@ -127,8 +136,11 @@ Player::~Player()
     }
     negotiatingWith.clear();
 
-    //    delete ps;
-    //    ps = nullptr;
+    //    delete playerStrategy; 
+    // gives linkage error Undefined symbols for architecture x86_64:
+    //   "__ZN14PlayerStrategyD1Ev", referenced from:
+    //       __ZN6PlayerD2Ev in Player.cpp.o
+    //       __ZN6PlayerD1Ev in Player.cpp.o
 
     for (Territory *t : territories)
     {
@@ -160,9 +172,8 @@ Player &Player::operator=(const Player &p)
     orderList = new OrderList(*(p.orderList));
     reinforcementPool = p.reinforcementPool;
     negotiatingWith = p.negotiatingWith;
-    // plArmies = p.plArmies;
     name = p.name;
-    ps = p.ps;
+    playerStrategy = p.playerStrategy;
     doneIssuing = p.doneIssuing;
     doneDeploying = p.doneDeploying;
     return *this;
@@ -235,87 +246,7 @@ void Player::issueOrder(Order *o)
 // TODO = A3: calls the strategy's
 void Player::issueOrder()
 {
-    if (this->isDoneIssuing())
-    {
-        // When done issuing orders, start issuing 1 card order per turn until both player are done...
-        // flawed but will work
-        Player *player = this;
-        cout << "DEBUG: Player " << player->getName() << " wants to play card..." << endl;
-        if (player->getHand()->getCards().size() > 0)
-        {
-            Territory *territorySrc = new Territory;
-            Territory *territoryTarget = new Territory;
-            if (player->getPriorityDefending().size() > 0)
-            {
-                territorySrc = player->popPriorityDefend();
-            }
-            else
-            {
-                territorySrc = nullptr;
-            }
-            if (player->getPriorityAttacking().size() > 0)
-            {
-                territoryTarget = player->popPriorityAttack();
-            }
-            else
-            {
-                territoryTarget = nullptr;
-            }
-            Card *lastCard = player->getHand()->useLast();
-            Player &playerRef = *player;
-
-            // TO DO: Reimplement creation of orders from cards
-
-            /*
-            Deck &deckRef = *deck; // TODO: add Deck * to Card class!
-            lastCard->play(playerRef, deckRef); // return card to deck
-
-            try
-            {
-                // Method throws exception to handle
-                createOrderFromCard(lastCard, player, territorySrc, territoryTarget);
-                cout << " ... played a card... " << endl;
-            }
-            catch (std::exception e)
-            {
-                cout << "Cannot create special order from card (not enough resources)" << endl;
-            }
-            */
-        }
-
-        // return from function so we can 'continue' from outside loop in issueOrderPhase()
-        return void();
-    }
-
-    // (1) Deploy: until reinforc pool == 0
-    if (this->getReinforcementPool() > 0)
-    {
-        Territory *territoryTarget = this->getPriorityDefending().top();
-        // Create Deploy -> decrease reinforcement)
-        Deploy *deploy = new Deploy(1, this, territoryTarget);
-        cout << "Issueing: " << deploy->getDetails() << endl;
-        this->issueOrder(deploy);
-        /* To do for A3: Able to use same territory in deploy order for advance (add stack to store popped defending territory?) */
-        this->popPriorityDefend();
-    }
-    else if (this->getPriorityDefending().size() > 0 and this->getPriorityAttacking().size() > 0)
-    {
-        // (3) Advance
-        Player *currentPlayer = this;
-        Territory *territorySource = currentPlayer->getPriorityDefending().top();
-        Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
-        Advance *advance = new Advance(1, currentPlayer, territorySource, territoryTarget);
-        cout << "Issueing! " << advance->getDetails() << endl;
-        currentPlayer->issueOrder(advance);
-        currentPlayer->popPriorityAttack();
-        currentPlayer->popPriorityDefend();
-    }
-
-    // After a player issue one order, check if reinforcementPool 0 or queues empty
-    if (this->getPriorityDefending().size() == 0 or this->getPriorityAttacking().size() == 0)
-    {
-        this->toggleDoneIssuing();
-    }
+    this->getPlayerStrategy()->issueOrder();
 }
 
 Hand *Player::getHand()
@@ -504,10 +435,10 @@ void Player::removeAllNegotiation()
 }
 PlayerStrategy *Player::getPlayerStrategy()
 {
-    return ps;
+    return playerStrategy;
 }
 
-void Player::setPlayerStrategy(PlayerStrategy *ps)
+void Player::setPlayerStrategy(PlayerStrategy *playerStrategy)
 {
-    this->ps = ps;
+    this->playerStrategy = playerStrategy;
 }

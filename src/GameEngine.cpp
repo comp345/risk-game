@@ -1,5 +1,5 @@
 #include <iostream>
-#include <sstream> 
+#include <sstream>
 #include <string>
 #include <vector>
 #include <filesystem>
@@ -13,6 +13,7 @@
 #include "Card.h"
 #include <exception>
 #include "CommandProcessor.h"
+#include "PlayerStrategies.h"
 
 namespace fs = filesystem;
 using namespace std;
@@ -22,7 +23,7 @@ using namespace std;
 /* ***************************** */
 bool debuggingMode = true; // Setting the value to true will run the program with debug messages
 
-section debugsection = section::mainGameLoop;
+section debugsection = section::all;
 
 // Noah: debugger that only prints debugging message when debugging mode is true
 void dprint(string message, section option)
@@ -522,13 +523,12 @@ void GameEngine::preStartup()
     cout << "Map " << mapName << " has been loaded. \n"
          << endl;
 
-    // validates map
     do
     {
         command = commandProcessor->getCommand(currentState);
     } while (!doTransition(command->getCommandName()));
 
-    map1->validate();
+    map1->validate(); // validates map
     map1->showLoadedMap();
     setMap(map1);
 
@@ -547,7 +547,7 @@ void GameEngine::preStartup()
         p->setPlName(cmdPlName);
         p->setReinforcementPool(5);
         cout << *p << "Number of Armies: " << p->getReinforcementPool() << endl;
-        cout << "Cards in players hand: " << p->getHand() << endl; //TODO: prints address
+        cout << "Cards in players hand: " << p->getHand() << endl; // TODO: prints address
         currentPlayers.push_back(p);
 
         cout << "total number of players so far is: " << getNumOfPlayers() << endl;
@@ -556,7 +556,8 @@ void GameEngine::preStartup()
             cout << "have 1 player so far" << endl;
             continue;
         }
-        if (getNumOfPlayers() < 7 && commandProcessor->fileName.empty()) {
+        if (getNumOfPlayers() < 7 && commandProcessor->fileName.empty())
+        {
             cout << "continue adding players? (y/n)" << endl;
             string keyInY;
             getline(cin, keyInY);
@@ -568,7 +569,9 @@ void GameEngine::preStartup()
             {
                 break;
             }
-        } else {
+        }
+        else
+        {
             break;
         }
     }
@@ -693,6 +696,14 @@ void StartupPhase::startup()
         {
             cout << *p << endl;
         }
+
+        dprint("= Debugging before gamestart: Hardcoding player strategies\n", section::startup);
+        // Hardcoding the second player to be whatever strategy we want to test
+        eng->getPlayers().at(1)->setPlayerStrategy(new NeutralPlayerStrategy(eng->getPlayers().at(1)));
+        for (auto player : eng->getPlayers())
+        {
+            dprint("\t" + player->getName() + " uses strat " + player->getPlayerStrategy()->strategyName(), section::startup);
+        }
     }
     else
     {
@@ -749,8 +760,8 @@ void GameEngine::reinforcementPhase(Player *p)
     if (numConqueredTerritories > 0)
         // deck->draw(*p); // Segmentation fault: to investigate
 
-    // update prevTerritorySize
-    p->setPrevTerritorySize();
+        // update prevTerritorySize
+        p->setPrevTerritorySize();
 
     /* ************************* */
     /*      Continent Bonus      */
@@ -789,13 +800,7 @@ void GameEngine::reinforcementPhase(Player *p)
             numberOfArmies += controlBonus;
             ownsContinent = false;
         }
-
-        string doneReinforcement = "Player: " +  p->getName() + " has " + to_string(p->getReinforcementPool())
-         +" in his reinforcement pool.";
-
-        dprint(doneReinforcement, section::reinforcement);
     }
-
     /* ************************************* */
     /*      Minimal Reinforcement to add     */
     /* ************************************* */
@@ -805,6 +810,9 @@ void GameEngine::reinforcementPhase(Player *p)
 
     // placed in the player’s reinforcement pool.
     p->setReinforcementPool(p->getReinforcementPool() + numberOfArmies);
+    string doneReinforcement = "Player: " + p->getName() + " has " + to_string(p->getReinforcementPool()) + " in his reinforcement pool.";
+
+    dprint(doneReinforcement, section::reinforcement);
 }
 
 // returns false if someone is still issuing orders
@@ -824,171 +832,74 @@ bool GameEngine::allPlayersDone()
 */
 Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget)
 {
-    string checkTypeCard = card->getCommand();
-
-    if (checkTypeCard == "Airlift type")
-    {
-        cout << "... player desires to create an AirLift order by using a valid card!..." << endl;
-        if (!territoryTarget or !territorySrc)
-            throw std::exception();
-        AirLift *a = new AirLift(1, player, territorySrc, territoryTarget);
-        cout << a->getDetails() << endl;
-        return a;
-    }
-
-    if (checkTypeCard == "Bomb type")
-    {
-        cout << "... player desires to create a Bomb order by using a valid card!..." << endl;
-
-        if (!territoryTarget)
-            throw std::exception();
-        Bomb *b = new Bomb(player, territoryTarget);
-        cout << b->getDetails() << endl;
-        return b;
-    }
-    if (checkTypeCard == "Blockade type")
-    {
-        if (!territorySrc)
-            throw std::exception();
-        Blockade *b = new Blockade(territorySrc, player, new Player("neutral (hardcoded)"));
-        cout << b->getDetails() << endl;
-        return b;
-    }
-    if (checkTypeCard == "Diplomacy type")
-    {
-        Negotiate *n = new Negotiate(player, new Player("enemy (hardcoded)"));
-        cout << n->getDetails() << endl;
-        return n;
-    }
-    if (checkTypeCard == "Reinforcement type")
-    {
-        // TODO: add to player's reinforcement pool
-        return nullptr;
-    }
-    else
-    {
-        cout << "== DEBUG in: creatingOrderFromCard. Card is not valid!? ==";
-        cout << checkTypeCard << endl;
-        return nullptr;
-    }
+    return nullptr;
 }
 
-void playerIssueOrder(Deck *deck, Player *issuingPlayer)
-{
-    // when done issueing deploy and advance, issue cards
-    // Bugs: commented out the creation of Orders from Cards
+// void playerIssueOrder(Deck *deck, Player *issuingPlayer)
+// {
+//     if (issuingPlayer->isDoneIssuing())
+//     {
+//         // when done issueing deploy and advance, issue cards
+//         // Bugs: commented out the creation of Orders from Cards
+//         return void();
+//     }
+//     // (1) Deploy: until reinforc pool == 0
+//     if (issuingPlayer->getReinforcementPool() > 0)
+//     {
+//         // cout << "Debug playerIssueOrder. Num of reinforcement pool: " << issuingPlayer->getReinforcementPool() << endl;
+//         // Check if there is no more territory in priority queue -> rebuild it until pool is empty
+//         if (issuingPlayer->getPriorityDefending().empty())
+//         {
+//             for (Territory *toDefend : issuingPlayer->toDefend())
+//             {
+//                 issuingPlayer->addToPriorityDefend(toDefend);
+//             }
+//         }
+//         Territory *territoryTarget = issuingPlayer->getPriorityDefending().top();
+//         // Create Deploy -> decrease reinforcement
+//         Deploy *deploy = new Deploy(1, issuingPlayer, territoryTarget);
+//         issuingPlayer->setReinforcementPool(issuingPlayer->getReinforcementPool() - 1);
+//         // cout << "Issueing: " << deploy->getDetails() << endl;
+//         issuingPlayer->issueOrder(deploy);
+//         issuingPlayer->popPriorityDefend();
+//     }
+//     else // when no more reinforcementPool
+//     {
+//         // (3) Advance
+//         if (issuingPlayer->isDoneDeploying() == false)
+//         {
+//             // This block should be entered only ONCE, before the first Advance order
+//             issuingPlayer->setDoneDeploying(true);
+//             issuingPlayer->getPriorityDefending() = priority_queue<Territory *, vector<Territory *>, compareArmySize>(); // clear queue
+//             for (Territory *toDefend : issuingPlayer->toDefend())
+//             {
+//                 issuingPlayer->addToPriorityDefend(toDefend);
+//             }
+//         }
+//         if (issuingPlayer->isDoneDeploying() and (issuingPlayer->getPriorityDefending().size() > 0 && issuingPlayer->getPriorityAttacking().size() > 0))
+//         {
+//             // Need to handle the case when the size of priorityAttack =/= size of priorityDefence => rebuild one or both queues depending on the strategy
+//             Player *currentPlayer = issuingPlayer;
+//             Territory *territorySource = currentPlayer->getPriorityDefending().top();
+//             Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
+//             Advance *advance = new Advance((territorySource->getNumberOfArmies() / 2), currentPlayer, territorySource, territoryTarget);
+//             // cout << "Issueing! " << advance->getDetails() << endl;
+//             currentPlayer->issueOrder(advance);
+//             currentPlayer->popPriorityAttack();
+//             currentPlayer->popPriorityDefend();
 
-    if (issuingPlayer->isDoneIssuing())
-    {
-        // // When done issuing orders, start issuing 1 card order per turn until both player are done...
-        // // flawed but will work
-        // Player *player = issuingPlayer;
-        // cout << "DEBUG: Player " << player->getName() << " wants to play card..." << endl;
-        // if (player->getHand()->getCards().size() > 0)
-        // {
-        //     Territory *territorySrc = new Territory;
-        //     Territory *territoryTarget = new Territory;
-        //     if (player->getPriorityDefending().size() > 0)
-        //     {
-        //         territorySrc = player->popPriorityDefend();
-        //     }
-        //     else
-        //     {
-        //         territorySrc = nullptr;
-        //     }
-        //     if (player->getPriorityAttacking().size() > 0)
-        //     {
-        //         territoryTarget = player->popPriorityAttack();
-        //     }
-        //     else
-        //     {
-        //         territoryTarget = nullptr;
-        //     }
-        //     // Card *lastCard = player->getHand()->useLast();
-        //     // Player &playerRef = *player;
-        //     // Deck &deckRef = *deck;
-        //     // lastCard->play(playerRef, deckRef); // return card to deck
-
-        //     try
-        //     {
-        //         // Method throws exception to handle
-        //         // createOrderFromCard(lastCard, player, territorySrc, territoryTarget);
-        //         cout << " ... played a card... " << endl;
-        //     }
-        //     catch (std::exception e)
-        //     {
-        //         cout << "Cannot create special order from card (not enough resources)" << endl;
-        //     }
-        // }
-
-        return void();
-    }
-
-    // (1) Deploy: until reinforc pool == 0
-    /*
-        Problem:
-        what is there are more armies in the reinforcement pool than there are territory?
-    */
-    if (issuingPlayer->getReinforcementPool() > 0)
-    {
-        // cout << "Debug playerIssueOrder. Num of reinforcement pool: " << issuingPlayer->getReinforcementPool() << endl;
-        // Check if there is no more territory in priority queue -> rebuild it until pool is empty
-        if (issuingPlayer->getPriorityDefending().empty())
-        {
-            for (Territory *toDefend : issuingPlayer->toDefend())
-            {
-                issuingPlayer->addToPriorityDefend(toDefend);
-            }
-        }
-
-        Territory *territoryTarget = issuingPlayer->getPriorityDefending().top();
-
-        // Create Deploy -> decrease reinforcement
-        Deploy *deploy = new Deploy(1, issuingPlayer, territoryTarget);
-        issuingPlayer->setReinforcementPool(issuingPlayer->getReinforcementPool() - 1);
-
-        // cout << "Issueing: " << deploy->getDetails() << endl;
-        issuingPlayer->issueOrder(deploy);
-        issuingPlayer->popPriorityDefend();
-    }
-    else // when no more reinforcementPool
-    {
-        // (3) Advance
-        /*TODO: Before the first issueing of an Advance order
-            - Put Player::isDoneDeploying flag to TRUE
-            - Rebuild the defending priority queue after deploying phase is done
-        */
-        if (issuingPlayer->isDoneDeploying() == false)
-        {
-            // This block should be entered only ONCE, before the first Advance order
-            issuingPlayer->setDoneDeploying(true);
-            issuingPlayer->getPriorityDefending() = priority_queue<Territory *, vector<Territory *>, compareArmySize>(); // clear queue
-            for (Territory *toDefend : issuingPlayer->toDefend())
-            {
-                issuingPlayer->addToPriorityDefend(toDefend);
-            }
-        }
-
-        if (issuingPlayer->isDoneDeploying() and (issuingPlayer->getPriorityDefending().size() > 0 && issuingPlayer->getPriorityAttacking().size() > 0))
-        {
-            // Need to handle the case when the size of priorityAttack =/= size of priorityDefence => rebuild one or both queues depending on the strategy
-            Player *currentPlayer = issuingPlayer;
-            Territory *territorySource = currentPlayer->getPriorityDefending().top();
-            Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
-            Advance *advance = new Advance((territorySource->getNumberOfArmies() / 2), currentPlayer, territorySource, territoryTarget);
-            // cout << "Issueing! " << advance->getDetails() << endl;
-            currentPlayer->issueOrder(advance);
-            currentPlayer->popPriorityAttack();
-            currentPlayer->popPriorityDefend();
-        }
-        // check if no more advance order can be created -> set isDone flag to true
-        if (issuingPlayer->getPriorityDefending().size() == 0 || issuingPlayer->getPriorityAttacking().size() == 0)
-        {
-            issuingPlayer->toggleDoneIssuing();
-            // cout << "Finished issueing Deploy and Advance. isDone flag is set to " << to_string(issuingPlayer->isDoneIssuing()) << endl;
-        }
-    }
-}
+//         //Changing the neutral players flag added by Alexander
+// if(territoryTarget->getOwner() != currentPlayer && territoryTarget->getOwner()->getPlayerStrategy()->strategyName() == "Neutral strategy")
+// dynamic_cast<NeutralPlayerStrategy*>(territoryTarget->getOwner()->getPlayerStrategy())->toggleHasBeenAttacked();
+//         }
+//         // check if no more advance order can be created -> set isDone flag to true
+//         if (issuingPlayer->getPriorityDefending().size() == 0 || issuingPlayer->getPriorityAttacking().size() == 0)
+//         {
+//             issuingPlayer->toggleDoneIssuing();
+//             // cout << "Finished issueing Deploy and Advance. isDone flag is set to " << to_string(issuingPlayer->isDoneIssuing()) << endl;
+//         }
+//     }
+// }
 
 void GameEngine::issueOrdersPhase()
 {
@@ -1010,15 +921,13 @@ void GameEngine::issueOrdersPhase()
         for (Territory *toAttack : p->toAttack())
         {
             p->addToPriorityAttack(toAttack);
-            showToAttack += toAttack->getName() + "(" + to_string(toAttack->getNumberOfArmies()) + ")"
-                 + ", ";
+            showToAttack += toAttack->getName() + "(" + to_string(toAttack->getNumberOfArmies()) + ")" + ", ";
         }
         string showToDefend = "Start of issueOrderPhase : player " + p->getName() + "'s toDefend = ";
         for (Territory *toDefend : p->toDefend())
         {
             p->addToPriorityDefend(toDefend);
-            showToDefend += toDefend->getName() + "(" + to_string(toDefend->getNumberOfArmies()) + ")"
-                 + ", ";
+            showToDefend += toDefend->getName() + "(" + to_string(toDefend->getNumberOfArmies()) + ")" + ", ";
         }
         dprint(showToAttack, section::issueorder);
         dprint(showToDefend, section::issueorder);
@@ -1026,13 +935,13 @@ void GameEngine::issueOrdersPhase()
     }
     while (!allPlayersDone())
     {
-        for (int i = 0; i < currentPlayers.size(); i++)
+        for (int i = 0; i < currentPlayers.size(); ++i)
         {
             dprint("\nGameEngine:: Player " + currentPlayers.at(i)->getName() + " is now entering playerIssueOrder method.\n", section::issueorder);
 
-            // Free function to implement as Player::issueOrder
-            playerIssueOrder(this->deck, currentPlayers.at(i));
+            currentPlayers.at(i)->issueOrder();
         }
+        auditPlayers(); // audit players inside the issueOrdersPhase due to presence of cheaters!
     }
 }
 
@@ -1069,8 +978,7 @@ void GameEngine::executeOrdersPhase()
             bool played = false;
 
             // Debug flag
-            string numOrdersLeftMsg = "\tGameEngine:: Player: " + currentPlayer->getName() +" has " 
-            + to_string(currentPlayer->getOrderList()->getList().size()) + " left orders to execute. ";
+            string numOrdersLeftMsg = "\tGameEngine:: Player: " + currentPlayer->getName() + " has " + to_string(currentPlayer->getOrderList()->getList().size()) + " left orders to execute. ";
             dprint(numOrdersLeftMsg, section::execorder);
 
             // Check if player still has order to execute, if not, skip iteration
@@ -1080,7 +988,7 @@ void GameEngine::executeOrdersPhase()
                 continue;
             }
 
-            // TODO: refactor this Order execution 
+            // TODO: refactor this Order execution
             if (currentPlayer->getOrderList()->getList().at(0)->getCommand() == "Deploy type")
             {
                 for (Order *order : currentPlayers.at(i)->getOrderList()->getList())
@@ -1138,7 +1046,6 @@ void riskGameDriver()
         if (engine->getCurrentStateName() == "start")
         {
             pressToContinueWith("REPLAY");
-
         }
         else if (engine->getCurrentStateName() == "final")
         {
@@ -1162,8 +1069,8 @@ void GameEngine::mainGameLoop()
 
     bool noWinner = true;
     // Keeping track of turns for tournament mode
-    int maximumNumberOfTurns = getPlayerTurn();
-    int numOfTurns;
+    int maximumNumberOfTurns = 50;
+    int numOfTurns = 0;
     // while (noWinner && (numOfTurns < maximumNumberOfTurns))
     while (noWinner)
     {
@@ -1200,7 +1107,6 @@ void GameEngine::mainGameLoop()
             dprint("Exited GameEngine::executeOrderPhase successfully", section::mainGameLoop);
         }
 
-        
         Player *winner = 0;
         for (auto p : getPlayers())
         {
@@ -1212,7 +1118,7 @@ void GameEngine::mainGameLoop()
             this->doTransition("win");
             cout << " ****************************************** " << endl;
             cout << "\nPlayer " << winner->getName() << " won the game!" << endl;
-            
+
             // Show the territories conquered by winner and the territories owned by losers (should be none)
             for (auto p : getEliminatedPlayers()) // loop for players who were audited out
             {
@@ -1257,17 +1163,9 @@ void GameEngine::mainGameLoop()
         }
 
         numOfTurns++;
-        setPlayerTurn(numOfTurns);
-        string endOfTurnMsg = "End of turn " + to_string(getPlayerTurn()) + "\n";
+        string endOfTurnMsg = "End of turn " + to_string(numOfTurns) + "\n";
         dprint(endOfTurnMsg, section::mainGameLoop);
-
-        //for running the tournament loop with given number of turns as input
-        if(getPlayerTurn()==maximumNumberOfTurns){
-            break;
-        }else if(maximumNumberOfTurns <10 || maximumNumberOfTurns>50){
-            cout<<"invalid number of turns!"<<endl;
-            exit(0);
-        }
+        pressToContinueWith("TURN");
     }
 
     // To delete
@@ -1280,13 +1178,6 @@ void GameEngine::mainGameLoop()
 /*    (๑•̀ᗝ•́)૭               (ง°ل͜°)ง       */
 /* **************************************** */
 
-int GameEngine::getPlayerTurn() {
-    return playerTurn;
-}
-void GameEngine::setPlayerTurn(int turn) {
-    playerTurn= turn;
-}
-
 // Format: tournament -M <listofmapfiles> -P <listofplayerstrategies> -G <numberofgames> -D <maxnumberofturns>
 void GameEngine::enterTournamentMode(Command *command)
 {
@@ -1294,7 +1185,7 @@ void GameEngine::enterTournamentMode(Command *command)
     vector<string> mapFileNames = {};
     vector<string> playerTypes = {};
     int numOfGames = 0;
-    int numOfTurns;
+    int numOfTurns = 0;
     try
     {
         for (int i = 0; i < command->getArgs().size();)
@@ -1327,7 +1218,6 @@ void GameEngine::enterTournamentMode(Command *command)
             else if (args[i] == "-D")
             {
                 numOfTurns = std::stoi(args[++i]);
-                setPlayerTurn(numOfTurns);
             }
             else
             {
@@ -1340,21 +1230,13 @@ void GameEngine::enterTournamentMode(Command *command)
         cout << e.what();
         exit(0);
     }
-    string path = "../maps/";
-    MapLoader *mapLoader = new MapLoader();
 
-
-    //TODO: create player types + load the maps, add it to the gameEngine players and maps
-    for (int i = 0; i < mapFileNames.size(); i++) {//loops over all the maps first
-        for (int j = 0; j < numOfGames; j++) {//then number of games
-            //TODO: load map here
-            //load map from each indexes of mapFileNames vector
-            cout<<"loading map: "<<mapFileNames[i]<<endl;
-            string fpath = path.append(mapFileNames[i]);
-            Map x1 = *mapLoader->loadMap(fpath);
-            Map *map1 = new Map(x1);
-            setMap(map1);
-            map1->showLoadedMap();
+    // TODO: create player types + load the maps, add it to the gameEngine players and maps
+    for (int i = 0; i < numOfGames; i++)
+    {
+        for (int j = 0; j < mapFileNames.size(); j++)
+        {
+            // TODO: load map here
             StartupPhase sp;
             sp.setGameEng(this);
             sp.startup();

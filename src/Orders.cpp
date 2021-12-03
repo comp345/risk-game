@@ -6,9 +6,7 @@
 #include "PlayerStrategies.h"
 #include "GameEngine.h"
 
-
 using namespace std;
-
 
 // Debugger (declared in GameEngine.cpp), enum type section declared in GameEngine.h
 extern void dprint(string message, section option);
@@ -98,14 +96,13 @@ Deploy::Deploy(int armies, Player *player, Territory *territory)
     string _command = "Deploy type";
     setCommand(_command);
     updateDetails();
-
 }
 
-/** 
+/**
  * Deploy Copy constructor 1 => can be used to create duplicate Deploy orders whose execution will be the same as the Original Deploy
  * Deep copy, with pointers of copy Deploy pointing to the same pointers (Player, Territory) as original
  * Is this desirable?
-*/
+ */
 // Deploy::Deploy(const Deploy &d) : Order(d.getCommand(), d.getDetails()),
 // armiesToMove(d.getArmies()), playerDeploying(d.getPlayer()), territoryTarget(d.getTerritory())
 // {
@@ -144,12 +141,12 @@ Deploy &Deploy::operator=(const Deploy &d)
 
 /**
  * Run down of creation and exec of Deploy order:
- * - Inside Part 3: issueOrdersPhase() { 
- *      determine which order to create depending on toDefend/toAttack territory, 
- *      create new <OrderSubType> (numberOfArmies, playerDeploying=engine.players[i], territoryTarget=toDefend().popFirst(), 
+ * - Inside Part 3: issueOrdersPhase() {
+ *      determine which order to create depending on toDefend/toAttack territory,
+ *      create new <OrderSubType> (numberOfArmies, playerDeploying=engine.players[i], territoryTarget=toDefend().popFirst(),
  *      then engine.players[i].orderList->add(o)
  *      }
- * - Inside Part 3: execOrdersPhase() { 
+ * - Inside Part 3: execOrdersPhase() {
  *      // round robin loop: while orderList != empty for every players; for i in range(num of players))
  *      engine.players[i].orderList.at(0)->execute();
  *      // after executing the order, pop the order and finish iteration
@@ -269,8 +266,8 @@ bool Advance::validate()
         if (negotiatee == territoryTarget->getOwner())
         {
             // cout << "Debug: Advance::validate() Negotiation is happening between advancing player "
-                //  << playerAdvancing->getName() << " and target territory owner, " 
-                //  << territoryTarget->getOwner()->getName() << endl;
+            //  << playerAdvancing->getName() << " and target territory owner, "
+            //  << territoryTarget->getOwner()->getName() << endl;
             return false;
         }
     }
@@ -319,13 +316,6 @@ bool Advance::execute()
                 getTerritorySource()->getNumberOfArmies() - getArmies());
             // Attack enemy
             bonus = simulateAttack();
-
-            //Check if the enemy was a Netural player
-            if(getTerritoryTarget()->getOwner()->getPlayerStrategy()->strategyName() == "Neutral strategy"){
-                //Cast it
-                NeutralPlayerStrategy* nps = dynamic_cast<NeutralPlayerStrategy*>(getTerritoryTarget()->getOwner()->getPlayerStrategy());
-                nps->toggleHasBeenAttacked();
-            }
         }
         else
         {
@@ -375,18 +365,29 @@ bool Advance::simulateAttack()
 
     } // Outcome: Either all defenders are dead, or all attackers are dead
     dprint("\t\tResult of battle: \n", section::fromOrder);
-    dprint("\t\tResult of battle: Attacker armies=" + to_string(this->getArmies())
-         + " Defender armies=" + to_string(territoryTarget->getNumberOfArmies()) + "\n", section::fromOrder);
+    dprint("\t\tResult of battle: Attacker armies=" + to_string(this->getArmies()) + " Defender armies=" + to_string(territoryTarget->getNumberOfArmies()) + "\n", section::fromOrder);
     // If attack wins
     bool win = (this->getArmies() > 0) ? true : false;
+
+    // Regardless of attack result, if enemy was neutral, he becomes aggressive
+    // Check if the enemy was a Netural player
+    if (getTerritoryTarget()->getOwner()->getPlayerStrategy()->strategyName() == "Neutral strategy")
+    {
+        // Cast it
+        cout << "Neutral player " << getTerritoryTarget()->getOwner()->getName() << " was attacked (debug from simulatedAttack)" << endl;
+        NeutralPlayerStrategy *nps = dynamic_cast<NeutralPlayerStrategy *>(getTerritoryTarget()->getOwner()->getPlayerStrategy());
+        nps->toggleHasBeenAttacked();
+    }
+
     if (win)
     {
+
         // set target armies number as remaining attacking armies
         territoryTarget->setNumberOfArmies(this->getArmies());
 
         // !! Remove ownership of the previous player (remove from enemy's territory list)
         int count = 0;
-        vector<Territory *>& enemyTerr = territoryTarget->getOwner()->getTerritories();
+        vector<Territory *> &enemyTerr = territoryTarget->getOwner()->getTerritories();
         for (vector<Territory *>::iterator it = enemyTerr.begin(); it != enemyTerr.end(); ++it)
         {
             if (*it == getTerritoryTarget())
@@ -401,7 +402,7 @@ bool Advance::simulateAttack()
         territoryTarget->setOwner(this->getPlayer());
         this->getPlayer()->addTerritory(territoryTarget);
 
-        dprint("\t\tSuccessful attack: Territory " + territoryTarget->getName() + " is won by " + playerAdvancing->getName() + "\n", section::fromOrder); 
+        dprint("\t\tSuccessful attack: Territory " + territoryTarget->getName() + " is won by " + playerAdvancing->getName() + "\n", section::fromOrder);
     }
 
     updateDetails(); // Advance order is modified
@@ -435,9 +436,7 @@ void Advance::setTerritoryTarget(Territory *t)
 void Advance::updateDetails()
 {
     string _desc = getCommand() + " = {" + getPlayer()->getName() + " advances " +
-                   to_string(getArmies()) + " army units from " + getTerritorySource()->getName() + " to " 
-                   + getTerritoryTarget()->getName() + ", owned by " 
-                   + getTerritoryTarget()->getOwner()->getName() + "}.";
+                   to_string(getArmies()) + " army units from " + getTerritorySource()->getName() + " to " + getTerritoryTarget()->getName() + ", owned by " + getTerritoryTarget()->getOwner()->getName() + "}.";
     setDetails(_desc);
 }
 
@@ -479,7 +478,7 @@ Bomb &Bomb::operator=(const Bomb &b)
     return *this;
 }
 
-//TODO: check if adjacency works
+// TODO: check if adjacency works
 bool Bomb::validate()
 {
     bool adjacent = false;
@@ -593,8 +592,7 @@ Blockade &Blockade::operator=(const Blockade &b)
 
 void Blockade::updateDetails()
 {
-    string _details = "Player " + player->getName() + " blockades " + target->getName() + ", owned by " + target->getOwner()->getName()
-    + ". Territory ownership is passed to the neutral player " + neutral->getName();
+    string _details = "Player " + player->getName() + " blockades " + target->getName() + ", owned by " + target->getOwner()->getName() + ". Territory ownership is passed to the neutral player " + neutral->getName();
     string desc = getCommand() + " = {" + _details + "}";
     setDetails(desc);
 }
@@ -616,12 +614,12 @@ bool Blockade::execute()
         target->setNumberOfArmies(target->getNumberOfArmies() * 2);
         target->setOwner(neutral);
         neutral->addTerritory(target);
-        
+
         int count = 0;
 
-        //removing the target from player territory list
-        // REVIEW THIS 
-        // CAREFUL: isn't playerTerr a reference?
+        // removing the target from player territory list
+        //  REVIEW THIS
+        //  CAREFUL: isn't playerTerr a reference?
         vector<Territory *> playerTerr = player->getTerritories();
         for (vector<Territory *>::iterator it = playerTerr.begin(); it != playerTerr.end(); ++it)
         {
@@ -633,7 +631,6 @@ bool Blockade::execute()
         }
 
         playerTerr.erase(playerTerr.begin() + count);
-
 
         return true;
     }
@@ -840,20 +837,20 @@ bool Negotiate::execute()
 {
     if (validate())
     {
-        //TODO: in ExecuteOrder phase, flush all players' negotiateWith vector with helper method
+        // TODO: in ExecuteOrder phase, flush all players' negotiateWith vector with helper method
         /*
             Source player and Target player cannot attack each other during a turn
-            
-            Definition of "one turn" : ~one sequence of execution during which every player 
+
+            Definition of "one turn" : ~one sequence of execution during which every player
             executes exactly one order.~ OR a whole execution turn (every player finished executing all orders from their list)
-            
+
             When sourcePlayer negotiates with targetPlayer, during this turn (aka one whole OrdersExecution phase),
             any advance orders of one of these player on the other enemy ARE DROPPED.
 
             => add this implementation by adding Player * isNegotiating (and other helpers)  to Player class. DONE.
             => add implementation inside Advance: Check if territory is not owed by advancing player + check if
             player and enemy are negotiating... DONE.
-            
+
             => TODO Remove negotiatees from vector (FLUSH negotiatingWith vector) at the end of turn/OrderExecutionPhase.
             (logic to implement in GameEngine?? using Player::removeAllNegotiation)
         */
@@ -981,7 +978,7 @@ void OrderList::printList()
     cout << "\n";
 }
 
-//when an order is added to the order list of a player, output the order to the log file
+// when an order is added to the order list of a player, output the order to the log file
 string OrderList::stringToLog()
 {
     return "Order was added to the OrderList of a player. Order: " + this->list.back()->getCommand();
