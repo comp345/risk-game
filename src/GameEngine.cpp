@@ -546,7 +546,6 @@ void GameEngine::preStartup()
         Player *p = new Player();
         p->setPlName(cmdPlName);
         p->setReinforcementPool(5);
-        p->setPlayerStrategy(new AggressivePlayerStrategy(p));
         cout << *p << "Number of Armies: " << p->getReinforcementPool() << endl;
         cout << "Cards in players hand: " << p->getHand() << endl;
         currentPlayers.push_back(p);
