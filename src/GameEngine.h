@@ -115,7 +115,7 @@ private:
 
     /* NEW */
     vector<Player *> eliminatedPlayers; // keep tracks of players who lost
-    int playerTurn;
+    int maxTurn;
 
 public:
     GameEngine(std::string newFile = "");
@@ -163,8 +163,8 @@ public:
 
     Deck *getDeck();
 
-    int getPlayerTurn();
-    void setPlayerTurn(int turn);
+    int getMaxTurn();
+    void setMaxTurn(int turn);
 
     // Alexanders additions:
     void mainGameLoop();
@@ -179,8 +179,7 @@ public:
     void enterTournamentMode(Command *pCommand);
 
     void initStates();
-
-
+    void cleanup();
 };
 
 class StartupPhase
