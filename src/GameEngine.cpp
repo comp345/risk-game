@@ -697,13 +697,13 @@ void StartupPhase::startup()
             cout << *p << endl;
         }
 
-        dprint("= Debugging before gamestart: Hardcoding player strategies\n", section::startup);
-        // Hardcoding the second player to be whatever strategy we want to test
-        eng->getPlayers().at(1)->setPlayerStrategy(new NeutralPlayerStrategy(eng->getPlayers().at(1)));
-        for (auto player : eng->getPlayers())
-        {
-            dprint("\t" + player->getName() + " uses strat " + player->getPlayerStrategy()->strategyName(), section::startup);
-        }
+//        dprint("= Debugging before gamestart: Hardcoding player strategies\n", section::startup);
+//        // Hardcoding the second player to be whatever strategy we want to test
+//        eng->getPlayers().at(1)->setPlayerStrategy(new NeutralPlayerStrategy(eng->getPlayers().at(1)));
+//        for (auto player : eng->getPlayers())
+//        {
+//            dprint("\t" + player->getName() + " uses strat " + player->getPlayerStrategy()->strategyName(), section::startup);
+//        }
     }
     else
     {
@@ -735,16 +735,13 @@ void GameEngine::auditPlayers()
 Player *GameEngine::hasWinner()
 {
     // Get the players territories
-    for (Player *p : currentPlayers)
+    for (auto p : getPlayers())
     {
-
-        if (map->getTerritorySize() == p->getTerritories().size())
-        {
+        if (p->getTerritories().size() == getMap()->getTerritorySize())
             return p;
-        }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void GameEngine::reinforcementPhase(Player *p)
@@ -1240,8 +1237,9 @@ void GameEngine::enterTournamentMode(Command *command) {
     StartupPhase sp;
     sp.setGameEng(this);
 
-    for (int i = 0; i < mapFileNames.size(); i++) {//loops over all the maps first
-        for (int j = 0; j < numOfGames; j++) {//then number of games
+    vector<Player *> winners;
+    for (int i = 0; i < mapFileNames.size(); i++) { //loops over all the maps first
+        for (int j = 0; j < numOfGames; j++) {  //then number of games
             //load map from each indexes of mapFileNames vector
             cout << "loading map: " << mapFileNames[i] << endl;
             string fpath = path.append(mapFileNames[i]);
@@ -1250,33 +1248,27 @@ void GameEngine::enterTournamentMode(Command *command) {
             setMap(map1);
             map1->showLoadedMap();
 
-            vector<Player *> winners;
-            for (int i = 0; i < numOfGames; i++) {
-                for (int j = 0; j < mapFileNames.size(); j++) {
-
-                    // creating players
-                    for (string pType: playerTypes) {
-                        Player *p = new Player();
-                        PlayerStrategy *ps = findPlayerStrategy(pType, p);
-                        p->setPlayerStrategy(ps);
-                        p->setPlName(pType);
-                        p->setReinforcementPool(5);
-                        cout << *p << "Number of Armies: " << p->getReinforcementPool() << endl;
-                        cout << "Cards in players hand: " << p->getHand() << endl; // TODO: prints address
-                        currentPlayers.push_back(p);
-                    }
-
-                    sp.startup();
-                    mainGameLoop();
-//                    Player* p = hasWinner();
-//                    winners.push_back(p);
-                    this->cleanup();
-                }
+            // creating players
+            for (string pType: playerTypes) {
+                Player *p = new Player();
+                PlayerStrategy *ps = findPlayerStrategy(pType, p);
+                p->setPlayerStrategy(ps);
+                p->setPlName(pType);
+                p->setReinforcementPool(5);
+                cout << *p << "Number of Armies: " << p->getReinforcementPool() << endl;
+                cout << "Cards in players hand: " << p->getHand() << endl; // TODO: prints address
+                currentPlayers.push_back(p);
             }
-            //TODO: log winners
-            exit(0);
+
+            sp.startup();
+            mainGameLoop();
+            Player *p = hasWinner();
+            winners.push_back(p);
+            this->cleanup();
         }
     }
+    //TODO: log winners
+    exit(0);
 }
 
 void GameEngine::cleanup() {
