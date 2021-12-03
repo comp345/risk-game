@@ -321,11 +321,11 @@ bool Advance::execute()
             bonus = simulateAttack();
 
             //Check if the enemy was a Netural player
-            if(getTerritoryTarget()->getOwner()->getPlayerStrategy()->strategyName() == "Neutral strategy"){
-                //Cast it
-                NeutralPlayerStrategy* nps = dynamic_cast<NeutralPlayerStrategy*>(getTerritoryTarget()->getOwner()->getPlayerStrategy());
-                nps->toggleHasBeenAttacked();
-            }
+            // if(getTerritoryTarget()->getOwner()->getPlayerStrategy()->strategyName() == "Neutral strategy"){
+            //     //Cast it
+            //     NeutralPlayerStrategy* nps = dynamic_cast<NeutralPlayerStrategy*>(getTerritoryTarget()->getOwner()->getPlayerStrategy());
+            //     nps->toggleHasBeenAttacked();
+            // }
         }
         else
         {
