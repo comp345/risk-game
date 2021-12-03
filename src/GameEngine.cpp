@@ -699,7 +699,7 @@ void StartupPhase::startup()
 
         dprint("= Debugging before gamestart: Hardcoding player strategies\n", section::startup);
         // Hardcode first 2 players' strategies
-        eng->getPlayers().at(0)->setPlayerStrategy(new CheaterPlayerStrategy(eng->getPlayers().at(0)));
+        eng->getPlayers().at(1)->setPlayerStrategy(new CheaterPlayerStrategy(eng->getPlayers().at(1)));
         for (auto player : eng->getPlayers())
         {
             dprint("\t" + player->getName() + " uses strat " + player->getPlayerStrategy()->strategyName(), section::startup);
@@ -931,35 +931,15 @@ void GameEngine::issueOrdersPhase()
     }
     while (!allPlayersDone())
     {
-        for (int i = 0; i < currentPlayers.size(); )
+        for (int i = 0; i < currentPlayers.size(); ++i)
         {
             dprint("\nGameEngine:: Player " + currentPlayers.at(i)->getName() + " is now entering playerIssueOrder method.\n", section::issueorder);
 
             currentPlayers.at(i)->issueOrder();
+            // to do: find position of players eliminated, to make sure we can remove them from iteration
+        
         }
-        // Cannot iterate through players normally while erasing players as they lose
-        // std::vector<int> v = {1, 2, 3, 4, 5, 6};
-
-        // auto player = currentPlayers.begin();
-        // while (player != currentPlayers.end())
-        // {
-        //     // remove odd numbers
-        //     if (*player & 1)
-        //     {
-        //         // `erase()` invalidates the iterator, use returned iterator
-        //         it = v.erase(it);
-        //     }
-        //     // Notice that the iterator is incremented only on the else part (why?)
-        //     else
-        //     {
-        //         ++it;
-        //     }
-        // }
-
-        // for (int const &i : v)
-        // {
-        //     std::cout << i << ' ';
-        // }
+        auditPlayers();
     }
 }
 
