@@ -116,6 +116,7 @@ private:
     /* NEW */
     vector<Player *> eliminatedPlayers; // keep tracks of players who lost
     int maxTurn;
+    bool isTournamentMode;
 
 public:
     GameEngine(std::string newFile = "");

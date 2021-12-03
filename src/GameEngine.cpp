@@ -1162,7 +1162,6 @@ void GameEngine::mainGameLoop()
         }
 
         numOfTurns++;
-        setMaxTurn(numOfTurns);
         string endOfTurnMsg = "End of turn " + to_string(numOfTurns) + "\n";
         dprint(endOfTurnMsg, section::mainGameLoop);
         pressToContinueWith("TURN");
@@ -1201,11 +1200,11 @@ PlayerStrategy* findPlayerStrategy(string pType, Player* p) {
 
 // Format: tournament -M <listofmapfiles> -P <listofplayerstrategies> -G <numberofgames> -D <maxnumberofturns>
 void GameEngine::enterTournamentMode(Command *command) {
+    isTournamentMode = true;
     vector<string> args = command->getArgs();
     vector<string> mapFileNames = {};
     vector<string> playerTypes = {};
     int numOfGames = 0;
-    int numOfTurns = 0;
     try {
         for (int i = 0; i < command->getArgs().size();) {
             // extract args
@@ -1226,8 +1225,7 @@ void GameEngine::enterTournamentMode(Command *command) {
             } else if (args[i] == "-G") {
                 numOfGames = std::stoi(args[++i]);
             } else if (args[i] == "-D") {
-                numOfTurns = std::stoi(args[++i]);
-                setMaxTurn(numOfTurns);
+                setMaxTurn(std::stoi(args[++i]));
             } else {
                 i++;
             }
