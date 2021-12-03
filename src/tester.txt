@@ -1,6 +1,4 @@
-wefwef
 loadmap
-wefewefew
 loadmap
 validatemap
 bullshit

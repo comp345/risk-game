@@ -1,4 +1,4 @@
-loadmap
+loadmap fakecountry.map
 validatemap 
 addplayer 
 gamestart 

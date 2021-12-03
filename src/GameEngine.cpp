@@ -13,6 +13,7 @@
 #include "Card.h"
 #include <exception>
 #include "CommandProcessor.h"
+#include "PlayerStrategies.h"
 
 namespace fs = filesystem;
 using namespace std;
@@ -545,6 +546,7 @@ void GameEngine::preStartup()
         Player *p = new Player();
         p->setPlName(cmdPlName);
         p->setReinforcementPool(5);
+        p->setPlayerStrategy(new AggressivePlayerStrategy(p));
         cout << *p << "Number of Armies: " << p->getReinforcementPool() << endl;
         cout << "Cards in players hand: " << p->getHand() << endl;
         currentPlayers.push_back(p);
@@ -946,7 +948,7 @@ void playerIssueOrder(Deck *deck, Player *issuingPlayer)
         issuingPlayer->setReinforcementPool(issuingPlayer->getReinforcementPool() - 1);
 
         // cout << "Issueing: " << deploy->getDetails() << endl;
-        issuingPlayer->issueOrder(deploy);
+        issuingPlayer->getPlayerStrategy()->issueOrder(deploy);     //Delegate call to the PlayerStrategy.cpp file
         issuingPlayer->popPriorityDefend();
     }
     else // when no more reinforcementPool
@@ -975,9 +977,13 @@ void playerIssueOrder(Deck *deck, Player *issuingPlayer)
             Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
             Advance *advance = new Advance((territorySource->getNumberOfArmies() / 2), currentPlayer, territorySource, territoryTarget);
             // cout << "Issueing! " << advance->getDetails() << endl;
-            currentPlayer->issueOrder(advance);
+            issuingPlayer->getPlayerStrategy()->issueOrder(advance);    //Delegate call to the PlayerStrategy.cpp file
             currentPlayer->popPriorityAttack();
             currentPlayer->popPriorityDefend();
+
+            //Changing the neutral players flag added by Alexander
+            if(territoryTarget->getOwner() != currentPlayer && territoryTarget->getOwner()->getPlayerStrategy()->strategyName() == "Neutral strategy")
+                dynamic_cast<NeutralPlayerStrategy*>(territoryTarget->getOwner())->toggleHasBeenAttacked();
         }
         // check if no more advance order can be created -> set isDone flag to true
         if (issuingPlayer->getPriorityDefending().size() == 0 || issuingPlayer->getPriorityAttacking().size() == 0)
@@ -1005,7 +1011,7 @@ void GameEngine::issueOrdersPhase()
 
         // Debugging: show current content of toAttack and toDefend before each issueOrdersPhase
         string showToAttack = "Start of issueOrderPhase : player " + p->getName() + "'s toAttack = ";
-        for (Territory *toAttack : p->toAttack())
+        for (Territory *toAttack : p->toAttack())            //Delegate call to the PlayerStrategy.cpp file
         {
             p->addToPriorityAttack(toAttack);
             showToAttack += toAttack->getName() + "(" + to_string(toAttack->getNumberOfArmies()) + ")"
@@ -1032,6 +1038,7 @@ void GameEngine::issueOrdersPhase()
             playerIssueOrder(this->deck, currentPlayers.at(i));
         }
     }
+
 }
 
 bool hasOrders(vector<Player *> currentPlayers)
@@ -1131,6 +1138,7 @@ void riskGameDriver()
 
         dprint("Debug: Entering mainGamePlay phase", section::all);
         engine->mainGameLoop();
+
         dprint("Debug: Exiting mainGamePlay phase", section::all);
 
         if (engine->getCurrentStateName() == "start")
@@ -1157,6 +1165,9 @@ void riskGameDriver()
 
 void GameEngine::mainGameLoop()
 {
+//    TODO:: REMOVE FOR DEBUGGING
+    int breakCount = 0;
+
 
     bool noWinner = true;
     // Keeping track of turns for tournament mode
@@ -1257,6 +1268,14 @@ void GameEngine::mainGameLoop()
         numOfTurns++;
         string endOfTurnMsg = "End of turn " + to_string(numOfTurns) + "\n";
         dprint(endOfTurnMsg, section::mainGameLoop);
+
+//**************************************************//
+//                  DEBUG PURPOSES                  //
+//**************************************************//
+
+//        if (breakCount == 0) this->currentPlayers.at(0)->setPlayerStrategy(new NeutralPlayerStrategy(this->currentPlayers.at(0)));
+//        if (breakCount == 3) break;
+//        breakCount++;
     }
 
     // To delete

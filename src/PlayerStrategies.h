@@ -33,7 +33,7 @@ private:
 };
 
 // class CheaterPlayerStrategy: public PlayerStrategy{
-
+//Just takes the adjacent territories and takes it. along with the armies
 // };
 
 // class HumanPlayerStrategy: public PlayerStrategy{
@@ -68,8 +68,8 @@ class NeutralPlayerStrategy: public PlayerStrategy{
 public:
     NeutralPlayerStrategy(Player* p);
     ~NeutralPlayerStrategy();
-    // NeutralPlayerStrategy(const NeutralPlayerStrategy& p);
-    // NeutralPlayerStrategy &operator=(const NeutralPlayerStrategy &ps);
+     NeutralPlayerStrategy(const NeutralPlayerStrategy& p);
+     NeutralPlayerStrategy &operator=(const NeutralPlayerStrategy &ps);
 
     void issueOrder(Order* o);
     vector<Territory *> toAttack();

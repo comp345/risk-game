@@ -126,6 +126,7 @@ vector<Territory *> BenevolentPlayerStrategy::toAttack()
 {
     //Since a benevolent player never advances to an enemy territory,
     //All this advance orders will target his own territories.
+    //TODO:: Check to make sure there are adj territories.
     return getPlayer()->getTerritories();
 };
 
@@ -154,9 +155,6 @@ void NeutralPlayerStrategy::issueOrder(Order *o)
 {
     if(hasBeenAttacked == true)
         getPlayer()->setPlayerStrategy(new AggressivePlayerStrategy(getPlayer()));
-
-    // Doesnt issue any order?
-    // getPlayer()->getOrderList()->add(o);
 }
 
 vector<Territory *> NeutralPlayerStrategy::toAttack()
@@ -176,8 +174,27 @@ string NeutralPlayerStrategy::strategyName()
 }
 
 void NeutralPlayerStrategy::toggleHasBeenAttacked(){
-    if(hasBeenAttacked)
+    cout << "DEBUG:: " << getPlayer()->getName() << " use to be a " << this->strategyName();
+    if(hasBeenAttacked) {
         hasBeenAttacked = false;
-    else
+    }else {
         hasBeenAttacked = true;
+    }
+    cout << " and is now a " << this->strategyName();
+}
+
+NeutralPlayerStrategy::NeutralPlayerStrategy(const NeutralPlayerStrategy &ps) : PlayerStrategy(ps)
+{
+    cout << "COPY CTOR CALLED @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@";
+    this->hasBeenAttacked = ps.hasBeenAttacked;
+}
+
+NeutralPlayerStrategy &NeutralPlayerStrategy::operator=(const NeutralPlayerStrategy &ps)
+{
+    cout << "ASSIGNEMNT OPERATOR CALLED @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@";
+    if (this == &ps)
+        return *this;
+
+    this->hasBeenAttacked = ps.hasBeenAttacked;
+    return *this;
 }

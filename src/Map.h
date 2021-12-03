@@ -50,10 +50,11 @@ public:
 
     bool operator<(const Territory& rhs);
     int numArmies = 0; // do not make private
+    Player* owner;     // had to make public since compareArmySize needs to get the strategy of the player.
 private:
     int ID;
     string name;
-    Player* owner;
+
     
     
     // int neighbors = 0;
