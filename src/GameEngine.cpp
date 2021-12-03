@@ -1340,12 +1340,21 @@ void GameEngine::enterTournamentMode(Command *command)
         cout << e.what();
         exit(0);
     }
+    string path = "../maps/";
+    MapLoader *mapLoader = new MapLoader();
+
 
     //TODO: create player types + load the maps, add it to the gameEngine players and maps
     for (int i = 0; i < mapFileNames.size(); i++) {//loops over all the maps first
         for (int j = 0; j < numOfGames; j++) {//then number of games
             //TODO: load map here
             //load map from each indexes of mapFileNames vector
+            cout<<"loading map: "<<mapFileNames[i]<<endl;
+            string fpath = path.append(mapFileNames[i]);
+            Map x1 = *mapLoader->loadMap(fpath);
+            Map *map1 = new Map(x1);
+            setMap(map1);
+            map1->showLoadedMap();
             StartupPhase sp;
             sp.setGameEng(this);
             sp.startup();
