@@ -795,10 +795,7 @@ void GameEngine::reinforcementPhase(Player *p)
             ownsContinent = false;
         }
 
-        string doneReinforcement = "Player: " +  p->getName() + " has " + to_string(p->getReinforcementPool())
-         +" in his reinforcement pool.";
-
-        dprint(doneReinforcement, section::reinforcement);
+        
     }
 
     /* ************************************* */
@@ -810,6 +807,11 @@ void GameEngine::reinforcementPhase(Player *p)
 
     // placed in the player’s reinforcement pool.
     p->setReinforcementPool(p->getReinforcementPool() + numberOfArmies);
+    
+    string doneReinforcement = "Player: " +  p->getName() + " has " + to_string(p->getReinforcementPool())
+         +" in his reinforcement pool.";
+
+        dprint(doneReinforcement, section::reinforcement);
 }
 
 // returns false if someone is still issuing orders
