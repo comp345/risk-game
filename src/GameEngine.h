@@ -139,11 +139,7 @@ public:
     // check if command is valid and updates current state accordingly
     bool doTransition(std::string command);
 
-    // check if command is valid. no update.
-    bool validateCommand(std::string command);
-
     void testGameEngine();
-    void testPart3();
     string stringToLog() override;
 
     void randomizePlayersTurn();
@@ -181,6 +177,7 @@ public:
 
     void initStates();
     void cleanup();
+    void logWinners(Player* player, string map, int game);
 };
 
 class StartupPhase

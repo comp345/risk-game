@@ -12,6 +12,7 @@
 #include "Orders.h"
 #include "Card.h"
 #include <exception>
+#include <fstream>
 #include "CommandProcessor.h"
 #include "PlayerStrategies.h"
 
@@ -1067,8 +1068,8 @@ void GameEngine::mainGameLoop()
 
     bool noWinner = true;
     // Keeping track of turns for tournament mode
-    int numOfTurns;
-     while (noWinner || (isTournamentMode && numOfTurns < getMaxTurn()))
+    int numOfTurns = 0;
+    while ((noWinner && !isTournamentMode) || numOfTurns < getMaxTurn())
     {
 
         /* ****************************** */
@@ -1134,6 +1135,11 @@ void GameEngine::mainGameLoop()
                 }
                 cout << ")" << endl;
             }
+            if (isTournamentMode) {
+                cout << "Results were logged to a file." << endl;
+                doTransition("quit");
+                return;
+            }
             cout << "Do you wish to replay? (y/n)" << endl;
             string input;
             cin >> input;
@@ -1161,7 +1167,9 @@ void GameEngine::mainGameLoop()
         numOfTurns++;
         string endOfTurnMsg = "End of turn " + to_string(numOfTurns) + "\n";
         dprint(endOfTurnMsg, section::mainGameLoop);
-        pressToContinueWith("TURN");
+        if (!isTournamentMode) {
+            pressToContinueWith("TURN");
+        }
     }
 
     // To delete
@@ -1181,7 +1189,7 @@ void GameEngine::setMaxTurn(int turn) {
     maxTurn = turn;
 }
 
-PlayerStrategy* findPlayerStrategy(string pType, Player* p) {
+PlayerStrategy* getPlayerStrategy(string pType, Player* p) {
     if (pType == "aggressive") {
         return new AggressivePlayerStrategy(p);
     } else if (pType == "benevolent") {
@@ -1195,6 +1203,13 @@ PlayerStrategy* findPlayerStrategy(string pType, Player* p) {
     } else {
         return new NormalPlayerStrategy(p);
     }
+}
+
+void GameEngine::logWinners(Player* player, string map, int game) {
+    std::ofstream logFile;
+    logFile.open("../tournament_results.txt", std::ios_base::app);
+    logFile << "Map: " << map << " | Game: " << game << " | Winner: " << player->getName() << endl;
+    logFile.close();
 }
 
 // Format: tournament -M <listofmapfiles> -P <listofplayerstrategies> -G <numberofgames> -D <maxnumberofturns>
@@ -1239,7 +1254,6 @@ void GameEngine::enterTournamentMode(Command *command) {
     StartupPhase sp;
     sp.setGameEng(this);
 
-    vector<Player *> winners;
     for (int i = 0; i < mapFileNames.size(); i++) { //loops over all the maps first
         for (int j = 0; j < numOfGames; j++) {  //then number of games
             //load map from each indexes of mapFileNames vector
@@ -1253,7 +1267,7 @@ void GameEngine::enterTournamentMode(Command *command) {
             // creating players
             for (string pType: playerTypes) {
                 Player *p = new Player();
-                PlayerStrategy *ps = findPlayerStrategy(pType, p);
+                PlayerStrategy *ps = getPlayerStrategy(pType, p);
                 p->setPlayerStrategy(ps);
                 p->setPlName(pType);
                 p->setReinforcementPool(5);
@@ -1264,12 +1278,11 @@ void GameEngine::enterTournamentMode(Command *command) {
 
             sp.startup();
             mainGameLoop();
-            Player *p = hasWinner();
-            winners.push_back(p);
+            Player *winner = hasWinner();
+            logWinners(winner, mapFileNames[i], j + 1);
             this->cleanup();
         }
     }
-    //TODO: log winners
     exit(0);
 }
 
