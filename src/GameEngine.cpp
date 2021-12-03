@@ -1,5 +1,5 @@
 #include <iostream>
-#include <sstream> 
+#include <sstream>
 #include <string>
 #include <vector>
 #include <filesystem>
@@ -546,7 +546,7 @@ void GameEngine::preStartup()
         p->setPlName(cmdPlName);
         p->setReinforcementPool(5);
         cout << *p << "Number of Armies: " << p->getReinforcementPool() << endl;
-        cout << "Cards in players hand: " << p->getHand() << endl; //TODO: prints address
+        cout << "Cards in players hand: " << p->getHand() << endl; // TODO: prints address
         currentPlayers.push_back(p);
 
         cout << "total number of players so far is: " << getNumOfPlayers() << endl;
@@ -555,7 +555,8 @@ void GameEngine::preStartup()
             cout << "have 1 player so far" << endl;
             continue;
         }
-        if (getNumOfPlayers() < 7 && commandProcessor->fileName.empty()) {
+        if (getNumOfPlayers() < 7 && commandProcessor->fileName.empty())
+        {
             cout << "continue adding players? (y/n)" << endl;
             string keyInY;
             getline(cin, keyInY);
@@ -567,7 +568,9 @@ void GameEngine::preStartup()
             {
                 break;
             }
-        } else {
+        }
+        else
+        {
             break;
         }
     }
@@ -748,8 +751,8 @@ void GameEngine::reinforcementPhase(Player *p)
     if (numConqueredTerritories > 0)
         // deck->draw(*p); // Segmentation fault: to investigate
 
-    // update prevTerritorySize
-    p->setPrevTerritorySize();
+        // update prevTerritorySize
+        p->setPrevTerritorySize();
 
     /* ************************* */
     /*      Continent Bonus      */
@@ -789,8 +792,7 @@ void GameEngine::reinforcementPhase(Player *p)
             ownsContinent = false;
         }
 
-        string doneReinforcement = "Player: " +  p->getName() + " has " + to_string(p->getReinforcementPool())
-         +" in his reinforcement pool.";
+        string doneReinforcement = "Player: " + p->getName() + " has " + to_string(p->getReinforcementPool()) + " in his reinforcement pool.";
 
         dprint(doneReinforcement, section::reinforcement);
     }
@@ -823,103 +825,16 @@ bool GameEngine::allPlayersDone()
 */
 Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, Territory *territoryTarget)
 {
-    string checkTypeCard = card->getCommand();
-
-    if (checkTypeCard == "Airlift type")
-    {
-        cout << "... player desires to create an AirLift order by using a valid card!..." << endl;
-        if (!territoryTarget or !territorySrc)
-            throw std::exception();
-        AirLift *a = new AirLift(1, player, territorySrc, territoryTarget);
-        cout << a->getDetails() << endl;
-        return a;
-    }
-
-    if (checkTypeCard == "Bomb type")
-    {
-        cout << "... player desires to create a Bomb order by using a valid card!..." << endl;
-
-        if (!territoryTarget)
-            throw std::exception();
-        Bomb *b = new Bomb(player, territoryTarget);
-        cout << b->getDetails() << endl;
-        return b;
-    }
-    if (checkTypeCard == "Blockade type")
-    {
-        if (!territorySrc)
-            throw std::exception();
-        Blockade *b = new Blockade(territorySrc, player, new Player("neutral (hardcoded)"));
-        cout << b->getDetails() << endl;
-        return b;
-    }
-    if (checkTypeCard == "Diplomacy type")
-    {
-        Negotiate *n = new Negotiate(player, new Player("enemy (hardcoded)"));
-        cout << n->getDetails() << endl;
-        return n;
-    }
-    if (checkTypeCard == "Reinforcement type")
-    {
-        // TODO: add to player's reinforcement pool
-        return nullptr;
-    }
-    else
-    {
-        cout << "== DEBUG in: creatingOrderFromCard. Card is not valid!? ==";
-        cout << checkTypeCard << endl;
-        return nullptr;
-    }
+    return nullptr;
 }
 
 void playerIssueOrder(Deck *deck, Player *issuingPlayer)
 {
-    // when done issueing deploy and advance, issue cards
-    // Bugs: commented out the creation of Orders from Cards
 
     if (issuingPlayer->isDoneIssuing())
     {
-        // // When done issuing orders, start issuing 1 card order per turn until both player are done...
-        // // flawed but will work
-        // Player *player = issuingPlayer;
-        // cout << "DEBUG: Player " << player->getName() << " wants to play card..." << endl;
-        // if (player->getHand()->getCards().size() > 0)
-        // {
-        //     Territory *territorySrc = new Territory;
-        //     Territory *territoryTarget = new Territory;
-        //     if (player->getPriorityDefending().size() > 0)
-        //     {
-        //         territorySrc = player->popPriorityDefend();
-        //     }
-        //     else
-        //     {
-        //         territorySrc = nullptr;
-        //     }
-        //     if (player->getPriorityAttacking().size() > 0)
-        //     {
-        //         territoryTarget = player->popPriorityAttack();
-        //     }
-        //     else
-        //     {
-        //         territoryTarget = nullptr;
-        //     }
-        //     // Card *lastCard = player->getHand()->useLast();
-        //     // Player &playerRef = *player;
-        //     // Deck &deckRef = *deck;
-        //     // lastCard->play(playerRef, deckRef); // return card to deck
-
-        //     try
-        //     {
-        //         // Method throws exception to handle
-        //         // createOrderFromCard(lastCard, player, territorySrc, territoryTarget);
-        //         cout << " ... played a card... " << endl;
-        //     }
-        //     catch (std::exception e)
-        //     {
-        //         cout << "Cannot create special order from card (not enough resources)" << endl;
-        //     }
-        // }
-
+        // when done issueing deploy and advance, issue cards
+        // Bugs: commented out the creation of Orders from Cards
         return void();
     }
 
@@ -1009,15 +924,13 @@ void GameEngine::issueOrdersPhase()
         for (Territory *toAttack : p->toAttack())
         {
             p->addToPriorityAttack(toAttack);
-            showToAttack += toAttack->getName() + "(" + to_string(toAttack->getNumberOfArmies()) + ")"
-                 + ", ";
+            showToAttack += toAttack->getName() + "(" + to_string(toAttack->getNumberOfArmies()) + ")" + ", ";
         }
         string showToDefend = "Start of issueOrderPhase : player " + p->getName() + "'s toDefend = ";
         for (Territory *toDefend : p->toDefend())
         {
             p->addToPriorityDefend(toDefend);
-            showToDefend += toDefend->getName() + "(" + to_string(toDefend->getNumberOfArmies()) + ")"
-                 + ", ";
+            showToDefend += toDefend->getName() + "(" + to_string(toDefend->getNumberOfArmies()) + ")" + ", ";
         }
         dprint(showToAttack, section::issueorder);
         dprint(showToDefend, section::issueorder);
@@ -1068,8 +981,7 @@ void GameEngine::executeOrdersPhase()
             bool played = false;
 
             // Debug flag
-            string numOrdersLeftMsg = "\tGameEngine:: Player: " + currentPlayer->getName() +" has " 
-            + to_string(currentPlayer->getOrderList()->getList().size()) + " left orders to execute. ";
+            string numOrdersLeftMsg = "\tGameEngine:: Player: " + currentPlayer->getName() + " has " + to_string(currentPlayer->getOrderList()->getList().size()) + " left orders to execute. ";
             dprint(numOrdersLeftMsg, section::execorder);
 
             // Check if player still has order to execute, if not, skip iteration
@@ -1079,7 +991,7 @@ void GameEngine::executeOrdersPhase()
                 continue;
             }
 
-            // TODO: refactor this Order execution 
+            // TODO: refactor this Order execution
             if (currentPlayer->getOrderList()->getList().at(0)->getCommand() == "Deploy type")
             {
                 for (Order *order : currentPlayers.at(i)->getOrderList()->getList())
@@ -1137,7 +1049,6 @@ void riskGameDriver()
         if (engine->getCurrentStateName() == "start")
         {
             pressToContinueWith("REPLAY");
-
         }
         else if (engine->getCurrentStateName() == "final")
         {
@@ -1199,7 +1110,6 @@ void GameEngine::mainGameLoop()
             dprint("Exited GameEngine::executeOrderPhase successfully", section::mainGameLoop);
         }
 
-        
         Player *winner = 0;
         for (auto p : getPlayers())
         {
@@ -1211,7 +1121,7 @@ void GameEngine::mainGameLoop()
             this->doTransition("win");
             cout << " ****************************************** " << endl;
             cout << "\nPlayer " << winner->getName() << " won the game!" << endl;
-            
+
             // Show the territories conquered by winner and the territories owned by losers (should be none)
             for (auto p : getEliminatedPlayers()) // loop for players who were audited out
             {
@@ -1323,10 +1233,12 @@ void GameEngine::enterTournamentMode(Command *command)
         exit(0);
     }
 
-    //TODO: create player types + load the maps, add it to the gameEngine players and maps
-    for (int i = 0; i < numOfGames; i++) {
-        for (int j = 0; j < mapFileNames.size(); j++) {
-            //TODO: load map here
+    // TODO: create player types + load the maps, add it to the gameEngine players and maps
+    for (int i = 0; i < numOfGames; i++)
+    {
+        for (int j = 0; j < mapFileNames.size(); j++)
+        {
+            // TODO: load map here
             StartupPhase sp;
             sp.setGameEng(this);
             sp.startup();
