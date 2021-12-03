@@ -1261,8 +1261,12 @@ void GameEngine::mainGameLoop()
         string endOfTurnMsg = "End of turn " + to_string(getPlayerTurn()) + "\n";
         dprint(endOfTurnMsg, section::mainGameLoop);
 
-        if(getPlayerTurn()==maximumNumberOfTurns){//for debugging
+        //for running the tournament loop with given number of turns as input
+        if(getPlayerTurn()==maximumNumberOfTurns){
             break;
+        }else if(maximumNumberOfTurns <10 || maximumNumberOfTurns>50){
+            cout<<"invalid number of turns!"<<endl;
+            exit(0);
         }
     }
 
