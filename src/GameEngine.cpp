@@ -1248,7 +1248,6 @@ void GameEngine::enterTournamentMode(Command *command) {
         cout << e.what();
         exit(0);
     }
-    string path = "../maps/";
     MapLoader *mapLoader = new MapLoader();
 
     StartupPhase sp;
@@ -1256,13 +1255,14 @@ void GameEngine::enterTournamentMode(Command *command) {
 
     for (int i = 0; i < mapFileNames.size(); i++) { //loops over all the maps first
         for (int j = 0; j < numOfGames; j++) {  //then number of games
+            cout << "Starting game: " << j+1 << endl;
+            string path = "../maps/";
             //load map from each indexes of mapFileNames vector
             cout << "loading map: " << mapFileNames[i] << endl;
             string fpath = path.append(mapFileNames[i]);
             Map x1 = *mapLoader->loadMap(fpath);
             Map *map1 = new Map(x1);
             setMap(map1);
-            map1->showLoadedMap();
 
             // creating players
             for (string pType: playerTypes) {
@@ -1271,8 +1271,6 @@ void GameEngine::enterTournamentMode(Command *command) {
                 p->setPlayerStrategy(ps);
                 p->setPlName(pType);
                 p->setReinforcementPool(5);
-                cout << *p << "Number of Armies: " << p->getReinforcementPool() << endl;
-                cout << "Cards in players hand: " << p->getHand() << endl; // TODO: prints address
                 currentPlayers.push_back(p);
             }
 
