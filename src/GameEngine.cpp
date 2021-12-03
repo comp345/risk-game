@@ -839,10 +839,6 @@ void playerIssueOrder(Deck *deck, Player *issuingPlayer)
     }
 
     // (1) Deploy: until reinforc pool == 0
-    /*
-        Problem:
-        what is there are more armies in the reinforcement pool than there are territory?
-    */
     if (issuingPlayer->getReinforcementPool() > 0)
     {
         // cout << "Debug playerIssueOrder. Num of reinforcement pool: " << issuingPlayer->getReinforcementPool() << endl;
@@ -868,10 +864,6 @@ void playerIssueOrder(Deck *deck, Player *issuingPlayer)
     else // when no more reinforcementPool
     {
         // (3) Advance
-        /*TODO: Before the first issueing of an Advance order
-            - Put Player::isDoneDeploying flag to TRUE
-            - Rebuild the defending priority queue after deploying phase is done
-        */
         if (issuingPlayer->isDoneDeploying() == false)
         {
             // This block should be entered only ONCE, before the first Advance order
@@ -943,7 +935,8 @@ void GameEngine::issueOrdersPhase()
             dprint("\nGameEngine:: Player " + currentPlayers.at(i)->getName() + " is now entering playerIssueOrder method.\n", section::issueorder);
 
             // Free function to implement as Player::issueOrder
-            playerIssueOrder(this->deck, currentPlayers.at(i));
+            // playerIssueOrder(this->deck, currentPlayers.at(i));
+            currentPlayers.at(i)->issueOrder();
         }
     }
 }
