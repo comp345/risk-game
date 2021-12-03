@@ -1275,10 +1275,12 @@ void GameEngine::enterTournamentMode(Command *command) {
 
 void GameEngine::cleanup() {
     this->currentPlayers.clear();
-    State *startState = new State("start");
-    this->currentState = startState;
+    delete currentState;
+    this->currentState = new State("start");
     initializedRand(); // randomize deck
+    delete deck;
     deck = new Deck(30);
+    delete map;
     map = new Map();
     eliminatedPlayers.clear();
 }
