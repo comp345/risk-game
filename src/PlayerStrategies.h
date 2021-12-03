@@ -86,21 +86,21 @@ public:
     string strategyName();
 };
 
-// class NeutralPlayerStrategy: public PlayerStrategy{
-// public:
-//     NeutralPlayerStrategy(Player* p);
-//     ~NeutralPlayerStrategy();
-//     // NeutralPlayerStrategy(const NeutralPlayerStrategy& p);
-//     // NeutralPlayerStrategy &operator=(const NeutralPlayerStrategy &ps);
+class NeutralPlayerStrategy: public PlayerStrategy{
+public:
+    NeutralPlayerStrategy(Player* p);
+    ~NeutralPlayerStrategy();
+    // NeutralPlayerStrategy(const NeutralPlayerStrategy& p);
+    // NeutralPlayerStrategy &operator=(const NeutralPlayerStrategy &ps);
 
-//     void issueOrder();
-//     vector<Territory *> toAttack();
-//     vector<Territory *> toDefend();
+    void issueOrder();
+    vector<Territory *> toAttack();
+    vector<Territory *> toDefend();
 
-//     string strategyName();
+    string strategyName();
 
-//     void toggleHasBeenAttacked();
+    void toggleHasBeenAttacked();
 
-// private:
-//     bool hasBeenAttacked;
-// };
+private:
+    bool hasBeenAttacked;
+};

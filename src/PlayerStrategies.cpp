@@ -492,44 +492,69 @@ string BenevolentPlayerStrategy::strategyName()
     return "Benevolent strategy";
 }
 
-// // ********************************************* //
-// //        NeutralPlayerStrategy functions:       //
-// // ********************************************* //
 
-// NeutralPlayerStrategy::NeutralPlayerStrategy(Player *p) : PlayerStrategy(p){hasBeenAttacked = false;};
+// ********************************************* //
+//        NeutralPlayerStrategy functions:       //
+// ********************************************* //
 
-// NeutralPlayerStrategy::~NeutralPlayerStrategy()
+NeutralPlayerStrategy::NeutralPlayerStrategy(Player *p) : PlayerStrategy(p){hasBeenAttacked = false;};
+
+
+void NeutralPlayerStrategy::issueOrder()
+{
+    // Becomes an Aggressive player only at next issueOrder turn (during execOrders, remains neutral until turn starts again)
+    if(hasBeenAttacked == true)
+    {
+        cout << "DEBUG:: " << getPlayer()->getName() << " use to be a " << getPlayer()->getPlayerStrategy()->strategyName();
+
+        getPlayer()->setPlayerStrategy(new AggressivePlayerStrategy(getPlayer()));
+        // Remove the player from neutral strategy pointer, added by Noah
+        setPlayer(nullptr); // careful, might be buggy
+        cout << " and is now a " << getPlayer()->getPlayerStrategy()->strategyName();
+    } else 
+    {
+        dprint("DEBUG NeutralPlayerStrategy::issueOrder = I never issue orders", section::issueOrderFromPlayer);
+        this->getPlayer()->setDoneIssuing(true);
+    }
+}
+
+vector<Territory *> NeutralPlayerStrategy::toAttack()
+{
+    //Doesnt issue any orders, do we need to return an attacking list?
+    // return getPlayer()->getTerritories(); // 
+    return vector<Territory*>();
+};
+
+vector<Territory *> NeutralPlayerStrategy::toDefend()
+{
+    return getPlayer()->getTerritories();
+};
+
+string NeutralPlayerStrategy::strategyName()
+{
+    return "Neutral strategy";
+}
+
+void NeutralPlayerStrategy::toggleHasBeenAttacked(){
+    if(hasBeenAttacked) {
+        hasBeenAttacked = false;
+    }else {
+        hasBeenAttacked = true;
+    }
+}
+
+// NeutralPlayerStrategy::NeutralPlayerStrategy(const NeutralPlayerStrategy &ps)
 // {
+//     cout << "COPY CTOR CALLED @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@";
+//     this->hasBeenAttacked = ps.hasBeenAttacked;
 // }
 
-// void NeutralPlayerStrategy::issueOrder(Order *o)
+// NeutralPlayerStrategy &NeutralPlayerStrategy::operator=(const NeutralPlayerStrategy &ps)
 // {
-//     if(hasBeenAttacked == true)
-//         getPlayer()->setPlayerStrategy(new AggressivePlayerStrategy(getPlayer()));
+//     cout << "ASSIGNEMNT OPERATOR CALLED @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@";
+//     if (this == &ps)
+//         return *this;
 
-//     // Doesnt issue any order?
-//     // getPlayer()->getOrderList()->add(o);
-// }
-
-// vector<Territory *> NeutralPlayerStrategy::toAttack()
-// {
-//     //Doesnt issue any orders, do we need to return an attacking list?
-//     return getPlayer()->getTerritories();
-// };
-
-// vector<Territory *> NeutralPlayerStrategy::toDefend()
-// {
-//     return getPlayer()->getTerritories();
-// };
-
-// string NeutralPlayerStrategy::strategyName()
-// {
-//     return "Neutral strategy";
-// }
-
-// void NeutralPlayerStrategy::toggleHasBeenAttacked(){
-//     if(hasBeenAttacked)
-//         hasBeenAttacked = false;
-//     else
-//         hasBeenAttacked = true;
+//     this->hasBeenAttacked = ps.hasBeenAttacked;
+//     return *this;
 // }
