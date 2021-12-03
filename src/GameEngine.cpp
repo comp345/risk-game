@@ -698,8 +698,8 @@ void StartupPhase::startup()
         }
 
         dprint("= Debugging before gamestart: Hardcoding player strategies\n", section::startup);
-        // Hardcoding the second player to be Aggressive
-        eng->getPlayers().at(1)->setPlayerStrategy(new AggressivePlayerStrategy(eng->getPlayers().at(1)));
+        // Hardcoding the second player to be whatever strategy we want to test
+        eng->getPlayers().at(1)->setPlayerStrategy(new BenevolentPlayerStrategy(eng->getPlayers().at(1)));
         for (auto player : eng->getPlayers())
         {
             dprint("\t" + player->getName() + " uses strat " + player->getPlayerStrategy()->strategyName(), section::startup);
@@ -940,9 +940,8 @@ void GameEngine::issueOrdersPhase()
             dprint("\nGameEngine:: Player " + currentPlayers.at(i)->getName() + " is now entering playerIssueOrder method.\n", section::issueorder);
 
             currentPlayers.at(i)->issueOrder();
-            // to do: find position of players eliminated, to make sure we can remove them from iteration
         }
-        auditPlayers();
+        auditPlayers(); // audit players inside the issueOrdersPhase due to presence of cheaters!
     }
 }
 
@@ -1166,7 +1165,7 @@ void GameEngine::mainGameLoop()
         numOfTurns++;
         string endOfTurnMsg = "End of turn " + to_string(numOfTurns) + "\n";
         dprint(endOfTurnMsg, section::mainGameLoop);
-        pressToContinueWith("TURN");
+        // pressToContinueWith("TURN");
     }
 
     // To delete
