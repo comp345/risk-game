@@ -1192,6 +1192,8 @@ PlayerStrategy* findPlayerStrategy(string pType, Player* p) {
         return new NormalPlayerStrategy(p);
     } else if (pType == "neutral") {
         return new NeutralPlayerStrategy(p);
+    } else {
+        return new NormalPlayerStrategy(p);
     }
 }
 
