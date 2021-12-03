@@ -67,7 +67,7 @@ public:
 //     AggressivePlayerStrategy(Player* p);
 //     ~AggressivePlayerStrategy();
 
-//     void issueOrder(Order* o);
+//     void issueOrder();
 //     vector<Territory *> toAttack();
 //     vector<Territory *> toDefend();
 
@@ -79,7 +79,7 @@ public:
 //     BenevolentPlayerStrategy(Player* p);
 //     ~BenevolentPlayerStrategy();
 
-//     void issueOrder(Order* o);
+//     void issueOrder();
 //     vector<Territory *> toAttack();
 //     vector<Territory *> toDefend();
 
@@ -93,7 +93,7 @@ public:
 //     // NeutralPlayerStrategy(const NeutralPlayerStrategy& p);
 //     // NeutralPlayerStrategy &operator=(const NeutralPlayerStrategy &ps);
 
-//     void issueOrder(Order* o);
+//     void issueOrder();
 //     vector<Territory *> toAttack();
 //     vector<Territory *> toDefend();
 

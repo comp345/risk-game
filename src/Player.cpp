@@ -13,7 +13,14 @@ bool compareArmySize::operator()(Territory const *t1, Territory const *t2)
 {
     // return "true" if "p1" is ordered
     // before "p2", for example:
-    return t1->numArmies > t2->numArmies;
+
+    // For aggresive player we need to only select the strongest territories:
+    if (t1->owner->getPlayerStrategy()->strategyName() == "Aggressive strategy")
+    {
+        return t1->numArmies < t2->numArmies;
+    }
+    else
+        return t1->numArmies > t2->numArmies;
 }
 
 Player::Player()
@@ -127,8 +134,11 @@ Player::~Player()
     }
     negotiatingWith.clear();
 
-    //    delete playerStrategy;
-    //    playerStrategy = nullptr;
+    //    delete playerStrategy; 
+    // gives linkage error Undefined symbols for architecture x86_64:
+    //   "__ZN14PlayerStrategyD1Ev", referenced from:
+    //       __ZN6PlayerD2Ev in Player.cpp.o
+    //       __ZN6PlayerD1Ev in Player.cpp.o
 
     for (Territory *t : territories)
     {
@@ -160,7 +170,6 @@ Player &Player::operator=(const Player &p)
     orderList = new OrderList(*(p.orderList));
     reinforcementPool = p.reinforcementPool;
     negotiatingWith = p.negotiatingWith;
-    // plArmies = p.plArmies;
     name = p.name;
     playerStrategy = p.playerStrategy;
     doneIssuing = p.doneIssuing;

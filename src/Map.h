@@ -50,10 +50,10 @@ public:
 
     bool operator<(const Territory& rhs);
     int numArmies = 0; // do not make private
+    Player* owner; // do not make private -> compareArmySize struct needs it
 private:
     int ID;
     string name;
-    Player* owner;
     
     
     // int neighbors = 0;
