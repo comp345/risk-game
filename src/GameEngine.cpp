@@ -698,7 +698,7 @@ void StartupPhase::startup()
         }
 
         dprint("= Debugging before gamestart: Hardcoding player strategies\n", section::startup);
-        // Hardcoding the second player to be Aggressive 
+        // Hardcoding the second player to be Aggressive
         eng->getPlayers().at(1)->setPlayerStrategy(new AggressivePlayerStrategy(eng->getPlayers().at(1)));
         for (auto player : eng->getPlayers())
         {
@@ -887,6 +887,10 @@ Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, 
 //             currentPlayer->issueOrder(advance);
 //             currentPlayer->popPriorityAttack();
 //             currentPlayer->popPriorityDefend();
+
+//         //Changing the neutral players flag added by Alexander
+// if(territoryTarget->getOwner() != currentPlayer && territoryTarget->getOwner()->getPlayerStrategy()->strategyName() == "Neutral strategy")
+// dynamic_cast<NeutralPlayerStrategy*>(territoryTarget->getOwner()->getPlayerStrategy())->toggleHasBeenAttacked();
 //         }
 //         // check if no more advance order can be created -> set isDone flag to true
 //         if (issuingPlayer->getPriorityDefending().size() == 0 || issuingPlayer->getPriorityAttacking().size() == 0)
@@ -937,7 +941,6 @@ void GameEngine::issueOrdersPhase()
 
             currentPlayers.at(i)->issueOrder();
             // to do: find position of players eliminated, to make sure we can remove them from iteration
-        
         }
         auditPlayers();
     }
