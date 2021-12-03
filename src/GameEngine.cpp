@@ -1273,9 +1273,10 @@ void GameEngine::mainGameLoop()
 //                  DEBUG PURPOSES                  //
 //**************************************************//
 
-//        if (breakCount == 0) this->currentPlayers.at(0)->setPlayerStrategy(new NeutralPlayerStrategy(this->currentPlayers.at(0)));
+//        if (breakCount == 0) this->currentPlayers.at(0)->setPlayerStrategy(new BenevolentPlayerStrategy(this->currentPlayers.at(0)));
+//        if (breakCount == 0) this->currentPlayers.at(1)->setPlayerStrategy(new BenevolentPlayerStrategy(this->currentPlayers.at(1)));
 //        if (breakCount == 3) break;
-//        breakCount++;
+        breakCount++;
     }
 
     // To delete

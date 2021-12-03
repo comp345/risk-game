@@ -126,7 +126,33 @@ vector<Territory *> BenevolentPlayerStrategy::toAttack()
 {
     //Since a benevolent player never advances to an enemy territory,
     //All this advance orders will target his own territories.
-    //TODO:: Check to make sure there are adj territories.
+
+    //Get the list of the players territories:
+    vector<Territory*> playersTerritoriesWithArmy = vector<Territory*>();
+
+    //Make sure there is atleast one army on the territory:
+    for(Territory* territory : getPlayer()->getTerritories()){
+        if(territory->numArmies > 0)
+            playersTerritoriesWithArmy.push_back(territory);
+    }
+
+
+    vector<Territory*> adjacentToPlayerTerritories = vector<Territory*>();
+
+    //For each of the territories owned by the player
+    for(Territory* playerTerritory : playersTerritoriesWithArmy){
+
+        //Get their adjacent territories
+        for(Territory* adjacentPlayerTerritory : playerTerritory->getNeighbors()){
+
+            //Make sure it is your own territory:
+            if(adjacentPlayerTerritory->getOwner() == getPlayer())
+
+            //Build their adjacency list:
+            adjacentToPlayerTerritories.push_back(adjacentPlayerTerritory);
+        }
+    }
+
     return getPlayer()->getTerritories();
 };
 
