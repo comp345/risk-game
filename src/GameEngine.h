@@ -113,7 +113,8 @@ private:
     Map *map;
 
     /* NEW */
-    vector<Player *> eliminatedPlayers; // keep tracks of players who lost (0 territory)
+    vector<Player *> eliminatedPlayers; // keep tracks of players who lost
+    int playerTurn;
 
 public:
     GameEngine(std::string newFile = "");
@@ -161,6 +162,9 @@ public:
 
     Deck *getDeck();
 
+    int getPlayerTurn();
+    void setPlayerTurn(int turn);
+
     // Alexanders additions:
     void mainGameLoop();
     void reinforcementPhase(Player *p);
@@ -174,6 +178,8 @@ public:
     void enterTournamentMode(Command *pCommand);
 
     void initStates();
+
+
 };
 
 class StartupPhase

@@ -522,12 +522,13 @@ void GameEngine::preStartup()
     cout << "Map " << mapName << " has been loaded. \n"
          << endl;
 
+    // validates map
     do
     {
         command = commandProcessor->getCommand(currentState);
     } while (!doTransition(command->getCommandName()));
 
-    map1->validate(); // validates map
+    map1->validate();
     map1->showLoadedMap();
     setMap(map1);
 
@@ -1161,8 +1162,8 @@ void GameEngine::mainGameLoop()
 
     bool noWinner = true;
     // Keeping track of turns for tournament mode
-    int maximumNumberOfTurns = 50;
-    int numOfTurns = 0;
+    int maximumNumberOfTurns = getPlayerTurn();
+    int numOfTurns;
     // while (noWinner && (numOfTurns < maximumNumberOfTurns))
     while (noWinner)
     {
@@ -1256,8 +1257,13 @@ void GameEngine::mainGameLoop()
         }
 
         numOfTurns++;
-        string endOfTurnMsg = "End of turn " + to_string(numOfTurns) + "\n";
+        setPlayerTurn(numOfTurns);
+        string endOfTurnMsg = "End of turn " + to_string(getPlayerTurn()) + "\n";
         dprint(endOfTurnMsg, section::mainGameLoop);
+
+        if(getPlayerTurn()==maximumNumberOfTurns){//for debugging
+            break;
+        }
     }
 
     // To delete
@@ -1270,6 +1276,13 @@ void GameEngine::mainGameLoop()
 /*    (๑•̀ᗝ•́)૭               (ง°ل͜°)ง       */
 /* **************************************** */
 
+int GameEngine::getPlayerTurn() {
+    return playerTurn;
+}
+void GameEngine::setPlayerTurn(int turn) {
+    playerTurn= turn;
+}
+
 // Format: tournament -M <listofmapfiles> -P <listofplayerstrategies> -G <numberofgames> -D <maxnumberofturns>
 void GameEngine::enterTournamentMode(Command *command)
 {
@@ -1277,7 +1290,7 @@ void GameEngine::enterTournamentMode(Command *command)
     vector<string> mapFileNames = {};
     vector<string> playerTypes = {};
     int numOfGames = 0;
-    int numOfTurns = 0;
+    int numOfTurns;
     try
     {
         for (int i = 0; i < command->getArgs().size();)
@@ -1310,6 +1323,7 @@ void GameEngine::enterTournamentMode(Command *command)
             else if (args[i] == "-D")
             {
                 numOfTurns = std::stoi(args[++i]);
+                setPlayerTurn(numOfTurns);
             }
             else
             {
@@ -1324,9 +1338,10 @@ void GameEngine::enterTournamentMode(Command *command)
     }
 
     //TODO: create player types + load the maps, add it to the gameEngine players and maps
-    for (int i = 0; i < numOfGames; i++) {
-        for (int j = 0; j < mapFileNames.size(); j++) {
+    for (int i = 0; i < mapFileNames.size(); i++) {//loops over all the maps first
+        for (int j = 0; j < numOfGames; j++) {//then number of games
             //TODO: load map here
+            //load map from each indexes of mapFileNames vector
             StartupPhase sp;
             sp.setGameEng(this);
             sp.startup();
