@@ -39,7 +39,7 @@ Player::Player()
     negotiatingWith = vector<Player *>();
 
     // From a3_strategy
-    this->ps = new AggressivePlayerStrategy(this);
+    this->playerStrategy = new BenevolentPlayerStrategy(this);
 }
 
 Player::Player(string n)
@@ -57,7 +57,7 @@ Player::Player(string n)
     negotiatingWith = vector<Player *>();
 
     // a3_strategy
-    this->ps = new AggressivePlayerStrategy(this);
+    this->playerStrategy = new BenevolentPlayerStrategy(this);
 }
 
 // parametrized constructor
@@ -77,7 +77,7 @@ Player::Player(string plName, vector<Territory *> t, Hand *h, OrderList *o)
     negotiatingWith = vector<Player *>();
 
     // Link player with strategy
-    this->ps = new AggressivePlayerStrategy(this);
+    this->playerStrategy = new BenevolentPlayerStrategy(this);
 }
 
 // parametrized constructor
@@ -97,7 +97,7 @@ Player::Player(int armies, string plName, vector<Territory *> t, Hand *h, OrderL
     // Implementing Negotiate order
     negotiatingWith = vector<Player *>();
     // Link player with strategy
-    this->ps = new AggressivePlayerStrategy(this);
+    this->playerStrategy = new BenevolentPlayerStrategy(this);
 }
 
 // copy constructor: Deep copy, cannot be used for reference semantic or to
@@ -117,7 +117,7 @@ Player::Player(const Player &p)
     // Implementing Negotiate order
     this->negotiatingWith = p.negotiatingWith;
     // Link player with strategy
-    this->ps = p.ps;
+    this->playerStrategy = p.playerStrategy;
 }
 
 // destructor
@@ -134,8 +134,7 @@ Player::~Player()
     }
     negotiatingWith.clear();
 
-    //    delete ps;
-    //    ps = nullptr;
+    delete playerStrategy;
 
     for (Territory *t : territories)
     {
@@ -167,9 +166,8 @@ Player &Player::operator=(const Player &p)
     orderList = new OrderList(*(p.orderList));
     reinforcementPool = p.reinforcementPool;
     negotiatingWith = p.negotiatingWith;
-    // plArmies = p.plArmies;
     name = p.name;
-    ps = p.ps;
+    playerStrategy = p.playerStrategy;
     doneIssuing = p.doneIssuing;
     doneDeploying = p.doneDeploying;
     return *this;
@@ -431,10 +429,10 @@ void Player::removeAllNegotiation()
 }
 PlayerStrategy *Player::getPlayerStrategy()
 {
-    return ps;
+    return playerStrategy;
 }
 
 void Player::setPlayerStrategy(PlayerStrategy *ps)
 {
-    this->ps = ps;
+    this->playerStrategy = ps;
 }

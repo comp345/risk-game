@@ -29,7 +29,7 @@ public:
     void setPlayer(Player* p);
     Player* getPlayer();
 private:
-    Player* p;
+    Player* player;
 };
 
 // class CheaterPlayerStrategy: public PlayerStrategy{

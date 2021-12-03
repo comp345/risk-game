@@ -693,6 +693,12 @@ void StartupPhase::startup()
         {
             cout << *p << endl;
         }
+
+        // Debugging strategy: display players strategies
+        for (Player * p : eng->getPlayers())
+        {
+            cout << "Player " << p->getName() << " uses " << p->getPlayerStrategy()->strategyName() << endl;
+        }
     }
     else
     {
@@ -1268,6 +1274,7 @@ void GameEngine::mainGameLoop()
         numOfTurns++;
         string endOfTurnMsg = "End of turn " + to_string(numOfTurns) + "\n";
         dprint(endOfTurnMsg, section::mainGameLoop);
+        pressToContinueWith("TURN");
 
 //**************************************************//
 //                  DEBUG PURPOSES                  //

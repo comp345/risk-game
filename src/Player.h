@@ -130,7 +130,7 @@ private:
     vector<Territory *> territories;
     Hand *hand;
     OrderList *orderList;
-    PlayerStrategy *ps;
+    PlayerStrategy *playerStrategy;
 
     bool doneDeploying;
     bool doneIssuing;

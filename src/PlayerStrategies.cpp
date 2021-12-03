@@ -13,12 +13,12 @@ PlayerStrategy::PlayerStrategy()
 
 PlayerStrategy::PlayerStrategy(Player *p)
 {
-    this->p = p;
+    this->player = p;
 }
 
 PlayerStrategy::PlayerStrategy(const PlayerStrategy &ps)
 {
-    this->p = new Player(*ps.p);
+    this->player = new Player(*ps.player);
 }
 
 PlayerStrategy &PlayerStrategy::operator=(const PlayerStrategy &ps)
@@ -26,23 +26,22 @@ PlayerStrategy &PlayerStrategy::operator=(const PlayerStrategy &ps)
     if (this == &ps)
         return *this;
 
-    p = new Player(*ps.p);
+    player = new Player(*ps.player);
     return *this;
 }
 
 PlayerStrategy::~PlayerStrategy()
 {
-    delete p;
-    p = NULL;
+    // do not dealloc player!
 }
 Player *PlayerStrategy::getPlayer()
 {
-    return p;
+    return player;
 }
 
 void PlayerStrategy::setPlayer(Player *p)
 {
-    this->p = p;
+    this->player = p;
 }
 
 
