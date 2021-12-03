@@ -62,17 +62,17 @@ public:
 
 // };
 
-// class AggressivePlayerStrategy: public PlayerStrategy{
-// public:
-//     AggressivePlayerStrategy(Player* p);
-//     ~AggressivePlayerStrategy();
+class AggressivePlayerStrategy: public PlayerStrategy{
+public:
+    AggressivePlayerStrategy(Player* p);
+    ~AggressivePlayerStrategy();
 
-//     void issueOrder();
-//     vector<Territory *> toAttack();
-//     vector<Territory *> toDefend();
+    void issueOrder();
+    vector<Territory *> toAttack();
+    vector<Territory *> toDefend();
 
-//     string strategyName();
-// };
+    string strategyName();
+};
 
 // class BenevolentPlayerStrategy: public PlayerStrategy{
 // public:

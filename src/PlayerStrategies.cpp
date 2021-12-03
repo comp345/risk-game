@@ -279,63 +279,127 @@ string CheaterPlayerStrategy::strategyName()
     return "Cheater strategy";
 }
 
-// // ************************************************ //
-// //      AggressivePlayerStrategy functions:         //
-// // ************************************************ //
+// ************************************************ //
+//      AggressivePlayerStrategy functions:         //
+// ************************************************ //
 
-// AggressivePlayerStrategy::AggressivePlayerStrategy(Player *p) : PlayerStrategy(p){};
+AggressivePlayerStrategy::AggressivePlayerStrategy(Player *p) : PlayerStrategy(p){};
 
-// AggressivePlayerStrategy::~AggressivePlayerStrategy()
-// {
-// }
 
-// void AggressivePlayerStrategy::issueOrder(Order *o)
-// {
-//     getPlayer()->getOrderList()->add(o);
-// }
+// same strat as normal player, except that toAttack uses a comparator to prioritize strongest territories
+void AggressivePlayerStrategy::issueOrder()
+{
+    Player *issuingPlayer = this->getPlayer();
+    // Second condition added due to cheating player who eliminated player durig issueOrdersPhase
+    if (issuingPlayer->isDoneIssuing() or issuingPlayer->getTerritories().empty())
+    {
+        if (issuingPlayer->getTerritories().empty())
+        {
+            dprint("\tPlayer " + issuingPlayer->getName() + " has been eliminated (not yet audited) by a cheater. isDone flag set to 1", section::issueOrderFromPlayer);
+            issuingPlayer->setDoneIssuing(true);
+        }
+        return void();
+    }
 
-// vector<Territory *> AggressivePlayerStrategy::toAttack()
-// {
-//     vector<Territory *> attackableTerritories = vector<Territory *>();
+    // (1) Deploy: until reinforc pool == 0
+    if (issuingPlayer->getReinforcementPool() > 0)
+    {
+        // cout << "Debug playerIssueOrder. Num of reinforcement pool: " << issuingPlayer->getReinforcementPool() << endl;
+        // Check if there is no more territory in priority queue -> rebuild it until pool is empty
+        if (issuingPlayer->getPriorityDefending().empty())
+        {
+            for (Territory *toDefend : issuingPlayer->toDefend())
+            {
+                issuingPlayer->addToPriorityDefend(toDefend);
+            }
+        }
 
-//     //Get the players territories
-//     for (Territory *territory : getPlayer()->getTerritories())
-//     {
-//         //add them to the attackable Territories if they have an army on them
-//         if (territory->getNumberOfArmies() > 0)
-//             attackableTerritories.push_back(territory);
-//     }
+        Territory *territoryTarget = issuingPlayer->getPriorityDefending().top();
 
-//     vector<Territory *> neighbourTerritories = vector<Territory *>();
-//     for (Territory *territory : attackableTerritories)
-//     {
+        // Create Deploy -> decrease reinforcement
+        Deploy *deploy = new Deploy(1, issuingPlayer, territoryTarget);
+        issuingPlayer->setReinforcementPool(issuingPlayer->getReinforcementPool() - 1);
 
-//         // cout << "the neighbours of " << territory->getName() << " are as follows:\n";
-//         for (Territory *neighbour : territory->getNeighbors())
-//         {
-//             // cout << neighbour->getName() << ", owned by " << neighbour->getOwner()->getName() <<"\n";
+        // cout << "Issueing: " << deploy->getDetails() << endl;
+        issuingPlayer->issueOrder(deploy);
+        issuingPlayer->popPriorityDefend();
+    }
+    else // when no more reinforcementPool
+    {
+        // (3) Advance
+        if (issuingPlayer->isDoneDeploying() == false)
+        {
+            // This block should be entered only ONCE, before the first Advance order
+            issuingPlayer->setDoneDeploying(true);
+            issuingPlayer->getPriorityDefending() = priority_queue<Territory *, vector<Territory *>, compareArmySize>(); // clear queue
+            for (Territory *toDefend : issuingPlayer->toDefend())
+            {
+                issuingPlayer->addToPriorityDefend(toDefend);
+            }
+        }
 
-//             // If we haven't already seen the territory, add it to the list.
-//             if (!count(neighbourTerritories.begin(), neighbourTerritories.end(), neighbour))
+        if (issuingPlayer->isDoneDeploying() and (issuingPlayer->getPriorityDefending().size() > 0 && issuingPlayer->getPriorityAttacking().size() > 0))
+        {
+            // Need to handle the case when the size of priorityAttack =/= size of priorityDefence => rebuild one or both queues depending on the strategy
+            Player *currentPlayer = issuingPlayer;
+            Territory *territorySource = currentPlayer->getPriorityDefending().top();
+            Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
+            Advance *advance = new Advance((territorySource->getNumberOfArmies() / 2), currentPlayer, territorySource, territoryTarget);
+            // cout << "Issueing! " << advance->getDetails() << endl;
+            currentPlayer->issueOrder(advance);
+            currentPlayer->popPriorityAttack();
+            currentPlayer->popPriorityDefend();
+        }
+        // check if no more advance order can be created -> set isDone flag to true
+        if (issuingPlayer->getPriorityDefending().size() == 0 || issuingPlayer->getPriorityAttacking().size() == 0)
+        {
+            issuingPlayer->toggleDoneIssuing();
+            // cout << "Finished issueing Deploy and Advance. isDone flag is set to " << to_string(issuingPlayer->isDoneIssuing()) << endl;
+        }
+    }
+}
+// Same toAttack implementation as normal player, except we deploy and advance on strongest territory (different comparator used)
+vector<Territory *> AggressivePlayerStrategy::toAttack()
+{
+    vector<Territory *> attackableTerritories = vector<Territory *>();
 
-//                 // If it already belongs to us then we dont have to attack it.
-//                 if (neighbour->getOwner() != getPlayer())
-//                     neighbourTerritories.push_back(neighbour);
-//         }
-//     }
+    // Get the players territories
+    for (Territory *territory : getPlayer()->getTerritories())
+    {
+        // add them to the attackable Territories if they have an army on them
+        if (territory->getNumberOfArmies() > 0)
+            attackableTerritories.push_back(territory);
+    }
 
-//     return neighbourTerritories;
-// };
+    vector<Territory *> neighbourTerritories = vector<Territory *>();
+    for (Territory *territory : attackableTerritories)
+    {
 
-// vector<Territory *> AggressivePlayerStrategy::toDefend()
-// {
-//     return getPlayer()->getTerritories();
-// };
+        // cout << "the neighbours of " << territory->getName() << " are as follows:\n";
+        for (Territory *neighbour : territory->getNeighbors())
+        {
+            // cout << neighbour->getName() << ", owned by " << neighbour->getOwner()->getName() <<"\n";
 
-// string AggressivePlayerStrategy::strategyName()
-// {
-//     return "Aggressive strategy";
-// }
+            // If we haven't already seen the territory, add it to the list.
+            if (!count(neighbourTerritories.begin(), neighbourTerritories.end(), neighbour))
+
+                // ALLOW ADVANCE ON OWN TERRITORY AND OPPONENT TERRITORY
+                neighbourTerritories.push_back(neighbour);
+        }
+    }
+
+    return neighbourTerritories;
+};
+
+vector<Territory *> AggressivePlayerStrategy::toDefend()
+{
+    return getPlayer()->getTerritories();
+};
+
+string AggressivePlayerStrategy::strategyName()
+{
+    return "Aggressive strategy";
+}
 
 // // ************************************************ //
 // //        BenevolentPlayerStrategy functions:       //

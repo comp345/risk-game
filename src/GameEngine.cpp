@@ -698,8 +698,8 @@ void StartupPhase::startup()
         }
 
         dprint("= Debugging before gamestart: Hardcoding player strategies\n", section::startup);
-        // Hardcode first 2 players' strategies
-        eng->getPlayers().at(1)->setPlayerStrategy(new CheaterPlayerStrategy(eng->getPlayers().at(1)));
+        // Hardcoding the second player to be Aggressive 
+        eng->getPlayers().at(1)->setPlayerStrategy(new AggressivePlayerStrategy(eng->getPlayers().at(1)));
         for (auto player : eng->getPlayers())
         {
             dprint("\t" + player->getName() + " uses strat " + player->getPlayerStrategy()->strategyName(), section::startup);

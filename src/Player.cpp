@@ -15,12 +15,14 @@ bool compareArmySize::operator()(Territory const *t1, Territory const *t2)
     // before "p2", for example:
 
     // For aggresive player we need to only select the strongest territories:
+    // For simplification, we assume aggressive players deploy/advance toward their strongest territory, but
+    // also attacks strongest enemy territories!
     if (t1->owner->getPlayerStrategy()->strategyName() == "Aggressive strategy")
     {
         return t1->numArmies < t2->numArmies;
     }
     else
-        return t1->numArmies > t2->numArmies;
+        return t1->numArmies > t2->numArmies; // Default, used in A2
 }
 
 Player::Player()
