@@ -7,13 +7,13 @@
 
 using namespace std;
 
-extern void riskGameDriver(string filename = "");            // driver for A2 P3
+extern void riskGameDriver(string filename = ""); // driver for A2 P3
 
 /* ***************************************** */
-/*  A3 Part 1: Tools to test the strategies  */     // Do not forget to comment out or set these values to false 
-/* ***************************************** */     // when testing the tournament mode
+/*  A3 Part 1: Tools to test the strategies  */ // Do not forget to comment out or set these values to false
+/* ***************************************** */ // when testing the tournament mode
 
-bool testingStrategyMode = true; // if set to false, players will run with Normal strategy (from A2)
+bool testingStrategyMode = false; // if set to false, players will run with Normal strategy (from A2)
 
 bool stopAfterEachTurn = true;
 
@@ -24,13 +24,13 @@ bool stopAfterEachTurn = true;
     4) Aggressive player and Benevolent player -> show Aggressive player prioritizing strong territories (own and enemy)
     5) Human player and Benevolent player
 */
-PlayerStrategy * arrayOfStrategies[2] = {new CheaterPlayerStrategy(new Player), new NormalPlayerStrategy(new Player)};
+PlayerStrategy *arrayOfStrategies[2] = {new CheaterPlayerStrategy(new Player), new NormalPlayerStrategy(new Player)};
 // PlayerStrategy * arrayOfStrategies[2] = {new BenevolentPlayerStrategy(new Player), new BenevolentPlayerStrategy(new Player)};
 // PlayerStrategy * arrayOfStrategies[2] = {new NeutralPlayerStrategy(new Player), new NormalPlayerStrategy(new Player)};
 // PlayerStrategy * arrayOfStrategies[2] = {new AggressivePlayerStrategy(new Player), new BenevolentPlayerStrategy(new Player)};
 // PlayerStrategy * arrayOfStrategies[2] = {new HumanPlayerStrategy(new Player), new BenevolentPlayerStrategy(new Player)};
 
-
+/* To test the tournament mode, just comment out/set to false ^ and input the command (or use fileadapter) */
 
 int main(int, char **)
 {
@@ -45,9 +45,12 @@ int main(int, char **)
     /*       A3 P1 : Strategies driver         */
     /* *************************************** */
 
+    // riskGameDriver("../strategy_driver_startup.txt"); // Auto run with file adapter
+    
 
-    riskGameDriver("../strategy_driver_startup.txt"); // Auto run with file adapter
-    // riskGameDriver();
+    /* *************************************** */
+    /*         A3 P2 : Tournament mo  de       */
+    /* *************************************** */
 
-
+    // riskGameDriver("../debug");
 }
