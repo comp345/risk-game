@@ -53,25 +53,23 @@ void PlayerStrategy::issueOrder(Order *o)
 //        Helper functions:     //
 // ************************** //
 vector<Territory*> getAttackableTerritories(Player* p) {
-    vector<Territory *> attackableTerritories = vector<Territory *>();
+    vector<Territory *> territoriesWithArmies;
 
     // Get the players territories
     for (Territory *territory : p->getTerritories())
     {
         // add them to the attackable Territories if they have an army on them
-        if (territory->getNumberOfArmies() > 0)
-            attackableTerritories.push_back(territory);
+        if (territory->getNumberOfArmies() > 0) {
+            territoriesWithArmies.push_back(territory);
+        }
     }
 
-    vector<Territory *> neighbourTerritories = vector<Territory *>();
-    for (Territory *territory : attackableTerritories)
+    vector<Territory *> neighbourTerritories;
+    for (Territory *territory : territoriesWithArmies)
     {
-
-        // cout << "the neighbours of " << territory->getName() << " are as follows:\n";
+         cout << "the neighbours of " << territory->getName() << " are as follows:\n";
         for (Territory *neighbour : territory->getNeighbors())
         {
-            // cout << neighbour->getName() << ", owned by " << neighbour->getOwner()->getName() <<"\n";
-
             // If we haven't already seen the territory, add it to the list.
             if (!count(neighbourTerritories.begin(), neighbourTerritories.end(), neighbour))
 
