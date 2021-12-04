@@ -10,3 +10,9 @@ Map: france.map | Game: 1 | Winner: Draw
 Map: france.map | Game: 2 | Winner: Draw
 Map: Hawaii.map | Game: 1 | Winner: Draw
 Map: Hawaii.map | Game: 2 | Winner: Draw
+Map: france.map | Game: 1 | Winner: Draw
+Map: france.map | Game: 2 | Winner: Draw
+Map: france.map | Game: 1 | Winner: Draw
+Map: france.map | Game: 2 | Winner: Draw
+Map: france.map | Game: 1 | Winner: Draw
+Map: france.map | Game: 2 | Winner: Draw
