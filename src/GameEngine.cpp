@@ -55,6 +55,15 @@ void pressToContinueWith(string msg)
     cin >> x;
 }
 
+/* Generating strategies tests => use a small map (fakecountry.map) */
+// 1) Cheater and Normal player
+// 2) Benevolent players (2)
+// 3) Neutral player and Cheater 
+// 4) Aggressive player and Benevolent player
+// 5) Human player and Benevolent player
+
+
+
 /* ************************************************************************** */
 /*              State, Transition, GameEngine basic functions                 */
 /* ************************************************************************** */

@@ -29,7 +29,8 @@ enum section
     issueorder,
     execorder,
     issueOrderFromPlayer, // debugger mode in Player class
-    fromOrder // debugger mode in Order class
+    fromOrder, // debugger mode in Order class
+    strategyDriver, // demo for strategies
 };
 
 class State
