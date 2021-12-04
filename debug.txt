@@ -1,1 +1,1 @@
-tournament -M france.map -P Neutral -G 4 -D 3
+tournament -M france.map -P aggressive Aggressive -G 2 -D 11

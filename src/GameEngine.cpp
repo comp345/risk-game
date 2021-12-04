@@ -1141,6 +1141,9 @@ void GameEngine::setMaxTurn(int turn) {
 }
 
 PlayerStrategy* getPlayerStrategy(string pType, Player* p) {
+    std::for_each(pType.begin(), pType.end(), [](char & c) {
+        c = ::tolower(c);
+    });
     if (pType == "aggressive") {
         return new AggressivePlayerStrategy(p);
     } else if (pType == "benevolent") {
