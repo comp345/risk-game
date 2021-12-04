@@ -1107,6 +1107,9 @@ void GameEngine::mainGameLoop()
 
         numOfTurns++;
         string endOfTurnMsg = "End of turn " + to_string(numOfTurns) + "\n";
+        for (Player* p : currentPlayers) {
+            p->removeAllNegotiation();
+        }
         dprint(endOfTurnMsg, section::mainGameLoop);
         if (!isTournamentMode) {
             pressToContinueWith("TURN"); // Stops after each turn -> useful to debug and for demo 
@@ -1138,7 +1141,7 @@ PlayerStrategy* getPlayerStrategy(string pType, Player* p) {
     } else if (pType == "cheater") {
         return new CheaterPlayerStrategy(p);
     } else if (pType == "human") {
-        return new NormalPlayerStrategy(p);
+        return new HumanPlayerStrategy(p);
     } else if (pType == "neutral") {
         return new NeutralPlayerStrategy(p);
     } else {

@@ -86,6 +86,21 @@ public:
     string strategyName();
 };
 
+class HumanPlayerStrategy: public PlayerStrategy {
+private:
+    string attackInput;
+    string defendInput;
+public:
+    HumanPlayerStrategy(Player* p);
+    ~HumanPlayerStrategy();
+
+    void issueOrder();
+    vector<Territory *> toAttack();
+    vector<Territory *> toDefend();
+
+    string strategyName();
+};
+
 class NeutralPlayerStrategy: public PlayerStrategy{
 public:
     NeutralPlayerStrategy(Player* p);

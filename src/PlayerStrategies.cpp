@@ -49,6 +49,40 @@ void PlayerStrategy::issueOrder(Order *o)
     player->getOrderList()->add(o);
 }
 
+// **************************** //
+//        Helper functions:     //
+// ************************** //
+vector<Territory*> getAttackableTerritories(Player* p) {
+    vector<Territory *> attackableTerritories = vector<Territory *>();
+
+    // Get the players territories
+    for (Territory *territory : p->getTerritories())
+    {
+        // add them to the attackable Territories if they have an army on them
+        if (territory->getNumberOfArmies() > 0)
+            attackableTerritories.push_back(territory);
+    }
+
+    vector<Territory *> neighbourTerritories = vector<Territory *>();
+    for (Territory *territory : attackableTerritories)
+    {
+
+        // cout << "the neighbours of " << territory->getName() << " are as follows:\n";
+        for (Territory *neighbour : territory->getNeighbors())
+        {
+            // cout << neighbour->getName() << ", owned by " << neighbour->getOwner()->getName() <<"\n";
+
+            // If we haven't already seen the territory, add it to the list.
+            if (!count(neighbourTerritories.begin(), neighbourTerritories.end(), neighbour))
+
+                // ALLOW ADVANCE ON OWN TERRITORY AND OPPONENT TERRITORY
+                neighbourTerritories.push_back(neighbour);
+        }
+    }
+
+    return neighbourTerritories;
+}
+
 // ********************************************* //
 //        NormalPlayerStrategy functions:       //
 // ********************************************* //
@@ -494,6 +528,151 @@ string BenevolentPlayerStrategy::strategyName()
 
 
 // ********************************************* //
+//        HumanPlayerStrategy functions:       //
+// ********************************************* //
+
+// the human player give command to do action - g
+void HumanPlayerStrategy::issueOrder() {
+    Player *issuingPlayer = this->getPlayer();
+    // Second condition added due to cheating player who eliminated player durig issueOrdersPhase
+    if (issuingPlayer->isDoneIssuing() or issuingPlayer->getTerritories().empty())
+    {
+        if (issuingPlayer->getTerritories().empty())
+        {
+            dprint("\tPlayer " + issuingPlayer->getName() + " has been eliminated (not yet audited) by a cheater. isDone flag set to 1", section::issueOrderFromPlayer);
+            issuingPlayer->setDoneIssuing(true);
+        }
+        return void();
+    }
+
+    if (!getAttackableTerritories(issuingPlayer).empty()) {
+        cout << "Enter order of territories to attack\n";
+        for (int i = 0; i < getAttackableTerritories(issuingPlayer).size(); i++)
+        {
+            cout << (i+1) << ":" << getAttackableTerritories(issuingPlayer)[i]->getName() << endl;
+        }
+        cout << "\n";
+        getline(cin, attackInput);
+    }
+
+    cout << "\n\nEnter order of territories to defend\n";
+    for (int i = 0; i < getPlayer()->getTerritories().size(); i++) {
+        cout << (i+1) << ":" << getPlayer()->getTerritories()[i]->getName() << endl;
+    }
+    cout << "\n";
+    getline(cin, defendInput);
+
+
+    // (1) Deploy: until reinforc pool == 0
+    if (issuingPlayer->getReinforcementPool() > 0)
+    {
+        // Check if there is no more territory in priority queue -> rebuild it until pool is empty
+        if (issuingPlayer->getPriorityDefending().empty())
+        {
+            for (Territory *toDefend : issuingPlayer->toDefend())
+            {
+                issuingPlayer->addToPriorityDefend(toDefend);
+            }
+        }
+
+        Territory *territoryTarget = issuingPlayer->getPriorityDefending().top();
+
+        // Create Deploy -> decrease reinforcement
+        Deploy *deploy = new Deploy(1, issuingPlayer, territoryTarget);
+        issuingPlayer->setReinforcementPool(issuingPlayer->getReinforcementPool() - 1);
+
+        issuingPlayer->issueOrder(deploy);
+        issuingPlayer->popPriorityDefend();
+    }
+    else // when no more reinforcementPool
+    {
+        // (3) Advance
+        if (!issuingPlayer->isDoneDeploying())
+        {
+            // This block should be entered only ONCE, before the first Advance order
+            issuingPlayer->setDoneDeploying(true);
+            issuingPlayer->getPriorityDefending() = priority_queue<Territory *, vector<Territory *>, compareArmySize>(); // clear queue
+            for (Territory *toDefend : issuingPlayer->toDefend())
+            {
+                issuingPlayer->addToPriorityDefend(toDefend);
+            }
+        }
+
+        if (issuingPlayer->isDoneDeploying() and (issuingPlayer->getPriorityDefending().size() > 0 && issuingPlayer->getPriorityAttacking().size() > 0))
+        {
+            // Need to handle the case when the size of priorityAttack =/= size of priorityDefence => rebuild one or both queues depending on the strategy
+            Player *currentPlayer = issuingPlayer;
+            Territory *territorySource = currentPlayer->getPriorityDefending().top();
+            Territory *territoryTarget = currentPlayer->getPriorityAttacking().top(); // problem is empties before priorityDefending
+            Advance *advance = new Advance((territorySource->getNumberOfArmies() / 2), currentPlayer, territorySource, territoryTarget);
+            currentPlayer->issueOrder(advance);
+            currentPlayer->popPriorityAttack();
+            currentPlayer->popPriorityDefend();
+        }
+        // check if no more advance order can be created -> set isDone flag to true
+        if (issuingPlayer->getPriorityDefending().size() == 0 || issuingPlayer->getPriorityAttacking().size() == 0)
+        {
+            issuingPlayer->toggleDoneIssuing();
+        }
+    }
+}
+vector<Territory *> HumanPlayerStrategy::toAttack() {
+    if (attackInput.empty()) {
+        return {};
+    }
+    string temp;
+    vector<int> toAttackIndices;
+    for (int i = 0; i < attackInput.length(); ++i) {
+        if (attackInput[i] == ' ') {
+            toAttackIndices.push_back(stoi(temp));
+            temp = "";
+        } else {
+            temp.push_back(attackInput[i]);
+        }
+    }
+    toAttackIndices.push_back(stoi(temp));
+
+    vector<Territory *> toAttackList = {};
+    for (auto i : toAttackIndices) {
+        cout << "\nYou selected to attack: " << getAttackableTerritories(this->getPlayer())[i - 1]->getName();
+        toAttackList.push_back(getAttackableTerritories(this->getPlayer())[i - 1]);
+    }
+    return toAttackList;
+}
+vector<Territory *> HumanPlayerStrategy::toDefend() {
+    if (defendInput.empty()) {
+        return {};
+    }
+    string temp;
+    vector<int> toDefendIndices;
+    for (int i = 0; i < defendInput.length(); ++i) {
+        if (defendInput[i] == ' ') {
+            toDefendIndices.push_back(stoi(temp));
+            temp = "";
+        } else {
+            temp.push_back(defendInput[i]);
+        }
+    }
+    toDefendIndices.push_back(stoi(temp));
+
+    vector<Territory *> toDefendList = {};
+    for (auto i : toDefendIndices) {
+        cout << "\nYou selected to defend: " << getPlayer()->getTerritories()[i - 1]->getName();
+        toDefendList.push_back(getPlayer()->getTerritories()[i - 1]);
+    }
+    return toDefendList;
+}
+
+string HumanPlayerStrategy::strategyName()
+{
+    return "Human strategy";
+}
+
+HumanPlayerStrategy::HumanPlayerStrategy(Player *p) : PlayerStrategy(p) {
+
+}
+
+// ********************************************* //
 //        NeutralPlayerStrategy functions:       //
 // ********************************************* //
 
@@ -549,19 +728,3 @@ bool NeutralPlayerStrategy::getHasBeenAttacked()
 {
     return hasBeenAttacked;
 }
-
-// NeutralPlayerStrategy::NeutralPlayerStrategy(const NeutralPlayerStrategy &ps)
-// {
-//     cout << "COPY CTOR CALLED @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@";
-//     this->hasBeenAttacked = ps.hasBeenAttacked;
-// }
-
-// NeutralPlayerStrategy &NeutralPlayerStrategy::operator=(const NeutralPlayerStrategy &ps)
-// {
-//     cout << "ASSIGNEMNT OPERATOR CALLED @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@";
-//     if (this == &ps)
-//         return *this;
-
-//     this->hasBeenAttacked = ps.hasBeenAttacked;
-//     return *this;
-// }
