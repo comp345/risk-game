@@ -698,13 +698,13 @@ void StartupPhase::startup()
             cout << *p << endl;
         }
 
-//        dprint("= Debugging before gamestart: Hardcoding player strategies\n", section::startup);
-//        // Hardcoding the second player to be whatever strategy we want to test
-//        eng->getPlayers().at(1)->setPlayerStrategy(new NeutralPlayerStrategy(eng->getPlayers().at(1)));
-//        for (auto player : eng->getPlayers())
-//        {
-//            dprint("\t" + player->getName() + " uses strat " + player->getPlayerStrategy()->strategyName(), section::startup);
-//        }
+       dprint("= Debugging before gamestart: Hardcoding player strategies\n", section::startup);
+       // Hardcoding the second player to be whatever strategy we want to test
+       eng->getPlayers().at(1)->setPlayerStrategy(new NeutralPlayerStrategy(eng->getPlayers().at(1)));
+       for (auto player : eng->getPlayers())
+       {
+           dprint("\t" + player->getName() + " uses strat " + player->getPlayerStrategy()->strategyName(), section::startup);
+       }
     }
     else
     {
@@ -871,7 +871,13 @@ void GameEngine::issueOrdersPhase()
         for (int i = 0; i < currentPlayers.size(); ++i)
         {
             dprint("\nGameEngine:: Player " + currentPlayers.at(i)->getName() + " is now entering playerIssueOrder method.\n", section::issueorder);
-
+            
+            // Debugging neutral player after it has been attacked in last turn
+            if (currentPlayers.at(i)->getPlayerStrategy()->strategyName() == "Neutral strategy")
+            {
+                cout << "Player " << currentPlayers.at(i)->getName() << " has strat " << currentPlayers.at(i)->getPlayerStrategy()->strategyName()
+                    << " . Flag hasBeenAttacked is set to " << to_string(dynamic_cast<NeutralPlayerStrategy *>(currentPlayers.at(i)->getPlayerStrategy())->getHasBeenAttacked()) << endl;
+            }
             currentPlayers.at(i)->issueOrder();
         }
         auditPlayers(); // audit players inside the issueOrdersPhase due to presence of cheaters!
@@ -1103,7 +1109,7 @@ void GameEngine::mainGameLoop()
         string endOfTurnMsg = "End of turn " + to_string(numOfTurns) + "\n";
         dprint(endOfTurnMsg, section::mainGameLoop);
         if (!isTournamentMode) {
-            pressToContinueWith("TURN");
+            pressToContinueWith("TURN"); // Stops after each turn -> useful to debug and for demo 
         }
     }
 

@@ -5,9 +5,12 @@
 #include <algorithm>
 #include "Orders.h"
 #include "Map.h"
-#include "PlayerStrategies.h"
+#include "PlayerStrategies.h"  
+#include "GameEngine.h"  
 
 using namespace std;
+
+extern void dprint(string message, section option);
 
 bool compareArmySize::operator()(Territory const *t1, Territory const *t2)
 {
@@ -246,6 +249,7 @@ void Player::issueOrder(Order *o)
 // TODO = A3: calls the strategy's
 void Player::issueOrder()
 {
+    dprint("Entering... Player::issueOrder()", section::issueOrderFromPlayer);
     this->getPlayerStrategy()->issueOrder();
 }
 

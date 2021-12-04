@@ -101,6 +101,8 @@ public:
 
     void toggleHasBeenAttacked();
 
+    bool getHasBeenAttacked();
+
 private:
     bool hasBeenAttacked;
 };

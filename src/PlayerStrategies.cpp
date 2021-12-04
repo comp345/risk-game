@@ -508,8 +508,10 @@ void NeutralPlayerStrategy::issueOrder()
         cout << "DEBUG:: " << getPlayer()->getName() << " use to be a " << getPlayer()->getPlayerStrategy()->strategyName();
 
         getPlayer()->setPlayerStrategy(new AggressivePlayerStrategy(getPlayer()));
+
         // Remove the player from neutral strategy pointer, added by Noah
-        setPlayer(nullptr); // careful, might be buggy
+        // setPlayer(nullptr); // careful, might be buggy 
+        
         cout << " and is now a " << getPlayer()->getPlayerStrategy()->strategyName();
     } else 
     {
@@ -541,6 +543,11 @@ void NeutralPlayerStrategy::toggleHasBeenAttacked(){
     }else {
         hasBeenAttacked = true;
     }
+}
+
+bool NeutralPlayerStrategy::getHasBeenAttacked()
+{
+    return hasBeenAttacked;
 }
 
 // NeutralPlayerStrategy::NeutralPlayerStrategy(const NeutralPlayerStrategy &ps)
