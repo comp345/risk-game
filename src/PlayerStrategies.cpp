@@ -728,19 +728,3 @@ bool NeutralPlayerStrategy::getHasBeenAttacked()
 {
     return hasBeenAttacked;
 }
-
-// NeutralPlayerStrategy::NeutralPlayerStrategy(const NeutralPlayerStrategy &ps)
-// {
-//     cout << "COPY CTOR CALLED @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@";
-//     this->hasBeenAttacked = ps.hasBeenAttacked;
-// }
-
-// NeutralPlayerStrategy &NeutralPlayerStrategy::operator=(const NeutralPlayerStrategy &ps)
-// {
-//     cout << "ASSIGNEMNT OPERATOR CALLED @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@";
-//     if (this == &ps)
-//         return *this;
-
-//     this->hasBeenAttacked = ps.hasBeenAttacked;
-//     return *this;
-// }

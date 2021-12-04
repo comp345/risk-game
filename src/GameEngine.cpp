@@ -1107,6 +1107,9 @@ void GameEngine::mainGameLoop()
 
         numOfTurns++;
         string endOfTurnMsg = "End of turn " + to_string(numOfTurns) + "\n";
+        for (Player* p : currentPlayers) {
+            p->removeAllNegotiation();
+        }
         dprint(endOfTurnMsg, section::mainGameLoop);
         if (!isTournamentMode) {
             pressToContinueWith("TURN"); // Stops after each turn -> useful to debug and for demo 
