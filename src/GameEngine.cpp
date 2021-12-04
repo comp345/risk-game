@@ -606,8 +606,6 @@ StartupPhase::StartupPhase(const StartupPhase &sp)
 
 StartupPhase::~StartupPhase()
 {
-    // TODO: missing destructor
-    // delete eng;
 }
 
 void StartupPhase::operator=(const StartupPhase &sp)
