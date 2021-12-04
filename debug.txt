@@ -1,2 +1,1 @@
 tournament -M france.map -P Neutral -G 4 -D 3
-tournament -M fakecountry.map -P Neutral Normal -G 1 -D 10

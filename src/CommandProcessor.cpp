@@ -259,6 +259,7 @@ vector<string> FileCommandProcessorAdapter::readCommand(State*& currentState)
         command = listOfCommands.at(0);
     } catch (exception& e) {
         cout << "No more commands to read" << endl;
+        return {};
     }
     listOfCommands.erase(listOfCommands.begin());
 

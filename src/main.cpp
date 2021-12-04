@@ -5,7 +5,7 @@
 
 using namespace std;
 
-extern void riskGameDriver(); // driver for A2 P3
+extern void riskGameDriver(string filename = ""); // driver for A2 P3
 
 int main(int, char **)
 {
@@ -20,7 +20,7 @@ int main(int, char **)
     /* *************************************** */
 
 
-   riskGameDriver();
+   riskGameDriver("../debug.txt");
 
 
 }

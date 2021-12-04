@@ -178,6 +178,8 @@ public:
     void initStates();
     void cleanup();
     void logWinners(Player* player, string map, int game);
+
+    bool validateTournamentCommand(Command*, int, int, vector<string>, vector<string>);
 };
 
 class StartupPhase
