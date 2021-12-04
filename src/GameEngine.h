@@ -29,8 +29,8 @@ enum section
     issueorder,
     execorder,
     issueOrderFromPlayer, // debugger mode in Player class
-    fromOrder, // debugger mode in Order class
-    strategyDriver, // demo for strategies
+    fromOrder,            // debugger mode in Order class
+    strategyDriver,       // demo for strategies
 };
 
 class State
@@ -178,9 +178,9 @@ public:
 
     void initStates();
     void cleanup();
-    void logWinners(Player* player, string map, int game);
+    void logWinners(Player *player, string map, int game);
 
-    bool validateTournamentCommand(Command*, int, int, vector<string>, vector<string>);
+    bool validateTournamentCommand(Command *, int, int, vector<string>, vector<string>);
 };
 
 class StartupPhase

@@ -48,6 +48,8 @@ void dprint(string message, section option)
 }
 
 // debugger which stops execution of code at inserted point
+extern bool stopAfterEachTurn; // defined in main.cpp
+
 void pressToContinueWith(string msg)
 {
     string x;
@@ -55,14 +57,27 @@ void pressToContinueWith(string msg)
     cin >> x;
 }
 
-/* Generating strategies tests => use a small map (fakecountry.map) */
+/*   **********************************************************************************  */
+/*   The following variables and functions are used to test the strategues in main.cpp   */
+/*   **********************************************************************************  */
 // 1) Cheater and Normal player
 // 2) Benevolent players (2)
-// 3) Neutral player and Cheater 
+// 3) Neutral player and Cheater
 // 4) Aggressive player and Benevolent player
 // 5) Human player and Benevolent player
 
+extern bool testingStrategyMode; // main.cpp
 
+extern PlayerStrategy * arrayOfStrategies[2]; // main.cpp
+
+void testStrategies(PlayerStrategy * twoPlayerStrats[2], GameEngine * engine) // pass array of pointers to strategies
+{
+    for (int i = 0; i < 2; ++i)
+    {
+        twoPlayerStrats[i]->setPlayer(engine->getPlayers().at(i));
+        engine->getPlayers().at(i)->setPlayerStrategy(twoPlayerStrats[i]);
+    }
+}
 
 /* ************************************************************************** */
 /*              State, Transition, GameEngine basic functions                 */
@@ -504,21 +519,23 @@ void GameEngine::preStartup()
 {
     Command *command;
 
+    // do
+    // {
+    //     command = commandProcessor->getCommand(currentState);
+    // } while (command->getArgs().empty() || !doTransition(command->getCommandName()));
+
+    // if (currentState->nameState == "tournament")
+    // {
+    //     enterTournamentMode(command);
+    // }
+    // if (currentState->nameState == "tournament" && !isTournamentMode)
+    // {
+    //     cout << "Invalid tournament arguments, try again!" << endl;
+    //     // TODO: fix states
+    // }
+
     do
     {
-        command = commandProcessor->getCommand(currentState);
-    } while (command->getArgs().empty() || !doTransition(command->getCommandName()));
-
-    if (currentState->nameState == "tournament")
-    {
-        enterTournamentMode(command);
-    }
-    if (currentState->nameState == "tournament" && !isTournamentMode) {
-        cout << "Invalid tournament arguments, try again!" << endl;
-        //TODO: fix states
-    }
-
-    do {
         command = commandProcessor->getCommand(currentState);
     } while (command->getArgs().empty() || !doTransition(command->getCommandName()));
     // starting with loadmap
@@ -712,13 +729,22 @@ void StartupPhase::startup()
             cout << *p << endl;
         }
 
-       dprint("= Debugging before gamestart: Hardcoding player strategies\n", section::startup);
-       // Hardcoding the second player to be whatever strategy we want to test
-       eng->getPlayers().at(1)->setPlayerStrategy(new NeutralPlayerStrategy(eng->getPlayers().at(1)));
-       for (auto player : eng->getPlayers())
-       {
-           dprint("\t" + player->getName() + " uses strat " + player->getPlayerStrategy()->strategyName(), section::startup);
-       }
+        dprint("= Debugging before gamestart: Hardcoding player strategies\n", section::startup);
+
+        // Hardcoding the second player to be whatever strategy we want to test
+        // eng->getPlayers().at(1)->setPlayerStrategy(new NeutralPlayerStrategy(eng->getPlayers().at(1)));
+
+        if (testingStrategyMode)
+        {
+            testStrategies(arrayOfStrategies, eng);
+        }
+            
+
+        for (auto player : eng->getPlayers())
+        {
+            dprint("\t" + player->getName() + " uses strat " + player->getPlayerStrategy()->strategyName(), section::all);
+        }
+        cout << endl << endl;
     }
     else
     {
@@ -847,7 +873,6 @@ Order *createOrderFromCard(Card *card, Player *player, Territory *territorySrc, 
     return nullptr;
 }
 
-
 void GameEngine::issueOrdersPhase()
 {
     // For turn 2 and on, need to reset player's queues and flags
@@ -885,12 +910,12 @@ void GameEngine::issueOrdersPhase()
         for (int i = 0; i < currentPlayers.size(); ++i)
         {
             dprint("\nGameEngine:: Player " + currentPlayers.at(i)->getName() + " is now entering playerIssueOrder method.\n", section::issueorder);
-            
+
             // Debugging neutral player after it has been attacked in last turn
             if (currentPlayers.at(i)->getPlayerStrategy()->strategyName() == "Neutral strategy")
             {
                 cout << "Player " << currentPlayers.at(i)->getName() << " has strat " << currentPlayers.at(i)->getPlayerStrategy()->strategyName()
-                    << " . Flag hasBeenAttacked is set to " << to_string(dynamic_cast<NeutralPlayerStrategy *>(currentPlayers.at(i)->getPlayerStrategy())->getHasBeenAttacked()) << endl;
+                     << " . Flag hasBeenAttacked is set to " << to_string(dynamic_cast<NeutralPlayerStrategy *>(currentPlayers.at(i)->getPlayerStrategy())->getHasBeenAttacked()) << endl;
             }
             currentPlayers.at(i)->issueOrder();
         }
@@ -999,7 +1024,6 @@ void riskGameDriver(string filename = "")
         if (engine->getCurrentStateName() == "start")
         {
             pressToContinueWith("REPLAY");
-
         }
         else if (engine->getCurrentStateName() == "final")
         {
@@ -1090,7 +1114,8 @@ void GameEngine::mainGameLoop()
                 }
                 cout << ")" << endl;
             }
-            if (isTournamentMode) {
+            if (isTournamentMode)
+            {
                 cout << "Results were logged to a file." << endl;
                 doTransition("quit");
                 return;
@@ -1121,12 +1146,15 @@ void GameEngine::mainGameLoop()
 
         numOfTurns++;
         string endOfTurnMsg = "End of turn " + to_string(numOfTurns) + "\n";
-        for (Player* p : currentPlayers) {
+        for (Player *p : currentPlayers)
+        {
             p->removeAllNegotiation();
         }
         dprint(endOfTurnMsg, section::mainGameLoop);
-        if (!isTournamentMode) {
-            pressToContinueWith("TURN"); // Stops after each turn -> useful to debug and for demo 
+        if (!isTournamentMode)
+        {
+            if (stopAfterEachTurn)
+                pressToContinueWith("TURN"); // Stops after each turn -> useful to debug and for demo
         }
     }
 
@@ -1140,80 +1168,114 @@ void GameEngine::mainGameLoop()
 /*    (๑•̀ᗝ•́)૭               (ง°ل͜°)ง       */
 /* **************************************** */
 
-int GameEngine::getMaxTurn() {
+int GameEngine::getMaxTurn()
+{
     return maxTurn;
 }
-void GameEngine::setMaxTurn(int turn) {
+void GameEngine::setMaxTurn(int turn)
+{
     maxTurn = turn;
 }
 
-PlayerStrategy* getPlayerStrategy(string pType, Player* p) {
-    std::for_each(pType.begin(), pType.end(), [](char & c) {
-        c = ::tolower(c);
-    });
-    if (pType == "aggressive") {
+PlayerStrategy *getPlayerStrategy(string pType, Player *p)
+{
+    std::for_each(pType.begin(), pType.end(), [](char &c)
+                  { c = ::tolower(c); });
+    if (pType == "aggressive")
+    {
         return new AggressivePlayerStrategy(p);
-    } else if (pType == "benevolent") {
+    }
+    else if (pType == "benevolent")
+    {
         return new BenevolentPlayerStrategy(p);
-    } else if (pType == "cheater") {
+    }
+    else if (pType == "cheater")
+    {
         return new CheaterPlayerStrategy(p);
-    } else if (pType == "human") {
+    }
+    else if (pType == "human")
+    {
         return new HumanPlayerStrategy(p);
-    } else if (pType == "neutral") {
+    }
+    else if (pType == "neutral")
+    {
         return new NeutralPlayerStrategy(p);
-    } else {
+    }
+    else
+    {
         return new NormalPlayerStrategy(p);
     }
 }
 
-void GameEngine::logWinners(Player* player, string map, int game) {
+void GameEngine::logWinners(Player *player, string map, int game)
+{
     std::ofstream logFile;
     logFile.open("../tournament_results.txt", std::ios_base::app);
-    if (player == nullptr) {
+    if (player == nullptr)
+    {
         logFile << "Map: " << map << " | Game: " << game << " | Winner: Draw" << endl;
-    } else {
+    }
+    else
+    {
         logFile << "Map: " << map << " | Game: " << game << " | Winner: " << player->getName() << endl;
     }
     logFile.close();
 }
 
 // Format: tournament -M <listofmapfiles> -P <listofplayerstrategies> -G <numberofgames> -D <maxnumberofturns>
-void GameEngine::enterTournamentMode(Command *command) {
+void GameEngine::enterTournamentMode(Command *command)
+{
     vector<string> args = command->getArgs();
     vector<string> mapFileNames = {};
     vector<string> playerTypes = {};
     int numOfGames = 0;
-    try {
-        for (int i = 0; i < command->getArgs().size();) {
+    try
+    {
+        for (int i = 0; i < command->getArgs().size();)
+        {
             // extract args
-            if (args[i] == "-M") {
+            if (args[i] == "-M")
+            {
                 // while we haven't reached another -
                 i++;
-                while (args[i].find('-') == std::string::npos) {
+                while (args[i].find('-') == std::string::npos)
+                {
                     mapFileNames.push_back(args[i]);
                     i++;
                 }
-            } else if (args[i] == "-P") {
+            }
+            else if (args[i] == "-P")
+            {
                 // while we haven't reached another -
                 i++;
-                while (args[i].find('-') == std::string::npos) {
+                while (args[i].find('-') == std::string::npos)
+                {
                     playerTypes.push_back(args[i]);
                     i++;
                 }
-            } else if (args[i] == "-G") {
+            }
+            else if (args[i] == "-G")
+            {
                 numOfGames = std::stoi(args[++i]);
-            } else if (args[i] == "-D") {
+            }
+            else if (args[i] == "-D")
+            {
                 setMaxTurn(std::stoi(args[++i]));
-            } else {
+            }
+            else
+            {
                 i++;
             }
         }
-    } catch (exception &e) {
+    }
+    catch (exception &e)
+    {
         cout << e.what();
         exit(0);
     }
 
-    if (!validateTournamentCommand(command, maxTurn, numOfGames, playerTypes, mapFileNames)) {
+    if (!validateTournamentCommand(command, maxTurn, numOfGames, playerTypes, mapFileNames))
+    {
         return;
     }
 
@@ -1224,11 +1286,13 @@ void GameEngine::enterTournamentMode(Command *command) {
     StartupPhase sp;
     sp.setGameEng(this);
 
-    for (int i = 0; i < mapFileNames.size(); i++) { //loops over all the maps first
-        for (int j = 0; j < numOfGames; j++) {  //then number of games
-            cout << "Starting game: " << j+1 << endl;
+    for (int i = 0; i < mapFileNames.size(); i++)
+    { // loops over all the maps first
+        for (int j = 0; j < numOfGames; j++)
+        { // then number of games
+            cout << "Starting game: " << j + 1 << endl;
             string path = "../maps/";
-            //load map from each indexes of mapFileNames vector
+            // load map from each indexes of mapFileNames vector
             cout << "loading map: " << mapFileNames[i] << endl;
             string fpath = path.append(mapFileNames[i]);
             Map x1 = *mapLoader->loadMap(fpath);
@@ -1236,7 +1300,8 @@ void GameEngine::enterTournamentMode(Command *command) {
             setMap(map1);
 
             // creating players
-            for (string pType: playerTypes) {
+            for (string pType : playerTypes)
+            {
                 Player *p = new Player();
                 PlayerStrategy *ps = getPlayerStrategy(pType, p);
                 p->setPlayerStrategy(ps);
@@ -1255,7 +1320,8 @@ void GameEngine::enterTournamentMode(Command *command) {
     exit(0);
 }
 
-void GameEngine::cleanup() {
+void GameEngine::cleanup()
+{
     this->currentPlayers.clear();
     delete currentState;
     this->currentState = new State("start");
@@ -1268,16 +1334,20 @@ void GameEngine::cleanup() {
 }
 
 bool GameEngine::validateTournamentCommand(Command *pCommand, int maxTurn, int numOfGames, vector<string> playerTypes,
-                                           vector<string> mapFileNames) {
-    //validate max and min
-    if (maxTurn < 10 || maxTurn > 50 || numOfGames < 1 || numOfGames > 5) {
+                                           vector<string> mapFileNames)
+{
+    // validate max and min
+    if (maxTurn < 10 || maxTurn > 50 || numOfGames < 1 || numOfGames > 5)
+    {
         cout << "G has to be 1 to 5 games and D has to be 10 to 50 maximum\n"
-                "number of turns for each game." << endl;
+                "number of turns for each game."
+             << endl;
         return false;
     }
 
-    //validate map and players
-    if (playerTypes.empty() && mapFileNames.empty()) {
+    // validate map and players
+    if (playerTypes.empty() && mapFileNames.empty())
+    {
         cout << "Check that your maps and players are entered." << endl;
         return false;
     }
