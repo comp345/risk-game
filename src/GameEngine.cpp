@@ -1138,7 +1138,7 @@ PlayerStrategy* getPlayerStrategy(string pType, Player* p) {
     } else if (pType == "cheater") {
         return new CheaterPlayerStrategy(p);
     } else if (pType == "human") {
-        return new NormalPlayerStrategy(p);
+        return new HumanPlayerStrategy(p);
     } else if (pType == "neutral") {
         return new NeutralPlayerStrategy(p);
     } else {

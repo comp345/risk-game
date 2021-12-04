@@ -1,2 +1,12 @@
+Map: france.map | Game: 1 | Winner: aggressive
+Map: france.map | Game: 2 | Winner: aggressive
+Map: Hawaii.map | Game: 1 | Winner: aggressive
+Map: Hawaii.map | Game: 2 | Winner: aggressive
 Map: france.map | Game: 1 | Winner: cheater
-Map: france.map | Game: 1 | Winner: cheater
+Map: france.map | Game: 2 | Winner: cheater
+Map: Hawaii.map | Game: 1 | Winner: cheater
+Map: Hawaii.map | Game: 2 | Winner: cheater
+Map: france.map | Game: 1 | Winner: Draw
+Map: france.map | Game: 2 | Winner: Draw
+Map: Hawaii.map | Game: 1 | Winner: Draw
+Map: Hawaii.map | Game: 2 | Winner: Draw
