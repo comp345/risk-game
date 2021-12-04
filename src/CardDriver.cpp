@@ -52,15 +52,6 @@ void testCard()
     cin >> i;
 }
 
-// Driver that test creating Orders from cards
-void testCardToOrder()
-{
-    // Instantiate players, territories
-
-    // TODO: Test that virtual inheritance is working on subcard --> card, suborder
-    
-}
-
 // int main()
 // {
 //     //    testCard();

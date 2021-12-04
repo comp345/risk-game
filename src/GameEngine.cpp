@@ -513,7 +513,14 @@ void GameEngine::preStartup()
     {
         enterTournamentMode(command);
     }
+    if (currentState->nameState == "tournament" && !isTournamentMode) {
+        cout << "Invalid tournament arguments, try again!" << endl;
+        //TODO: fix states
+    }
 
+    do {
+        command = commandProcessor->getCommand(currentState);
+    } while (command->getArgs().empty() || !doTransition(command->getCommandName()));
     // starting with loadmap
     string path = "../maps/";
     MapLoader *mapLoader = new MapLoader();
@@ -608,8 +615,6 @@ StartupPhase::StartupPhase(const StartupPhase &sp)
 
 StartupPhase::~StartupPhase()
 {
-    // TODO: missing destructor
-    // delete eng;
 }
 
 void StartupPhase::operator=(const StartupPhase &sp)
@@ -976,13 +981,13 @@ void GameEngine::executeOrdersPhase()
 /* ***************************************************************************************************************************** */
 
 // Rewriting the mainLoop test as a free function
-void riskGameDriver()
+void riskGameDriver(string filename = "")
 {
     bool stillPlaying = true;
 
     while (stillPlaying)
     {
-        GameEngine *engine = new GameEngine(); // need to re-instantiate engine after each game (else, segmentation fault error... badly defined GameEngine Constructors?)
+        GameEngine *engine = new GameEngine(filename); // need to re-instantiate engine after each game (else, segmentation fault error... badly defined GameEngine Constructors?)
 
         dprint("Debug: Entering StartUp phase", section::all);
         engine->preStartup();
@@ -1143,6 +1148,9 @@ void GameEngine::setMaxTurn(int turn) {
 }
 
 PlayerStrategy* getPlayerStrategy(string pType, Player* p) {
+    std::for_each(pType.begin(), pType.end(), [](char & c) {
+        c = ::tolower(c);
+    });
     if (pType == "aggressive") {
         return new AggressivePlayerStrategy(p);
     } else if (pType == "benevolent") {
@@ -1171,7 +1179,6 @@ void GameEngine::logWinners(Player* player, string map, int game) {
 
 // Format: tournament -M <listofmapfiles> -P <listofplayerstrategies> -G <numberofgames> -D <maxnumberofturns>
 void GameEngine::enterTournamentMode(Command *command) {
-    isTournamentMode = true;
     vector<string> args = command->getArgs();
     vector<string> mapFileNames = {};
     vector<string> playerTypes = {};
@@ -1205,6 +1212,13 @@ void GameEngine::enterTournamentMode(Command *command) {
         cout << e.what();
         exit(0);
     }
+
+    if (!validateTournamentCommand(command, maxTurn, numOfGames, playerTypes, mapFileNames)) {
+        return;
+    }
+
+    isTournamentMode = true;
+
     MapLoader *mapLoader = new MapLoader();
 
     StartupPhase sp;
@@ -1251,4 +1265,21 @@ void GameEngine::cleanup() {
     delete map;
     map = new Map();
     eliminatedPlayers.clear();
+}
+
+bool GameEngine::validateTournamentCommand(Command *pCommand, int maxTurn, int numOfGames, vector<string> playerTypes,
+                                           vector<string> mapFileNames) {
+    //validate max and min
+    if (maxTurn < 10 || maxTurn > 50 || numOfGames < 1 || numOfGames > 5) {
+        cout << "G has to be 1 to 5 games and D has to be 10 to 50 maximum\n"
+                "number of turns for each game." << endl;
+        return false;
+    }
+
+    //validate map and players
+    if (playerTypes.empty() && mapFileNames.empty()) {
+        cout << "Check that your maps and players are entered." << endl;
+        return false;
+    }
+    return true;
 }

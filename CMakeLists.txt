@@ -16,7 +16,7 @@ src/CardDriver.cpp src/MapDriver.cpp src/main.cpp src/Orders.cpp src/Orders.h sr
 src/GameEngine.cpp src/GameEngine.h src/GameEngineDriver.cpp
 src/LoggingObserver.cpp src/LoggingObserver.h src/LoggingObserverDriver.cpp
 src/CommandProcessor.cpp src/CommandProcessor.h src/Player.cpp src/Player.h src/PlayerDriver.cpp 
-src/PlayerStrategies.cpp src/PlayerStrategies.h src/PlayerStrategiesDriver.cpp)
+src/PlayerStrategies.cpp src/PlayerStrategies.h)
 
 # Had to add to remove filesystem error -Alexander
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
