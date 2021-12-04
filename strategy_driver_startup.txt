@@ -2,3 +2,4 @@ loadmap fakecountry.map
 validatemap
 addplayer Alice
 addplayer Bob
+gamestart

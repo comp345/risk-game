@@ -24,8 +24,8 @@ bool stopAfterEachTurn = true;
     4) Aggressive player and Benevolent player -> show Aggressive player prioritizing strong territories (own and enemy)
     5) Human player and Benevolent player
 */
-// PlayerStrategy * arrayOfStrategies[2] = {new CheaterPlayerStrategy(new Player), new NormalPlayerStrategy(new Player)};
-PlayerStrategy * arrayOfStrategies[2] = {new BenevolentPlayerStrategy(new Player), new BenevolentPlayerStrategy(new Player)};
+PlayerStrategy * arrayOfStrategies[2] = {new CheaterPlayerStrategy(new Player), new NormalPlayerStrategy(new Player)};
+// PlayerStrategy * arrayOfStrategies[2] = {new BenevolentPlayerStrategy(new Player), new BenevolentPlayerStrategy(new Player)};
 // PlayerStrategy * arrayOfStrategies[2] = {new NeutralPlayerStrategy(new Player), new NormalPlayerStrategy(new Player)};
 // PlayerStrategy * arrayOfStrategies[2] = {new AggressivePlayerStrategy(new Player), new BenevolentPlayerStrategy(new Player)};
 // PlayerStrategy * arrayOfStrategies[2] = {new HumanPlayerStrategy(new Player), new BenevolentPlayerStrategy(new Player)};
@@ -46,7 +46,8 @@ int main(int, char **)
     /* *************************************** */
 
 
-    riskGameDriver();
+    riskGameDriver("../strategy_driver_startup.txt"); // Auto run with file adapter
+    // riskGameDriver();
 
 
 }
