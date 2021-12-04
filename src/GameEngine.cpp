@@ -256,6 +256,9 @@ void GameEngine::initStates()
     // Add transitions to the states
     startState->addTransition(loadmapTransition);
     startState->addTransition(tournamentTransition);
+    tournamentState->addTransition(gamestart); //if tournament is valid, go to gamestart
+    tournamentState->addTransition(tournamentTransition); //if tournament is invalid, try again
+    tournamentState->addTransition(loadmapTransition); //if tournament is invalid, go to loadmap
     maploadedState->addTransition(loadmapTransition);
     maploadedState->addTransition(validatemapTransition);
     mapvalidatedState->addTransition(addplayerTransition);
@@ -519,25 +522,15 @@ void GameEngine::preStartup()
 {
     Command *command;
 
-    // do
-    // {
-    //     command = commandProcessor->getCommand(currentState);
-    // } while (command->getArgs().empty() || !doTransition(command->getCommandName()));
-
-    // if (currentState->nameState == "tournament")
-    // {
-    //     enterTournamentMode(command);
-    // }
-    // if (currentState->nameState == "tournament" && !isTournamentMode)
-    // {
-    //     cout << "Invalid tournament arguments, try again!" << endl;
-    //     // TODO: fix states
-    // }
-
-    do
-    {
+    do {
         command = commandProcessor->getCommand(currentState);
-    } while (command->getArgs().empty() || !doTransition(command->getCommandName()));
+    } while (command->getArgs().empty() || !doTransition(command->getCommandName()) ||
+            (currentState->nameState == "tournament" && !validateTournamentCommand(command)));
+
+    if (currentState->nameState == "tournament") {
+        enterTournamentMode(command);
+    }
+
     // starting with loadmap
     string path = "../maps/";
     MapLoader *mapLoader = new MapLoader();
@@ -1274,11 +1267,6 @@ void GameEngine::enterTournamentMode(Command *command)
         exit(0);
     }
 
-    if (!validateTournamentCommand(command, maxTurn, numOfGames, playerTypes, mapFileNames))
-    {
-        return;
-    }
-
     isTournamentMode = true;
 
     MapLoader *mapLoader = new MapLoader();
@@ -1309,7 +1297,7 @@ void GameEngine::enterTournamentMode(Command *command)
                 p->setReinforcementPool(5);
                 currentPlayers.push_back(p);
             }
-
+            doTransition("gamestart");
             sp.startup();
             mainGameLoop();
             Player *winner = hasWinner();
@@ -1333,15 +1321,45 @@ void GameEngine::cleanup()
     eliminatedPlayers.clear();
 }
 
-bool GameEngine::validateTournamentCommand(Command *pCommand, int maxTurn, int numOfGames, vector<string> playerTypes,
-                                           vector<string> mapFileNames)
-{
-    // validate max and min
-    if (maxTurn < 10 || maxTurn > 50 || numOfGames < 1 || numOfGames > 5)
-    {
-        cout << "G has to be 1 to 5 games and D has to be 10 to 50 maximum\n"
-                "number of turns for each game."
-             << endl;
+bool GameEngine::validateTournamentCommand(Command *command) {
+
+    vector<string> args = command->getArgs();
+    vector<string> mapFileNames = {};
+    vector<string> playerTypes = {};
+    int numOfGames = 0;
+    try {
+        for (int i = 0; i < command->getArgs().size();) {
+            // extract args
+            if (args[i] == "-M") {
+                // while we haven't reached another -
+                i++;
+                while (args[i].find('-') == std::string::npos) {
+                    mapFileNames.push_back(args[i]);
+                    i++;
+                }
+            } else if (args[i] == "-P") {
+                // while we haven't reached another -
+                i++;
+                while (args[i].find('-') == std::string::npos) {
+                    playerTypes.push_back(args[i]);
+                    i++;
+                }
+            } else if (args[i] == "-G") {
+                numOfGames = std::stoi(args[++i]);
+            } else if (args[i] == "-D") {
+                setMaxTurn(std::stoi(args[++i]));
+            } else {
+                i++;
+            }
+        }
+    } catch (exception &e) {
+        return false;
+    }
+
+    //validate max and min
+    if (maxTurn < 10 || maxTurn > 50 || numOfGames < 1 || numOfGames > 5) {
+        cout << "G has to be 1 to 5 games and D has to be 10 to 50 maximum "
+                "number of turns for each game." << endl;
         return false;
     }
 
