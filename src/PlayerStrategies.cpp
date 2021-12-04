@@ -160,34 +160,7 @@ void NormalPlayerStrategy::issueOrder()
 }
 vector<Territory *> NormalPlayerStrategy::toAttack()
 {
-    vector<Territory *> attackableTerritories = vector<Territory *>();
-
-    // Get the players territories
-    for (Territory *territory : getPlayer()->getTerritories())
-    {
-        // add them to the attackable Territories if they have an army on them
-        if (territory->getNumberOfArmies() > 0)
-            attackableTerritories.push_back(territory);
-    }
-
-    vector<Territory *> neighbourTerritories = vector<Territory *>();
-    for (Territory *territory : attackableTerritories)
-    {
-
-        // cout << "the neighbours of " << territory->getName() << " are as follows:\n";
-        for (Territory *neighbour : territory->getNeighbors())
-        {
-            // cout << neighbour->getName() << ", owned by " << neighbour->getOwner()->getName() <<"\n";
-
-            // If we haven't already seen the territory, add it to the list.
-            if (!count(neighbourTerritories.begin(), neighbourTerritories.end(), neighbour))
-
-                // ALLOW ADVANCE ON OWN TERRITORY AND OPPONENT TERRITORY
-                neighbourTerritories.push_back(neighbour);
-        }
-    }
-
-    return neighbourTerritories;
+    return getAttackableTerritories(getPlayer());
 }
 vector<Territory *> NormalPlayerStrategy::toDefend()
 {
@@ -543,11 +516,12 @@ void HumanPlayerStrategy::issueOrder() {
         return void();
     }
 
-    if (!getAttackableTerritories(issuingPlayer).empty()) {
+    vector<Territory*> attackableTerritories = getAttackableTerritories(issuingPlayer);
+    if (!attackableTerritories.empty()) {
         cout << "Enter order of territories to attack\n";
-        for (int i = 0; i < getAttackableTerritories(issuingPlayer).size(); i++)
+        for (int i = 0; i < attackableTerritories.size(); i++)
         {
-            cout << (i+1) << ":" << getAttackableTerritories(issuingPlayer)[i]->getName() << endl;
+            cout << (i+1) << ":" << attackableTerritories[i]->getName() << endl;
         }
         cout << "\n";
         getline(cin, attackInput);
@@ -631,9 +605,10 @@ vector<Territory *> HumanPlayerStrategy::toAttack() {
     toAttackIndices.push_back(stoi(temp));
 
     vector<Territory *> toAttackList = {};
+    vector<Territory*> attackableTerritories = getAttackableTerritories(this->getPlayer());
     for (auto i : toAttackIndices) {
-        cout << "\nYou selected to attack: " << getAttackableTerritories(this->getPlayer())[i - 1]->getName();
-        toAttackList.push_back(getAttackableTerritories(this->getPlayer())[i - 1]);
+        cout << "\nYou selected to attack: " << attackableTerritories[i - 1]->getName();
+        toAttackList.push_back(attackableTerritories[i - 1]);
     }
     return toAttackList;
 }
