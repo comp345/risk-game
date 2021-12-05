@@ -527,13 +527,18 @@ void HumanPlayerStrategy::issueOrder() {
         getline(cin, attackInput);
     }
 
-    cout << "\n\nEnter order of territories to defend\n";
+    cout << "\n\nEnter order of territories to defend in format: territory_id armycount\n";
     for (int i = 0; i < getPlayer()->getTerritories().size(); i++) {
         cout << (i+1) << ":" << getPlayer()->getTerritories()[i]->getName() << endl;
     }
+    cout << "Enter x when you're done with adding territories and their army count." << endl;
     cout << "\n";
-    getline(cin, defendInput);
-
+    string input;
+    getline(cin, input);
+    while(input != "x") {
+        defendInput.push_back(input);
+        getline(cin, input);
+    }
 
     // (1) Deploy: until reinforc pool == 0
     if (issuingPlayer->getReinforcementPool() > 0)
@@ -550,8 +555,10 @@ void HumanPlayerStrategy::issueOrder() {
         Territory *territoryTarget = issuingPlayer->getPriorityDefending().top();
 
         // Create Deploy -> decrease reinforcement
-        Deploy *deploy = new Deploy(1, issuingPlayer, territoryTarget);
-        issuingPlayer->setReinforcementPool(issuingPlayer->getReinforcementPool() - 1);
+        Deploy *deploy = new Deploy(armyCount.at(0), issuingPlayer, territoryTarget);
+        issuingPlayer->setReinforcementPool(issuingPlayer->getReinforcementPool() - armyCount.at(0));
+        armyCount.erase(armyCount.begin());
+
 
         issuingPlayer->issueOrder(deploy);
         issuingPlayer->popPriorityDefend();
@@ -618,15 +625,19 @@ vector<Territory *> HumanPlayerStrategy::toDefend() {
     }
     string temp;
     vector<int> toDefendIndices;
-    for (int i = 0; i < defendInput.length(); ++i) {
-        if (defendInput[i] == ' ') {
-            toDefendIndices.push_back(stoi(temp));
-            temp = "";
-        } else {
-            temp.push_back(defendInput[i]);
+    for (int i = 0; i < defendInput.size(); ++i) {
+        temp = "";
+        for (char const &c: defendInput[i]) {
+            if (c == ' ') {
+                toDefendIndices.push_back(stoi(temp));
+                temp = "";
+            } else {
+                temp.push_back(c);
+            }
         }
+        cout << "Armies: " << temp << endl;
+        armyCount.push_back(stoi(temp));
     }
-    toDefendIndices.push_back(stoi(temp));
 
     vector<Territory *> toDefendList = {};
     for (auto i : toDefendIndices) {

@@ -89,7 +89,8 @@ public:
 class HumanPlayerStrategy: public PlayerStrategy {
 private:
     string attackInput;
-    string defendInput;
+    vector<string> defendInput;
+    vector<int> armyCount;
 public:
     HumanPlayerStrategy(Player* p);
     ~HumanPlayerStrategy();

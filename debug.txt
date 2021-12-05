@@ -1,1 +1,1 @@
-tournament -M france.map -P aggressive Aggressive -G 2 -D 11
+tournament -M fakecountry.map -P aggressive human -G 2 -D 11

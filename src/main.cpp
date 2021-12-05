@@ -52,5 +52,5 @@ int main(int, char **)
     /*         A3 P2 : Tournament mo  de       */
     /* *************************************** */
 
-    // riskGameDriver("../debug");
+     riskGameDriver("../debug.txt");
 }
