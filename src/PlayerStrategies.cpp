@@ -556,9 +556,9 @@ void HumanPlayerStrategy::issueOrder() {
 
         // Create Deploy -> decrease reinforcement
         Deploy *deploy = new Deploy(armyCount.at(0), issuingPlayer, territoryTarget);
+        issuingPlayer->setReinforcementPool(issuingPlayer->getReinforcementPool() - armyCount.at(0));
         armyCount.erase(armyCount.begin());
 
-        issuingPlayer->setReinforcementPool(issuingPlayer->getReinforcementPool() - 1);
 
         issuingPlayer->issueOrder(deploy);
         issuingPlayer->popPriorityDefend();
