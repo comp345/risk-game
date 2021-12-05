@@ -527,7 +527,7 @@ void HumanPlayerStrategy::issueOrder() {
         getline(cin, attackInput);
     }
 
-    cout << "\n\nEnter order of territories to defend\n";
+    cout << "\n\nEnter order of territories to defend in format: territory_id armycount\n";
     for (int i = 0; i < getPlayer()->getTerritories().size(); i++) {
         cout << (i+1) << ":" << getPlayer()->getTerritories()[i]->getName() << endl;
     }
