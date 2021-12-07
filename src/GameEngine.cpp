@@ -1364,7 +1364,7 @@ bool GameEngine::validateTournamentCommand(Command *command) {
     }
 
     // validate map and players
-    if (playerTypes.empty() && mapFileNames.empty())
+    if (playerTypes.empty() || mapFileNames.empty())
     {
         cout << "Check that your maps and players are entered." << endl;
         return false;
