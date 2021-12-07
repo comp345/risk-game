@@ -67,7 +67,6 @@ vector<Territory*> getAttackableTerritories(Player* p) {
     vector<Territory *> neighbourTerritories;
     for (Territory *territory : territoriesWithArmies)
     {
-         cout << "the neighbours of " << territory->getName() << " are as follows:\n";
         for (Territory *neighbour : territory->getNeighbors())
         {
             // If we haven't already seen the territory, add it to the list.
@@ -554,9 +553,16 @@ void HumanPlayerStrategy::issueOrder() {
 
         Territory *territoryTarget = issuingPlayer->getPriorityDefending().top();
 
+        Deploy *deploy;
         // Create Deploy -> decrease reinforcement
-        Deploy *deploy = new Deploy(armyCount.at(0), issuingPlayer, territoryTarget);
-        issuingPlayer->setReinforcementPool(issuingPlayer->getReinforcementPool() - armyCount.at(0));
+        if (issuingPlayer->getReinforcementPool() > armyCount.at(0)) {
+            // Create Deploy -> decrease reinforcement
+            deploy = new Deploy(armyCount.at(0), issuingPlayer, territoryTarget);
+            issuingPlayer->setReinforcementPool(issuingPlayer->getReinforcementPool());
+        } else {
+            deploy = new Deploy(issuingPlayer->getReinforcementPool(), issuingPlayer, territoryTarget);
+            issuingPlayer->setReinforcementPool(0);
+        }
         armyCount.erase(armyCount.begin());
 
 
