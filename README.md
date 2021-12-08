@@ -1,27 +1,7 @@
-Team:
-Alexander Abrantes Figueiras, 40007320
-Gurinder Dheer, 40029441
-Rahimuz Zaman, 27771789
-Laila Chamma'a, 40107470
-Noah-James Dinh, 40128079
-
 # risk-game
-On Windows:
-Video for path variables:
-https://www.youtube.com/watch?v=VtEstN5gOts
-I dont recommend installing it where he does, but the idea is the same for everything else
+[Warzone](https://www.warzone.com/) game on console implemented using C++. Used patterns such as `Strategy, Adapter, Observer` to implement different features.
 
-
-If building isn't working:
-https://github.com/microsoft/vscode-cmake-tools/issues/880#issuecomment-598996051
-
-You'll have to make sure that you have the correct paths to where your cmake and gcc are!!
-
-
-On mac:
-Download gcc from homebrew, also cmake from the website
-
-
+## Setup ✨
 How to Run the project:
 1) Git clone the repo
 2) Install tools (GCC/CMAKE & Update path variables)
@@ -42,3 +22,13 @@ then
 (path example to switch compiler for macOS)
 usr/local/bin/gcc-<version>
 *it's also possible to configure the compiler in vscode
+
+    
+## Team 🦄
+| Name | Github Username |
+|---|---|
+| Alexander Abrantes Figueiras | [Figgueh](https://github.com/Figgueh) |
+| Noah-James Dinh | [eyeshield2110](https://github.com/eyeshield2110) |
+| Laila Chamma'a | [laila-chammaa](https://github.com/laila-chammaa) |
+| Gurinder Dheer | [GD-Dheer](https://github.com/GD-Dheer) |
+| Rahimuz Zaman | [ratulkai93](https://github.com/ratulkai93) |
